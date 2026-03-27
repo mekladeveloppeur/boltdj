@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BoltDj — Restaurant</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gr:#1D9E75;--gr-l:#E1F5EE;--gr-d:#085041;--side:200px;
+--bg:#F7F7F5;--card:#fff;--border:#E5E5E2;--text:#1A1A1A;--muted:#888}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+.auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px}
+.auth-logo{font-size:24px;font-weight:700;color:var(--gr);margin-bottom:6px}
+.auth-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);color:var(--text);outline:none;font-family:inherit}
+.field input:focus{border-color:var(--gr)}
+.field textarea{resize:vertical;min-height:70px}
+.btn{padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:500;transition:all .15s}
+.btn:hover{background:var(--bg)}
+.btn-gr{background:var(--gr);color:#fff;border-color:var(--gr)}.btn-gr:hover{background:var(--gr-d)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{background:#FFEBEE;color:#C62828;border-color:#FFCDD2}
+.btn-warn{background:#FFF3E0;color:#E65100;border-color:#FFE0B2}
+.btn-blue{background:#E3F2FD;color:#0D47A1;border-color:#BBDEFB}
+.btn-block{width:100%;padding:12px;font-size:14px}
+.alert-err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+/* SHELL */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:var(--side);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100}
+.sb-logo{padding:16px 14px;border-bottom:1px solid var(--border)}
+.sb-brand{font-size:14px;font-weight:700;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-id{font-size:11px;color:var(--muted);margin-top:2px}
+.open-btn{display:flex;align-items:center;gap:6px;margin-top:10px;padding:7px 10px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;width:100%;transition:all .2s}
+.open-btn.open{background:var(--gr-l);color:var(--gr-d)}
+.open-btn.closed{background:#FFEBEE;color:#C62828}
+.open-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.open-btn.open .open-dot{background:var(--gr)}
+.open-btn.closed .open-dot{background:#D32F2F}
+.sb-nav{padding:10px 8px;flex:1}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;font-size:13px;color:var(--muted);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:500}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--gr-l);color:var(--gr-d)}
+.nav-ic{font-size:14px;width:16px;text-align:center}
+.nav-badge{margin-left:auto;background:#D32F2F;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.sb-foot{padding:10px 8px;border-top:1px solid var(--border)}
+.rest-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:var(--bg)}
+.rest-av{width:28px;height:28px;border-radius:8px;background:var(--gr-l);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.rv-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv-code{font-size:11px;color:var(--muted)}
+.main{margin-left:var(--side);flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.pg-title{font-size:16px;font-weight:600}
+.content{padding:22px;flex:1}
+.pane{display:none}.pane.active{display:block}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:700}
+/* ORDERS */
+.orders-grid{display:flex;flex-direction:column;gap:12px}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .2s}
+.order-card.new{border-color:var(--gr);border-width:2px}
+.order-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.order-id{font-size:14px;font-weight:600}
+.order-client{font-size:12px;color:var(--muted);margin-top:2px}
+.order-items-list{font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.7;background:var(--bg);border-radius:6px;padding:8px 10px}
+.order-footer{display:flex;justify-content:space-between;align-items:center}
+.order-total{font-size:15px;font-weight:700;color:var(--gr-d)}
+.order-acts{display:flex;gap:6px}
+.new-pulse{background:var(--gr);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px}
+.card-head{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.card-title{font-size:14px;font-weight:600}
+/* MENU */
+.menu-cat-head{padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.menu-cat-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.menu-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.menu-row:last-child{border-bottom:none}
+.menu-row:hover{background:var(--bg)}
+.m-emoji{font-size:26px;width:36px;text-align:center;flex-shrink:0}
+.m-info{flex:1;min-width:0}
+.m-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.m-desc{font-size:11px;color:var(--muted)}
+.m-price{font-size:13px;font-weight:700;color:var(--gr-d);margin-right:10px;white-space:nowrap}
+.toggle{position:relative;width:38px;height:22px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
+.toggle input:checked+.toggle-track{background:var(--gr)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
+.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
+.unavail-tag{font-size:10px;color:#C62828;margin-left:4px;font-weight:600}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.b-green{background:#E8F5E9;color:#1B5E20}.b-amber{background:#FFF3E0;color:#E65100}
+.b-red{background:#FFEBEE;color:#C62828}.b-blue{background:#E3F2FD;color:#0D47A1}.b-gray{background:var(--bg);color:var(--muted)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.d-green{background:#388E3C}.d-amber{background:#F57C00}.d-red{background:#D32F2F}
+/* STATS BARS */
+.stat-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.stat-bar-lbl{font-size:13px;flex-shrink:0;min-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-bar-track{flex:1;height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:4px;background:var(--gr);transition:width .5s}
+.stat-bar-val{font-size:12px;color:var(--muted);min-width:40px;text-align:right}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:14px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
+.modal-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card)}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.modal-body{padding:18px}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">🏪 BoltDj Partenaire</div>
+    <div class="auth-sub">Connectez-vous avec votre code restaurant</div>
+    <div id="auth-err" class="alert-err"></div>
+    <div style="background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--muted)">
+      💡 <strong>Démo:</strong> Code <code>REST001</code> · Mot de passe <code>Restaurant2026!</code>
+    </div>
+    <div class="field"><label>Code restaurant</label><input id="r-code" placeholder="Ex: REST001" style="text-transform:uppercase"></div>
+    <div class="field"><label>Mot de passe</label><input id="r-pwd" type="password" placeholder="••••••••"></div>
+    <button class="btn btn-gr btn-block" onclick="doLogin()">Se connecter</button>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="shell" class="shell" style="display:none">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-brand" id="sb-name">Mon restaurant</div>
+      <div class="sb-id" id="sb-code">CODE</div>
+      <button class="open-btn open" id="open-btn" onclick="toggleOpen()">
+        <span class="open-dot"></span><span id="open-lbl">Ouvert</span>
+      </button>
+    </div>
+    <div class="sb-nav">
+      <button class="nav-item active" onclick="showPane('commandes',this)"><span class="nav-ic">📦</span>Commandes<span class="nav-badge" id="new-badge" style="display:none">0</span></button>
+      <button class="nav-item" onclick="showPane('menu',this)"><span class="nav-ic">🍽️</span>Mon menu</button>
+      <button class="nav-item" onclick="showPane('stats',this)"><span class="nav-ic">📊</span>Statistiques</button>
+      <button class="nav-item" onclick="showPane('profil',this)"><span class="nav-ic">🏪</span>Mon profil</button>
+    </div>
+    <div class="sb-foot">
+      <div class="rest-pill">
+        <div class="rest-av" id="sb-emoji">🍽️</div>
+        <div style="min-width:0"><div class="rv-name" id="sb-name2">Restaurant</div><div class="rv-code" id="sb-quartier">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="pg-title" id="pg-title">Commandes</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="loadOrders()">↻ Actualiser</button>
+        <button class="btn btn-sm btn-gr" onclick="openAddItem()">+ Ajouter plat</button>
+        <button class="btn btn-sm btn-danger" onclick="logout()">Déconnexion</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- COMMANDES -->
+      <div class="pane active" id="pane-commandes">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-lbl">Nouvelles</div><div class="stat-val" id="c-new" style="color:var(--gr)">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">En préparation</div><div class="stat-val" id="c-prep" style="color:#E65100">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Livrées aujourd'hui</div><div class="stat-val" id="c-done">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Revenus du jour</div><div class="stat-val" id="c-rev" style="font-size:17px">0 FDJ</div></div>
+        </div>
+        <div id="orders-empty" style="text-align:center;padding:60px 20px;color:var(--muted);display:none">
+          <div style="font-size:40px;margin-bottom:12px">📭</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Aucune commande</div>
+          <div style="font-size:13px">Les nouvelles commandes apparaîtront ici</div>
+        </div>
+        <div class="orders-grid" id="orders-grid"></div>
+      </div>
+
+      <!-- MENU -->
+      <div class="pane" id="pane-menu">
+        <div id="menu-content"></div>
+      </div>
+
+      <!-- STATS -->
+      <div class="pane" id="pane-stats">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-lbl">Ce mois</div><div class="stat-val" id="st-mo">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px">commandes</div></div>
+          <div class="stat-card"><div class="stat-lbl">Revenus mois</div><div class="stat-val" id="st-rev" style="font-size:17px">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">En attente</div><div class="stat-val" id="st-pend" style="color:#D32F2F">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Note clients</div><div class="stat-val" id="st-rating">—</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Plats les plus commandés</span></div>
+          <div style="padding:16px" id="top-items">
+            <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Chargement...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFIL -->
+      <div class="pane" id="pane-profil">
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Informations</span><button class="btn btn-sm btn-gr" onclick="saveProfile()">Sauvegarder</button></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div class="field"><label>Nom du restaurant</label><input id="p-name"></div>
+              <div class="field"><label>Description</label><input id="p-desc"></div>
+              <div class="field"><label>Adresse</label><input id="p-addr"></div>
+              <div class="field"><label>Téléphone</label><input id="p-phone"></div>
+              <div class="field"><label>Délai livraison</label><input id="p-time"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Tarification</span></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div class="field"><label>Frais de livraison (FDJ)</label><input id="p-fee" type="number"></div>
+              <div class="field"><label>Commande minimum (FDJ)</label><input id="p-min" type="number"></div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px;font-size:12px;color:var(--muted)">
+                Ces informations sont visibles par les clients sur l'application.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Ajouter plat -->
+<div class="modal-bg" id="modal-item">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title" id="item-modal-title">Ajouter un plat</span><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-item-id">
+      <div class="field"><label>Nom du plat *</label><input id="i-name" placeholder="Ex: Homard grillé"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label>Prix (FDJ) *</label><input id="i-price" type="number" placeholder="2500"></div>
+        <div class="field"><label>Emoji</label><input id="i-emoji" placeholder="🍽️" style="font-size:18px"></div>
+      </div>
+      <div class="field"><label>Catégorie</label><select id="i-cat"></select></div>
+      <div class="field"><label>Description</label><input id="i-desc" placeholder="Brève description..."></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-gr" onclick="saveItem()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nouvelle catégorie -->
+<div class="modal-bg" id="modal-cat">
+  <div class="modal" style="max-width:320px">
+    <div class="modal-head"><span class="modal-title">Nouvelle catégorie</span><button class="modal-close" onclick="document.getElementById('modal-cat').classList.remove('open')">✕</button></div>
+    <div class="modal-body"><div class="field"><label>Nom</label><input id="cat-name" placeholder="Ex: Plats principaux"></div></div>
+    <div class="modal-foot">
+      <button class="btn" onclick="document.getElementById('modal-cat').classList.remove('open')">Annuler</button>
+      <button class="btn btn-gr" onclick="saveCategory()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let TOKEN = localStorage.getItem('rest_token') || '';
+let MENU = [];
+let pollInterval;
+
+if (TOKEN) showShell();
+
+async function api(method, path, body) {
+  const r = await fetch(API + path, {
+    method, headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return r.json();
+}
+
+async function doLogin() {
+  const code = document.getElementById('r-code').value.trim().toUpperCase();
+  const password = document.getElementById('r-pwd').value;
+  const r = await fetch(API+'/restaurant/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,password})}).then(r=>r.json());
+  if (r.error) { const e=document.getElementById('auth-err');e.textContent=r.error;e.style.display='block'; return; }
+  TOKEN = r.token; localStorage.setItem('rest_token',TOKEN);
+  showShell(r.restaurant);
+}
+
+function showShell(info) {
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('shell').style.display='flex';
+  loadMe();
+  loadOrders();
+  startPolling();
+}
+
+function logout() { localStorage.removeItem('rest_token'); TOKEN=''; clearInterval(pollInterval); location.reload(); }
+
+async function loadMe() {
+  const r = await api('GET','/restaurant/me');
+  if (r.error) return;
+  document.getElementById('sb-name').textContent = r.logo_emoji+' '+r.name;
+  document.getElementById('sb-name2').textContent = r.name;
+  document.getElementById('sb-code').textContent = r.code+' · Partenaire';
+  document.getElementById('sb-emoji').textContent = r.logo_emoji;
+  document.getElementById('sb-quartier').textContent = r.quartier||r.address||'—';
+  const btn = document.getElementById('open-btn');
+  btn.className = 'open-btn '+(r.is_open?'open':'closed');
+  document.getElementById('open-lbl').textContent = r.is_open ? 'Ouvert' : 'Fermé';
+  // Fill profile form
+  document.getElementById('p-name').value = r.name||'';
+  document.getElementById('p-desc').value = r.description||'';
+  document.getElementById('p-addr').value = r.address||'';
+  document.getElementById('p-phone').value = r.phone||'';
+  document.getElementById('p-time').value = r.delivery_time||'';
+  document.getElementById('p-fee').value = r.delivery_fee||300;
+  document.getElementById('p-min').value = r.min_order||500;
+}
+
+async function toggleOpen() {
+  const r = await api('PATCH','/restaurant/toggle-open');
+  if (r.error) { alert(r.error); return; }
+  const btn = document.getElementById('open-btn');
+  btn.className = 'open-btn '+(r.is_open?'open':'closed');
+  document.getElementById('open-lbl').textContent = r.is_open ? 'Ouvert' : 'Fermé';
+}
+
+async function saveProfile() {
+  const r = await api('PATCH','/restaurant/me',{
+    name: document.getElementById('p-name').value,
+    description: document.getElementById('p-desc').value,
+    address: document.getElementById('p-addr').value,
+    phone: document.getElementById('p-phone').value,
+    delivery_time: document.getElementById('p-time').value,
+    delivery_fee: parseInt(document.getElementById('p-fee').value)||300,
+    min_order: parseInt(document.getElementById('p-min').value)||500,
+  });
+  if (r.error) { alert(r.error); return; }
+  alert('Profil sauvegardé !'); loadMe();
+}
+
+// ORDERS
+async function loadOrders() {
+  const orders = await api('GET','/restaurant/orders');
+  if (!Array.isArray(orders)) return;
+  const stats = await api('GET','/restaurant/stats');
+  if (!stats.error) {
+    document.getElementById('c-new').textContent = stats.pendingOrders||0;
+    document.getElementById('c-prep').textContent = stats.preparingOrders||0;
+    document.getElementById('c-done').textContent = stats.todayOrders||0;
+    document.getElementById('c-rev').textContent = (stats.todayRevenue||0).toLocaleString()+' FDJ';
+    const nb = document.getElementById('new-badge');
+    nb.textContent = stats.pendingOrders||0;
+    nb.style.display = stats.pendingOrders > 0 ? 'inline' : 'none';
+    // stats page
+    document.getElementById('st-mo').textContent = stats.monthOrders||0;
+    document.getElementById('st-rev').textContent = (stats.monthRevenue||0).toLocaleString()+' FDJ';
+    document.getElementById('st-pend').textContent = stats.pendingOrders||0;
+  }
+  if (!orders.length) {
+    document.getElementById('orders-empty').style.display='block';
+    document.getElementById('orders-grid').innerHTML='';
+    return;
+  }
+  document.getElementById('orders-empty').style.display='none';
+  const stMap = {
+    pending:`<span class="badge b-amber" style="animation:pulse 1.5s infinite">⏳ Nouvelle</span>`,
+    accepted:`<span class="badge b-blue">✓ Acceptée</span>`,
+    preparing:`<span class="badge b-amber">🍳 Préparation</span>`,
+    ready:`<span class="badge b-green">✅ Prête</span>`,
+    delivering:`<span class="badge b-blue">🛵 En livraison</span>`,
+    delivered:`<span class="badge b-green">📦 Livrée</span>`,
+    cancelled:`<span class="badge b-red">✗ Annulée</span>`
+  };
+  document.getElementById('orders-grid').innerHTML = orders.filter(o=>!['delivered','cancelled'].includes(o.status)).map(o=>`
+    <div class="order-card ${o.status==='pending'?'new':''}" id="ord-${o.id}">
+      <div class="order-head">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="order-id">#${o.order_number} — ${o.client_name||'Client'}</span>
+            ${o.status==='pending'?'<span class="new-pulse">NOUVELLE</span>':''}
+          </div>
+          <div class="order-client">${o.client_phone||''} · ${o.delivery_address||'Adresse non précisée'}</div>
+        </div>
+        <div>${stMap[o.status]||o.status}</div>
+      </div>
+      <div class="order-items-list">${(o.items||[]).map(i=>`${i.emoji||'•'} ${i.name} × ${i.quantity} — ${(i.price*i.quantity).toLocaleString()} FDJ`).join('<br>')}</div>
+      <div class="order-footer">
+        <span class="order-total">${(o.total||0).toLocaleString()} FDJ</span>
+        <div class="order-acts">
+          ${o.status==='pending'?`<button class="btn btn-sm btn-danger" onclick="updateOrder('${o.id}','cancelled')">✗ Refuser</button><button class="btn btn-sm btn-gr" onclick="updateOrder('${o.id}','accepted')">✓ Accepter</button>`:''}
+          ${o.status==='accepted'?`<button class="btn btn-sm btn-gr" onclick="updateOrder('${o.id}','preparing')">🍳 En préparation</button>`:''}
+          ${o.status==='preparing'?`<button class="btn btn-sm btn-blue" onclick="updateOrder('${o.id}','ready')">✅ Prêt à livrer</button>`:''}
+          ${o.status==='ready'?`<span style="font-size:12px;color:var(--muted)">🛵 Livreur en route...</span>`:''}
+        </div>
+      </div>
+    </div>`).join('') || '<div style="text-align:center;padding:30px;color:var(--muted)">Toutes les commandes sont livrées ✅</div>';
+}
+
+async function updateOrder(id, status) {
+  const r = await api('PATCH',`/restaurant/orders/${id}/status`,{status});
+  if (r.error) { alert(r.error); return; }
+  loadOrders();
+}
+
+function startPolling() {
+  pollInterval = setInterval(loadOrders, 15000); // refresh every 15s
+}
+
+// MENU
+async function loadMenu() {
+  MENU = await api('GET','/restaurant/menu');
+  if (!Array.isArray(MENU)) return;
+  const catSel = document.getElementById('i-cat');
+  catSel.innerHTML = MENU.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  renderMenu();
+}
+
+function renderMenu() {
+  document.getElementById('menu-content').innerHTML = `
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
+      <button class="btn btn-sm" onclick="document.getElementById('modal-cat').classList.add('open')">+ Catégorie</button>
+      <button class="btn btn-sm btn-gr" onclick="openAddItem()">+ Plat</button>
+    </div>
+    ${MENU.map(cat=>`
+      <div class="card" style="margin-bottom:14px">
+        <div class="menu-cat-head">
+          <span class="menu-cat-name">${cat.name}</span>
+          <button class="btn btn-sm" onclick="openAddItemCat('${cat.id}')">+ Plat</button>
+        </div>
+        ${cat.items.length===0?'<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Aucun plat — ajoutez-en un</div>':''}
+        ${cat.items.map(item=>`
+          <div class="menu-row" id="item-${item.id}">
+            <span class="m-emoji">${item.emoji||'🍽️'}</span>
+            <div class="m-info">
+              <div class="m-name">${item.name}</div>
+              <div class="m-desc">${item.description||''}</div>
+            </div>
+            <span class="m-price">${(item.price||0).toLocaleString()} FDJ</span>
+            <label class="toggle">
+              <input type="checkbox" ${item.is_available?'checked':''} onchange="toggleItem('${item.id}',this.checked)">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+            ${!item.is_available?'<span class="unavail-tag">Indispo.</span>':''}
+            <button class="btn btn-sm" style="margin-left:4px" onclick="openEditItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">✏️</button>
+            <button class="btn btn-sm btn-danger" style="margin-left:2px" onclick="deleteItem('${item.id}')">🗑</button>
+          </div>`).join('')}
+      </div>`).join('')}`;
+}
+
+async function toggleItem(id, available) {
+  await api('PATCH',`/restaurant/menu/items/${id}`,{is_available: available});
+  loadMenu();
+}
+
+async function deleteItem(id) {
+  if (!confirm('Supprimer ce plat ?')) return;
+  await api('DELETE',`/restaurant/menu/items/${id}`);
+  loadMenu();
+}
+
+function openAddItem() { openAddItemCat(null); }
+function openAddItemCat(catId) {
+  document.getElementById('item-modal-title').textContent = 'Ajouter un plat';
+  document.getElementById('edit-item-id').value = '';
+  document.getElementById('i-name').value='';
+  document.getElementById('i-price').value='';
+  document.getElementById('i-emoji').value='🍽️';
+  document.getElementById('i-desc').value='';
+  if (catId) document.getElementById('i-cat').value = catId;
+  document.getElementById('modal-item').classList.add('open');
+}
+
+function openEditItem(item) {
+  document.getElementById('item-modal-title').textContent = 'Modifier le plat';
+  document.getElementById('edit-item-id').value = item.id;
+  document.getElementById('i-name').value = item.name||'';
+  document.getElementById('i-price').value = item.price||'';
+  document.getElementById('i-emoji').value = item.emoji||'🍽️';
+  document.getElementById('i-desc').value = item.description||'';
+  document.getElementById('i-cat').value = item.category_id||'';
+  document.getElementById('modal-item').classList.add('open');
+}
+
+async function saveItem() {
+  const editId = document.getElementById('edit-item-id').value;
+  const body = {
+    name: document.getElementById('i-name').value,
+    price: parseInt(document.getElementById('i-price').value),
+    emoji: document.getElementById('i-emoji').value,
+    description: document.getElementById('i-desc').value,
+    category_id: document.getElementById('i-cat').value,
+  };
+  if (!body.name || !body.price) { alert('Nom et prix requis'); return; }
+  if (editId) { await api('PATCH',`/restaurant/menu/items/${editId}`,body); }
+  else { await api('POST','/restaurant/menu/items',body); }
+  closeModal(); loadMenu();
+}
+
+async function saveCategory() {
+  const name = document.getElementById('cat-name').value.trim();
+  if (!name) return;
+  await api('POST','/restaurant/menu/categories',{name});
+  document.getElementById('modal-cat').classList.remove('open');
+  document.getElementById('cat-name').value='';
+  loadMenu();
+}
+
+async function loadStats() {
+  const me = await api('GET','/restaurant/me');
+  if (!me.error) document.getElementById('st-rating').textContent = me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
+}
+
+function showPane(id, btn) {
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const t={commandes:'Commandes en cours',menu:'Gestion du menu',stats:'Statistiques',profil:'Mon profil'};
+  document.getElementById('pg-title').textContent=t[id]||id;
+  if (id==='menu') loadMenu();
+  if (id==='stats') { loadStats(); loadOrders(); }
+  if (id==='profil') loadMe();
+}
+
+function closeModal() { document.getElementById('modal-item').classList.remove('open'); }
+</script>
+</body></html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>BoltDj</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --pu:#6C5CE7;--pu2:#5A4BD1;--pu3:#4834C0;--pu-l:#EEF0FF;--pu-ll:#F8F7FF;
+  --gr:#00B894;--gr-l:#E8FBF6;--re:#E17055;--re-l:#FFF0EE;--or:#FDCB6E;--or-l:#FFF5E0;
+  --dark:#2D3436;--mid:#636E72;--light:#B2BEC3;--border:#EDE9FF;--white:#fff
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--pu-ll);color:var(--dark);font-size:14px;min-height:100vh}
+/* ── LAYOUT ── */
+.app-wrap{max-width:430px;margin:0 auto;min-height:100vh;background:var(--white);display:flex;flex-direction:column;position:relative;overflow-x:hidden}
+.portal{display:none;flex-direction:column;flex:1}
+.portal.active{display:flex}
+.page{display:none;flex-direction:column;flex:1;padding-bottom:68px;overflow-y:auto;min-height:100vh}
+.page.active{display:flex}
+/* ── BUTTONS ── */
+.btn-pu{background:var(--pu);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit;transition:background .15s}
+.btn-pu:hover,.btn-pu:active{background:var(--pu2)}
+.btn-gr{background:var(--gr);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
+.btn-out{background:none;border:2px solid var(--pu);color:var(--pu);border-radius:14px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
+.btn-sm{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;border:none;cursor:pointer;font-family:inherit}
+.btn-sm-pu{background:var(--pu);color:#fff}
+.btn-sm-gr{background:var(--gr-l);color:#007A60;border:1px solid #A8EFD8}
+.btn-sm-re{background:var(--re-l);color:#A8432A;border:1px solid #FFC5B5}
+.btn-sm-or{background:var(--or-l);color:#9A6E00;border:1px solid var(--or)}
+/* ── FORMS ── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit;transition:border-color .15s}
+.inp:focus{border-color:var(--pu);background:var(--white)}
+/* ── HEADER GRADIENT ── */
+.pu-header{background:linear-gradient(135deg,var(--pu) 0%,var(--pu3) 100%);padding:16px 18px;color:#fff}
+.header-title{font-size:18px;font-weight:800;color:#fff}
+.header-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
+.header-row{display:flex;justify-content:space-between;align-items:center}
+/* ── BOTTOM NAV ── */
+.btm-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--white);border-top:1px solid var(--border);display:flex;z-index:300;padding-bottom:env(safe-area-inset-bottom)}
+.btm-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;cursor:pointer;border:none;background:none;font-family:inherit}
+.btm-tab .ti{font-size:21px;color:var(--light)}
+.btm-tab .tl{font-size:10px;color:var(--light);font-weight:600}
+.btm-tab.active .ti,.btm-tab.active .tl{color:var(--pu)}
+.btm-tab.active .tl{font-weight:800}
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.b-pu{background:var(--pu-l);color:var(--pu2)}
+.b-gr{background:var(--gr-l);color:#007A60}
+.b-or{background:var(--or-l);color:#9A6E00}
+.b-re{background:var(--re-l);color:#A8432A}
+.b-mid{background:var(--pu-ll);color:var(--mid)}
+/* ── OTP BOXES ── */
+.otp-row{display:flex;gap:12px;justify-content:center;margin:20px 0}
+.otp-box{width:56px;height:60px;border:2px solid var(--border);border-radius:14px;text-align:center;font-size:26px;font-weight:800;background:var(--pu-ll);color:var(--dark);font-family:inherit;outline:none}
+.otp-box:focus{border-color:var(--pu);background:var(--white)}
+/* ── CARDS ── */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.card-head{padding:12px 16px;background:var(--pu-ll);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:13px;font-weight:800;color:var(--pu2)}
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px 16px}
+.stat-c{background:var(--pu-ll);border-radius:14px;padding:14px;border:1px solid var(--border)}
+.stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mid);margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:800}
+.c-pu{color:var(--pu)}.c-gr{color:var(--gr)}.c-or{color:#9A6E00}.c-re{color:var(--re)}.c-dark{color:var(--dark)}
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{padding:9px 16px;background:var(--pu-ll);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--pu2);text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--pu-ll)}
+/* ── ROWS ── */
+.list-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.list-row:hover{background:var(--pu-ll)}
+.list-row:last-child{border-bottom:none}
+.row-ic{width:40px;height:40px;border-radius:12px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.row-title{font-size:13px;font-weight:700;color:var(--dark)}
+.row-sub{font-size:11px;color:var(--mid);margin-top:2px}
+/* ── MENU ITEMS ── */
+.menu-sec{padding:9px 16px;background:var(--pu-ll);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--pu2)}
+.menu-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.menu-row:last-child{border-bottom:none}
+.me-em{font-size:30px;flex-shrink:0;width:38px;text-align:center}
+.me-body{flex:1;min-width:0}
+.me-name{font-size:13px;font-weight:700}
+.me-desc{font-size:11px;color:var(--mid);margin-top:2px;line-height:1.4}
+.me-price{font-size:13px;font-weight:800;color:var(--pu);margin-top:3px}
+.add-btn{width:32px;height:32px;border-radius:10px;background:var(--pu);color:#fff;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+.qty-ctrl{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.qty-btn{width:28px;height:28px;border-radius:8px;background:var(--pu);color:#fff;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800}
+.qty-num{font-size:14px;font-weight:800;min-width:16px;text-align:center}
+/* ── TOGGLE ── */
+.tog{position:relative;width:38px;height:22px;cursor:pointer;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
+.tog input:checked+.tog-track{background:var(--pu)}
+.tog-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
+.tog input:checked~.tog-thumb{transform:translateX(16px)}
+/* ── MAP ── */
+.map-box{width:100%;height:190px;background:#E8E4FF;position:relative;overflow:hidden}
+.mr-h{position:absolute;background:rgba(255,255,255,.85);left:0;right:0;height:16px}
+.mr-v{position:absolute;background:rgba(255,255,255,.85);top:0;bottom:0;width:16px}
+.mb{position:absolute;background:rgba(108,92,231,.1);border-radius:6px}
+.ml{position:absolute;font-size:10px;font-weight:700;color:var(--pu2);background:rgba(255,255,255,.9);padding:2px 6px;border-radius:6px}
+.map-pin{position:absolute;font-size:28px;z-index:5;cursor:grab;user-select:none;top:50%;left:50%;transform:translate(-50%,-100%)}
+.map-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:rgba(108,92,231,.15);border:2px solid rgba(108,92,231,.35);animation:mpulse 2s infinite}
+@keyframes mpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(1.4);opacity:.4}}
+/* ── MISC ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;flex:1;color:var(--mid)}
+.empty-ic{font-size:48px;margin-bottom:14px}
+.empty-title{font-size:17px;font-weight:800;color:var(--dark);margin-bottom:6px}
+.promo-bar{margin:0 16px 14px;background:var(--pu);border-radius:14px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.search-box{position:relative;padding:12px 16px}
+.search-box input{width:100%;padding:11px 14px 11px 40px;border:1.5px solid var(--border);border-radius:12px;font-size:13px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit}
+.search-box input:focus{border-color:var(--pu);background:var(--white)}
+.search-box::before{content:"🔍";position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:15px}
+.cats-row{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.cats-row::-webkit-scrollbar{display:none}
+.cat{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;min-width:62px;background:var(--white);transition:all .15s}
+.cat.active{background:var(--pu);border-color:var(--pu)}
+.cat.active span:last-child{color:#fff}
+.cat-em{font-size:19px}
+.cat-lb{font-size:10px;font-weight:700;color:var(--mid)}
+.sec-title{padding:0 16px 8px;font-size:14px;font-weight:800;color:var(--dark)}
+.rest-card{border:1.5px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;margin:0 16px 14px}
+.rest-img{height:120px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.rest-info{padding:12px 14px}
+.rest-name{font-size:15px;font-weight:800;margin-bottom:5px}
+.rest-meta{display:flex;gap:5px;flex-wrap:wrap}
+.rmeta{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--pu-ll);color:var(--pu2)}
+.rmeta.gold{background:var(--or-l);color:#9A6E00}
+.order-card{border:1.5px solid var(--border);border-radius:14px;margin:0 16px 12px;overflow:hidden}
+.order-card.new-ord{border-color:var(--pu);border-width:2px}
+.oc-head{padding:10px 14px;background:var(--pu-ll);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.oc-body{padding:12px 14px}
+.oc-items{font-size:12px;color:var(--mid);background:var(--pu-ll);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.7}
+.oc-footer{display:flex;justify-content:space-between;align-items:center}
+.oc-total{font-size:15px;font-weight:800;color:var(--pu)}
+.oc-acts{display:flex;gap:6px}
+/* ── ANIMATION ── */
+@keyframes pulse-new{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse-new 1.5s infinite}
+/* ── SIDEBAR ADMIN ── */
+.admin-layout{display:flex;flex:1;overflow:hidden;max-height:calc(100vh - 0px)}
+.admin-sidebar{width:200px;background:var(--pu);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.admin-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.admin-content{flex:1;overflow-y:auto;padding:16px}
+.sb-logo{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.15)}
+.sb-brand{font-size:16px;font-weight:800;color:#fff}
+.sb-role{font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:10px;display:inline-block}
+.sb-nav{padding:10px 8px;flex:1}
+.sb-btn{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;margin-bottom:2px;font-size:13px;color:rgba(255,255,255,.7);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:600;transition:all .15s}
+.sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb-btn.active{background:rgba(255,255,255,.2);color:#fff}
+.sb-ic{font-size:15px;width:18px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--re);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px}
+.admin-topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
+.admin-page{display:none}.admin-page.active{display:block}
+.a-filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.a-chip{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:12px;cursor:pointer;color:var(--mid);font-weight:600}
+.a-chip.active{background:var(--pu-l);border-color:var(--pu);color:var(--pu2)}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 2px}
+.cbar{flex:1;border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;background:var(--pu-l);border-top:2px solid var(--pu)}
+.cbar.today{background:var(--pu-ll);border-top-color:var(--pu2)}
+/* ── MISSION (LIVREUR) ── */
+.mission-card{border:2px solid var(--border);border-radius:16px;overflow:hidden;margin:12px 16px}
+.mission-card.active-m{border-color:var(--pu)}
+.mc-h{background:var(--pu-ll);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.mc-id{font-size:13px;font-weight:800;color:var(--pu2)}
+.mc-b{padding:12px 14px}
+.addr-s{display:flex;gap:10px;margin-bottom:10px}
+.addr-s:last-child{margin-bottom:0}
+.addr-dot-col{display:flex;flex-direction:column;align-items:center;padding-top:2px}
+.addr-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.addr-line{width:2px;height:20px;background:var(--border);margin:3px 0}
+.addr-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mid)}
+.addr-val{font-size:12px;font-weight:700;color:var(--dark);margin-top:2px}
+.mc-f{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+</style>
+</head>
+<body>
+<div class="app-wrap">
+
+<!-- ══════════════════════════════════════════
+     PORTAL: LOGIN (détection de rôle auto)
+═══════════════════════════════════════════ -->
+<div class="portal active" id="portal-login" style="background:var(--pu)">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px 24px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:54px;margin-bottom:12px">⚡</div>
+      <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:-.5px">BoltDj</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:6px">Plateforme de livraison — Djibouti 🇩🇯</div>
+    </div>
+    <div style="background:var(--white);border-radius:22px;padding:24px">
+      <div id="login-step-1">
+        <div style="font-size:17px;font-weight:800;color:var(--dark);margin-bottom:4px">Connexion</div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:18px">Admin · Restaurant · Client · Livreur</div>
+        <div style="background:var(--pu-ll);border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--mid)">
+          💡 <strong style="color:var(--pu2)">Démo :</strong><br>
+          Admin: <code style="color:var(--pu2)">admin@boltdj.dj</code> / <code style="color:var(--pu2)">Admin2026!</code><br>
+          Restaurant: <code style="color:var(--pu2)">REST001</code> / <code style="color:var(--pu2)">Restaurant2026!</code><br>
+          Client/Livreur: numéro <code style="color:var(--pu2)">+25377112233</code> → OTP <code style="color:var(--pu2)">1234</code>
+        </div>
+        <div id="login-err" style="background:var(--re-l);color:var(--re);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:14px;display:none"></div>
+        <!-- Phone login -->
+        <div id="phone-section">
+          <div class="field"><label>Numéro de téléphone (Client / Livreur)</label>
+            <div style="display:flex;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;background:var(--pu-ll)">
+              <span style="padding:12px 12px;font-size:13px;color:var(--mid);background:rgba(108,92,231,.07);border-right:1.5px solid var(--border);white-space:nowrap;font-weight:700">🇩🇯 +253</span>
+              <input style="border:none;flex:1;padding:12px;font-size:14px;background:transparent;color:var(--dark);font-family:inherit;outline:none" placeholder="77 XX XX XX" id="ph-inp" type="tel" inputmode="tel">
+            </div>
+          </div>
+          <button class="btn-pu" onclick="doPhoneLogin()" style="margin-bottom:12px">Recevoir le code SMS →</button>
+          <div style="text-align:center;font-size:12px;color:var(--mid)">— ou —</div>
+        </div>
+        <!-- Email/Code login -->
+        <div style="margin-top:12px">
+          <div class="field"><label>Email (Admin) ou Code REST (Restaurant)</label>
+            <input class="inp" id="id-inp" placeholder="admin@boltdj.dj  ou  REST001">
+          </div>
+          <div class="field"><label>Mot de passe</label>
+            <input class="inp" id="pwd-inp" type="password" placeholder="••••••••">
+          </div>
+          <button class="btn-pu" onclick="doIdLogin()">Se connecter →</button>
+        </div>
+      </div>
+      <!-- OTP Step -->
+      <div id="login-step-2" style="display:none">
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="font-size:30px;margin-bottom:8px">📱</div>
+          <div style="font-size:16px;font-weight:800;color:var(--dark)">Code SMS</div>
+          <div style="font-size:12px;color:var(--mid);margin-top:4px" id="otp-hint">Code envoyé</div>
+        </div>
+        <div class="otp-row">
+          <input class="otp-box" maxlength="1" id="o1" oninput="nOtp(this,'o2')" inputmode="numeric">
+          <input class="otp-box" maxlength="1" id="o2" oninput="nOtp(this,'o3')" inputmode="numeric">
+          <input class="otp-box" maxlength="1" id="o3" oninput="nOtp(this,'o4')" inputmode="numeric">
+          <input class="otp-box" maxlength="1" id="o4" oninput="checkOtp()" inputmode="numeric">
+        </div>
+        <button class="btn-pu" onclick="doOtpLogin()" style="margin-bottom:10px">Confirmer →</button>
+        <button class="btn-out" onclick="backToStep1()">← Retour</button>
+      </div>
+      <!-- New client profile -->
+      <div id="login-step-3" style="display:none">
+        <div style="font-size:16px;font-weight:800;color:var(--dark);margin-bottom:4px">Votre profil</div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:18px">Bienvenue ! Quelques infos pour commencer.</div>
+        <div class="field"><label>Prénom *</label><input class="inp" id="np-first" placeholder="Ex: Hodan"></div>
+        <div class="field"><label>Nom *</label><input class="inp" id="np-last" placeholder="Ex: Abdi"></div>
+        <button class="btn-pu" onclick="saveNewProfile()">Commencer →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PORTAL: CLIENT
+═══════════════════════════════════════════ -->
+<div class="portal" id="portal-client">
+  <!-- HOME -->
+  <div class="page active" id="c-home">
+    <div class="pu-header">
+      <div class="header-row">
+        <div><div style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600">📍 <span id="c-loc">Bender Djedid ▾</span></div><div style="font-size:20px;font-weight:800;color:#fff;margin-top:2px" id="c-greeting">Bonjour 👋</div></div>
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;cursor:pointer" id="c-av" onclick="cTab('profile')">H</div>
+      </div>
+    </div>
+    <div style="background:var(--white);flex:1;overflow-y:auto">
+      <div class="search-box"><input placeholder="Chercher un plat ou restaurant..." id="c-search" oninput="cSearchRests(this.value)"></div>
+      <div class="promo-bar"><div><div style="color:#fff;font-size:13px;font-weight:800;margin-bottom:2px">-30% ce soir ! 🔥</div><div style="color:rgba(255,255,255,.8);font-size:11px">Jusqu'à 21h</div></div><div style="background:#fff;color:var(--pu2);font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px">Profiter</div></div>
+      <div class="sec-title">Catégories</div>
+      <div class="cats-row" id="c-cats"><div class="cat active" onclick="cLoadRests('all',this)"><span class="cat-em">🍽️</span><span class="cat-lb">Tout</span></div></div>
+      <div class="sec-title">Restaurants</div>
+      <div id="c-rests-list"><div style="text-align:center;padding:40px;color:var(--mid)">Chargement...</div></div>
+    </div>
+  </div>
+  <!-- REST DETAIL -->
+  <div class="page" id="c-rest">
+    <div style="overflow-y:auto;flex:1;padding-bottom:80px">
+      <div style="height:170px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:74px;position:relative" id="c-rest-hero">
+        <button style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:18px;cursor:pointer;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center" onclick="cGoPage('c-home')">←</button>
+      </div>
+      <div style="padding:14px 16px;border-bottom:1.5px solid var(--border)">
+        <div style="font-size:20px;font-weight:800;margin-bottom:6px" id="c-rest-name">—</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="c-rest-tags"></div>
+        <div style="display:flex;gap:18px" id="c-rest-stats"></div>
+      </div>
+      <div id="c-rest-menu"></div>
+    </div>
+    <div id="c-cart-float" style="display:none;position:sticky;bottom:68px;padding:0 16px 10px;background:transparent">
+      <button style="width:100%;background:var(--pu);color:#fff;border:none;border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;box-shadow:0 4px 20px rgba(108,92,231,.4)" onclick="cGoPage('c-cart')">
+        <span>🛒 Panier (<span id="c-cart-count">0</span>)</span><span id="c-cart-total-float">0 FDJ</span>
+      </button>
+    </div>
+  </div>
+  <!-- CART -->
+  <div class="page" id="c-cart">
+    <div class="pu-header header-row">
+      <div style="display:flex;align-items:center;gap:10px"><button style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="cGoPage('c-rest')">←</button><div><div class="header-title">Mon panier</div><div class="header-sub" id="c-cart-rest-name">—</div></div></div>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <div id="c-cart-items"></div>
+      <div id="c-cart-summary"></div>
+      <div style="padding:14px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:10px">📍 Adresse de livraison</div><div id="c-cart-addrs"></div></div>
+      <div style="padding:0 16px 24px" id="c-cart-cta"></div>
+    </div>
+  </div>
+  <!-- ORDERS -->
+  <div class="page" id="c-orders">
+    <div class="pu-header"><div class="header-title">Mes commandes</div></div>
+    <div style="flex:1;overflow-y:auto;padding-top:12px" id="c-orders-list"><div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande</div></div></div>
+  </div>
+  <!-- SUCCESS -->
+  <div class="page" id="c-success" style="align-items:center;padding:50px 24px 30px;text-align:center">
+    <div style="width:88px;height:88px;border-radius:50%;background:var(--gr-l);display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:18px">✅</div>
+    <div style="font-size:22px;font-weight:800;margin-bottom:8px">Commande confirmée !</div>
+    <div style="font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:24px">Votre commande <strong id="c-succ-num" style="color:var(--pu)">#—</strong> est en préparation</div>
+    <div style="width:100%;background:var(--pu-ll);border-radius:16px;padding:16px;margin-bottom:24px;text-align:left" id="c-track"></div>
+    <button class="btn-pu" onclick="cTab('home')">Retour à l'accueil</button>
+  </div>
+  <!-- PROFILE -->
+  <div class="page" id="c-profile">
+    <div style="background:linear-gradient(135deg,var(--pu),var(--pu3));padding:28px 20px 24px;text-align:center">
+      <div style="width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.25);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;border:3px solid rgba(255,255,255,.4)" id="cpf-av">H</div>
+      <div style="font-size:19px;font-weight:800;color:#fff" id="cpf-name">—</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px" id="cpf-phone">—</div>
+      <div style="display:flex;justify-content:center;gap:28px;margin-top:14px">
+        <div><div style="font-size:20px;font-weight:800;color:#fff" id="cpf-orders">0</div><div style="font-size:10px;color:rgba(255,255,255,.65)">commandes</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:#fff" id="cpf-addrs">0</div><div style="font-size:10px;color:rgba(255,255,255,.65)">adresses</div></div>
+      </div>
+    </div>
+    <div id="cpf-addresses" style="padding-top:8px"></div>
+    <div class="list-row" onclick="cTab('orders')"><div class="row-ic">📦</div><div><div class="row-title">Mes commandes</div></div><span style="margin-left:auto;color:var(--light)">›</span></div>
+    <div class="list-row" style="color:var(--re)" onclick="logout()"><div class="row-ic" style="background:var(--re-l)">🚪</div><div style="font-size:13px;font-weight:700;color:var(--re)">Se déconnecter</div></div>
+  </div>
+  <!-- BOTTOM NAV CLIENT -->
+  <div class="btm-nav" id="c-nav">
+    <button class="btm-tab active" id="c-tab-home" onclick="cTab('home')"><span class="ti">🏠</span><span class="tl">Accueil</span></button>
+    <button class="btm-tab" id="c-tab-orders" onclick="cTab('orders')"><span class="ti">📦</span><span class="tl">Commandes</span></button>
+    <button class="btm-tab" id="c-tab-profile" onclick="cTab('profile')"><span class="ti">👤</span><span class="tl">Profil</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PORTAL: RESTAURANT
+═══════════════════════════════════════════ -->
+<div class="portal" id="portal-restaurant">
+  <div class="page active" id="r-page">
+    <div style="background:linear-gradient(135deg,var(--pu),var(--pu3));padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div style="font-size:15px;font-weight:800;color:#fff" id="r-name">Mon restaurant</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px" id="r-code">CODE</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="r-open-btn" onclick="rToggleOpen()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit"><span id="r-open-dot" style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block"></span><span id="r-open-lbl">Ouvert</span></button>
+          <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700">⬤ Quitter</button>
+        </div>
+      </div>
+    </div>
+    <!-- TABS -->
+    <div style="display:flex;background:var(--pu-ll);border-bottom:1px solid var(--border)" id="r-tabs">
+      <button class="btm-tab active" id="rt-orders" onclick="rTab('orders')" style="padding:10px 0"><span class="ti" style="font-size:18px">📦</span><span class="tl">Commandes<span id="r-new-badge" style="display:none;background:var(--re);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px">0</span></span></button>
+      <button class="btm-tab" id="rt-menu" onclick="rTab('menu')" style="padding:10px 0"><span class="ti" style="font-size:18px">🍽️</span><span class="tl">Menu</span></button>
+      <button class="btm-tab" id="rt-stats" onclick="rTab('stats')" style="padding:10px 0"><span class="ti" style="font-size:18px">📊</span><span class="tl">Stats</span></button>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <!-- COMMANDES TAB -->
+      <div id="r-orders-tab">
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);gap:8px;padding:12px">
+          <div class="stat-c"><div class="stat-lbl">Nouvelles</div><div class="stat-val c-pu" id="rs-new">0</div></div>
+          <div class="stat-c"><div class="stat-lbl">En prépa.</div><div class="stat-val c-or" id="rs-prep">0</div></div>
+          <div class="stat-c"><div class="stat-lbl">Livrées auj.</div><div class="stat-val c-gr" id="rs-done">0</div></div>
+          <div class="stat-c" style="grid-column:auto"><div class="stat-lbl">Revenu</div><div class="stat-val c-dark" style="font-size:14px" id="rs-rev">0 FDJ</div></div>
+        </div>
+        <div id="r-orders-list"><div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande active</div><div class="empty-sub">Les nouvelles commandes apparaissent ici</div></div></div>
+      </div>
+      <!-- MENU TAB -->
+      <div id="r-menu-tab" style="display:none">
+        <div style="padding:12px 16px;display:flex;gap:8px;border-bottom:1px solid var(--border)">
+          <button class="btn-sm btn-sm-pu" onclick="rOpenAddItem()">+ Ajouter un plat</button>
+          <button class="btn-sm btn-sm-or" onclick="rOpenAddCat()">+ Catégorie</button>
+        </div>
+        <div id="r-menu-list"><div style="text-align:center;padding:30px;color:var(--mid)">Chargement du menu...</div></div>
+      </div>
+      <!-- STATS TAB -->
+      <div id="r-stats-tab" style="display:none">
+        <div class="stats-grid">
+          <div class="stat-c"><div class="stat-lbl">Ce mois</div><div class="stat-val c-pu" id="rss-mo">—</div></div>
+          <div class="stat-c"><div class="stat-lbl">Revenu mois</div><div class="stat-val c-gr" style="font-size:16px" id="rss-rev">—</div></div>
+          <div class="stat-c"><div class="stat-lbl">Note clients</div><div class="stat-val c-or" id="rss-rat">—</div></div>
+          <div class="stat-c"><div class="stat-lbl">En attente</div><div class="stat-val c-re" id="rss-pend">—</div></div>
+        </div>
+        <div style="padding:0 16px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:10px">Activité 7 jours</div><div class="chart-bars" id="r-chart"></div></div>
+      </div>
+    </div>
+  </div>
+  <!-- MODALS -->
+  <div id="r-modal-item" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center">
+    <div style="background:var(--white);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-size:16px;font-weight:800" id="item-modal-title">Ajouter un plat</span><button onclick="document.getElementById('r-modal-item').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mid)">✕</button></div>
+      <input type="hidden" id="edit-item-id">
+      <div class="field"><label>Nom *</label><input class="inp" id="i-name" placeholder="Ex: Homard grillé"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>Prix (FDJ) *</label><input class="inp" id="i-price" type="number" placeholder="2500"></div>
+        <div class="field"><label>Emoji</label><input class="inp" id="i-emoji" placeholder="🍽️" style="font-size:18px"></div>
+      </div>
+      <div class="field"><label>Catégorie</label><select class="inp" id="i-cat"></select></div>
+      <div class="field"><label>Description</label><input class="inp" id="i-desc" placeholder="Courte description..."></div>
+      <button class="btn-pu" onclick="rSaveItem()">Sauvegarder</button>
+    </div>
+  </div>
+  <div id="r-modal-cat" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+    <div style="background:var(--white);border-radius:16px;padding:20px;width:85%;max-width:320px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:14px">Nouvelle catégorie</div>
+      <div class="field"><label>Nom</label><input class="inp" id="cat-name" placeholder="Ex: Desserts"></div>
+      <div style="display:flex;gap:8px"><button class="btn-out" onclick="document.getElementById('r-modal-cat').style.display='none'" style="flex:1">Annuler</button><button class="btn-pu" onclick="rSaveCat()" style="flex:1">Créer</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PORTAL: ADMIN
+═══════════════════════════════════════════ -->
+<div class="portal" id="portal-admin">
+  <div class="page active" id="a-page">
+    <div class="admin-layout" style="height:100vh">
+      <!-- Sidebar -->
+      <div class="admin-sidebar">
+        <div class="sb-logo"><div class="sb-brand">⚡ BoltDj</div><span class="sb-role">Super Admin</span></div>
+        <div class="sb-nav">
+          <button class="sb-btn active" onclick="aTab('overview',this)"><span class="sb-ic">📊</span>Vue d'ensemble</button>
+          <button class="sb-btn" onclick="aTab('restaurants',this)"><span class="sb-ic">🏪</span>Restaurants<span class="sb-badge" id="a-pend-badge">0</span></button>
+          <button class="sb-btn" onclick="aTab('orders',this)"><span class="sb-ic">📦</span>Commandes</button>
+          <button class="sb-btn" onclick="aTab('clients',this)"><span class="sb-ic">👥</span>Clients</button>
+          <button class="sb-btn" onclick="aTab('livreurs',this)"><span class="sb-ic">🛵</span>Livreurs</button>
+        </div>
+        <div style="padding:10px 8px;border-top:1px solid rgba(255,255,255,.15)">
+          <button onclick="logout()" style="width:100%;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:none;border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">Déconnexion</button>
+        </div>
+      </div>
+      <!-- Main -->
+      <div class="admin-main">
+        <div class="admin-topbar">
+          <div style="font-size:15px;font-weight:800" id="a-page-title">Vue d'ensemble</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm btn-sm-pu" onclick="aOpenNewRest()">+ Nouveau restaurant</button>
+            <button class="btn-sm btn-sm-or" onclick="aLoadAll()">↻</button>
+          </div>
+        </div>
+        <div class="admin-content">
+          <!-- OVERVIEW -->
+          <div class="admin-page active" id="a-overview">
+            <div class="stats-grid" style="padding:0;margin-bottom:14px">
+              <div class="stat-c"><div class="stat-lbl">Restaurants actifs</div><div class="stat-val c-pu" id="as-active">—</div></div>
+              <div class="stat-c"><div class="stat-lbl">Commandes auj.</div><div class="stat-val c-gr" id="as-today">—</div></div>
+              <div class="stat-c"><div class="stat-lbl">En attente</div><div class="stat-val c-or" id="as-pend">—</div></div>
+              <div class="stat-c"><div class="stat-lbl">Revenus livrés</div><div class="stat-val c-dark" style="font-size:14px" id="as-rev">—</div></div>
+            </div>
+            <div class="card"><div class="card-head"><span class="card-title">Commandes 7 jours</span></div><div style="padding:14px"><div class="chart-bars" id="a-chart"></div></div></div>
+            <div class="card"><div class="card-head"><span class="card-title">En attente de validation</span></div><div id="a-pending-rests"></div></div>
+            <div class="card"><div class="card-head"><span class="card-title">Dernières commandes</span></div><div id="a-recent-orders"></div></div>
+          </div>
+          <!-- RESTAURANTS -->
+          <div class="admin-page" id="a-restaurants">
+            <div class="a-filter-row">
+              <span class="a-chip active" onclick="aFilterStatus('all',this)">Tous</span>
+              <span class="a-chip" onclick="aFilterStatus('active',this)">Actifs</span>
+              <span class="a-chip" onclick="aFilterStatus('pending',this)">En attente</span>
+              <span class="a-chip" onclick="aFilterStatus('suspended',this)">Suspendus</span>
+            </div>
+            <div class="card" style="overflow-x:auto"><table class="data-table" id="a-rest-table"><thead><tr><th>Code</th><th>Restaurant</th><th>Gérant</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="a-rest-tbody"></tbody></table></div>
+          </div>
+          <!-- ORDERS -->
+          <div class="admin-page" id="a-orders">
+            <div class="card" style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>Client</th><th>Restaurant</th><th>Montant</th><th>Statut</th></tr></thead><tbody id="a-orders-tbody"></tbody></table></div>
+          </div>
+          <!-- CLIENTS -->
+          <div class="admin-page" id="a-clients">
+            <div class="card" style="overflow-x:auto"><table class="data-table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Commandes</th><th>Dépensé</th></tr></thead><tbody id="a-clients-tbody"></tbody></table></div>
+          </div>
+          <!-- LIVREURS -->
+          <div class="admin-page" id="a-livreurs">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn-sm btn-sm-pu" onclick="aOpenNewLiv()">+ Ajouter livreur</button></div>
+            <div class="card" style="overflow-x:auto"><table class="data-table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Zone</th><th>Livraisons</th><th>Statut</th></tr></thead><tbody id="a-livreurs-tbody"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL new restaurant -->
+  <div id="a-modal-rest" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+    <div style="background:var(--white);border-radius:18px;width:90%;max-width:420px;max-height:90vh;overflow-y:auto">
+      <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:800">Créer un restaurant</span><button onclick="document.getElementById('a-modal-rest').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--mid)">✕</button></div>
+      <div style="padding:18px">
+        <div id="a-rest-created" style="display:none;background:var(--gr-l);border:1px solid #A8EFD8;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:#007A60"></div>
+        <div class="field"><label>Nom *</label><input class="inp" id="ar-name" placeholder="Ex: La Scorpion"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Catégorie</label><select class="inp" id="ar-cat"><option>Fruits de mer</option><option>Fast Food</option><option>Pizza</option><option>Local</option><option>Grillades</option></select></div>
+          <div class="field"><label>Emoji</label><input class="inp" id="ar-emoji" value="🍽️" style="font-size:18px"></div>
+        </div>
+        <div class="field"><label>Gérant *</label><input class="inp" id="ar-mgr" placeholder="Prénom Nom"></div>
+        <div class="field"><label>Téléphone *</label><input class="inp" id="ar-tel" placeholder="+253 77 XX XX XX"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Quartier</label><input class="inp" id="ar-q" placeholder="Ex: Bender Djedid"></div>
+          <div class="field"><label>Adresse</label><input class="inp" id="ar-addr" placeholder="Rue, repère..."></div>
+        </div>
+        <button class="btn-pu" onclick="aCreateRest()">Créer & Envoyer identifiants</button>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL new livreur -->
+  <div id="a-modal-liv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+    <div style="background:var(--white);border-radius:18px;width:85%;max-width:360px;padding:20px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:16px">Ajouter un livreur</div>
+      <div class="field"><label>Nom *</label><input class="inp" id="al-name" placeholder="Prénom Nom"></div>
+      <div class="field"><label>Téléphone *</label><input class="inp" id="al-tel" placeholder="+253 77 XX XX XX"></div>
+      <div class="field"><label>Zone</label><select class="inp" id="al-zone"><option>Centre-ville</option><option>Bender Djedid</option><option>Plateau du Serpent</option><option>Quartier 7</option><option>Balbala</option></select></div>
+      <div style="display:flex;gap:8px"><button class="btn-out" onclick="document.getElementById('a-modal-liv').style.display='none'" style="flex:1">Annuler</button><button class="btn-pu" onclick="aCreateLiv()" style="flex:1">Créer</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PORTAL: LIVREUR
+═══════════════════════════════════════════ -->
+<div class="portal" id="portal-livreur">
+  <div class="page active" id="l-page">
+    <div style="background:linear-gradient(135deg,var(--pu),var(--pu3));padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:15px;font-weight:800;color:#fff" id="l-name">Livreur</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px" id="l-zone">Zone BoltDj</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="l-status-btn" onclick="lToggleStatus()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit">
+            <span id="l-status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block"></span><span id="l-status-lbl">Disponible</span>
+          </button>
+          <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700">Quitter</button>
+        </div>
+      </div>
+    </div>
+    <!-- Map -->
+    <div class="map-box">
+      <div class="mr-h" style="top:33%"></div><div class="mr-h" style="top:64%"></div>
+      <div class="mr-v" style="left:30%"></div><div class="mr-v" style="left:62%"></div>
+      <div class="mb" style="top:8%;left:32%;width:26%;height:22%"></div>
+      <div class="mb" style="top:40%;left:8%;width:18%;height:20%"></div>
+      <div class="mb" style="top:68%;left:65%;width:24%;height:24%"></div>
+      <div class="ml" style="top:6px;left:6px">Bender Djedid</div>
+      <div class="ml" style="top:35%;right:6px">Quartier 3</div>
+      <div class="ml" style="bottom:6px;left:6px">Plateau</div>
+      <div class="map-pulse"></div>
+      <div style="position:absolute;top:50%;left:26%;transform:translate(-50%,-50%);font-size:20px;color:var(--pu)">🟣</div>
+      <div style="position:absolute;top:16%;right:20%;font-size:22px">📍</div>
+      <div style="position:absolute;bottom:18%;left:52%;font-size:22px">🏠</div>
+      <div id="l-eta" style="position:absolute;top:10px;right:10px;background:var(--pu);color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:10px">En attente</div>
+    </div>
+    <!-- Tabs -->
+    <div style="display:flex;background:var(--pu-ll);border-bottom:1px solid var(--border)">
+      <button class="btm-tab active" id="lt-missions" onclick="lTab('missions')" style="padding:9px 0"><span class="ti" style="font-size:18px">🗺️</span><span class="tl">Missions</span></button>
+      <button class="btm-tab" id="lt-history" onclick="lTab('history')" style="padding:9px 0"><span class="ti" style="font-size:18px">📋</span><span class="tl">Historique</span></button>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <div id="l-missions-tab">
+        <div id="l-active-mission"></div>
+        <div id="l-available-missions"><div class="empty-state"><div class="empty-ic">⏳</div><div class="empty-title">En attente de missions</div><div class="empty-sub">Les commandes prêtes apparaîtront ici</div></div></div>
+      </div>
+      <div id="l-history-tab" style="display:none">
+        <div class="stats-grid">
+          <div class="stat-c"><div class="stat-lbl">Total livrées</div><div class="stat-val c-pu" id="lh-total">0</div></div>
+          <div class="stat-c"><div class="stat-lbl">Note moyenne</div><div class="stat-val c-or" id="lh-rating">N/A</div></div>
+        </div>
+        <div id="l-history-list"><div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune livraison</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end app-wrap -->
+
+<script>
+const API='/api';
+let TOKEN='',ROLE='',CART={},CURRENT_REST=null,ALL_RESTS=[],ALL_RESTS_DATA=[],currentPhone='',R_MENU=[],pollInterval,A_RESTS=[],A_STATUS_FILTER='all';
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+const api=(m,p,b)=>fetch(API+p,{method:m,headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:b?JSON.stringify(b):undefined}).then(r=>r.json());
+const $=id=>document.getElementById(id);
+function showPortal(id){document.querySelectorAll('.portal').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');}
+function showErr(msg){const e=$('login-err');e.textContent=msg;e.style.display='block';}
+function hideErr(){$('login-err').style.display='none';}
+function sBadge(s){const m={active:'<span class="badge b-gr">Actif</span>',pending:'<span class="badge b-or">En attente</span>',suspended:'<span class="badge b-re">Suspendu</span>',rejected:'<span class="badge b-mid">Refusé</span>'};return m[s]||s;}
+function osBadge(s){const m={pending:'<span class="badge b-mid">En attente</span>',accepted:'<span class="badge b-pu">Acceptée</span>',preparing:'<span class="badge b-or">Préparation</span>',ready:'<span class="badge b-gr">Prête</span>',delivering:'<span class="badge b-pu">Livraison</span>',delivered:'<span class="badge b-gr">Livrée</span>',cancelled:'<span class="badge b-re">Annulée</span>'};return m[s]||s;}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+function nOtp(el,nid){if(el.value.length===1)$(nid).focus();}
+function checkOtp(){const c=['o1','o2','o3','o4'].map(id=>$(id).value).join('');if(c.length===4)setTimeout(doOtpLogin,150);}
+function backToStep1(){$('login-step-1').style.display='block';$('login-step-2').style.display='none';$('login-step-3').style.display='none';}
+
+async function doPhoneLogin(){
+  const raw=$('ph-inp').value.trim();
+  if(!raw){showErr('Entrez un numéro de téléphone');return;}
+  currentPhone=raw.startsWith('+')?raw:'+253'+raw.replace(/\s/g,'');
+  const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:currentPhone})}).then(r=>r.json());
+  if(r.error){showErr(r.error);return;}
+  if(r.needs_otp){
+    hideErr();
+    $('otp-hint').textContent='Code envoyé au '+currentPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
+    $('login-step-1').style.display='none';$('login-step-2').style.display='block';
+  }
+}
+
+async function doIdLogin(){
+  const identifier=$('id-inp').value.trim();
+  const password=$('pwd-inp').value;
+  if(!identifier||!password){showErr('Remplissez les deux champs');return;}
+  const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier,password})}).then(r=>r.json());
+  if(r.error){showErr(r.error);return;}
+  enterApp(r);
+}
+
+async function doOtpLogin(){
+  const otp=['o1','o2','o3','o4'].map(id=>$(id).value).join('');
+  const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:currentPhone,otp})}).then(r=>r.json());
+  if(r.error){showErr(r.error);return;}
+  if(r.role==='client'&&r.is_new){$('login-step-2').style.display='none';$('login-step-3').style.display='block';TOKEN=r.token;ROLE='client';}
+  else enterApp(r);
+}
+
+async function saveNewProfile(){
+  const first=$('np-first').value.trim(),last=$('np-last').value.trim();
+  if(!first||!last){alert('Prénom et nom requis');return;}
+  await api('PATCH','/client/profile',{first_name:first,last_name:last});
+  enterApp({role:'client',token:TOKEN});
+}
+
+function enterApp(r){
+  TOKEN=r.token||TOKEN;ROLE=r.role;
+  localStorage.setItem('boltdj_token',TOKEN);localStorage.setItem('boltdj_role',ROLE);
+  if(ROLE==='admin'){showPortal('portal-admin');aLoadAll();}
+  else if(ROLE==='restaurant'){showPortal('portal-restaurant');rLoad();}
+  else if(ROLE==='client'){showPortal('portal-client');cInit();}
+  else if(ROLE==='livreur'){showPortal('portal-livreur');lInit();}
+}
+
+function logout(){TOKEN='';ROLE='';localStorage.removeItem('boltdj_token');localStorage.removeItem('boltdj_role');clearInterval(pollInterval);showPortal('portal-login');backToStep1();}
+
+// Auto-login from localStorage
+(function(){
+  const t=localStorage.getItem('boltdj_token'),ro=localStorage.getItem('boltdj_role');
+  if(t&&ro){TOKEN=t;ROLE=ro;enterApp({role:ro,token:t});}
+})();
+
+// ─── CLIENT ───────────────────────────────────────────────────────────────────
+async function cInit(){cLoadRests('all',document.querySelector('.cat.active'));cLoadProfile();}
+
+async function cLoadProfile(){
+  const p=await api('GET','/client/profile');if(p.error)return;
+  const n=(p.first_name||'')+(p.last_name?' '+p.last_name:'');
+  $('c-greeting').textContent='Bonjour '+(p.first_name||'')+'  👋';
+  $('c-av').textContent=p.first_name?p.first_name[0].toUpperCase():'👤';
+  $('cpf-av').textContent=p.first_name?p.first_name[0].toUpperCase():'👤';
+  $('cpf-name').textContent=n||'—';$('cpf-phone').textContent=p.phone||'—';
+  $('cpf-orders').textContent=p.order_count||0;$('cpf-addrs').textContent=(p.addresses||[]).length;
+  $('cpf-addresses').innerHTML=(p.addresses||[]).map(a=>`<div class="list-row"><div class="row-ic">${a.label==='Bureau'?'💼':'🏠'}</div><div><div class="row-title">${a.label}</div><div class="row-sub">${a.quartier}${a.street?', '+a.street:''}</div></div>${a.is_default?'<span class="badge b-pu" style="margin-left:auto">Défaut</span>':''}</div>`).join('');
+}
+
+async function cLoadRests(cat,el){
+  if(el){document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+  const url=cat==='all'?'/restaurants':'/restaurants?category='+encodeURIComponent(cat);
+  ALL_RESTS=await api('GET',url);ALL_RESTS_DATA=ALL_RESTS;
+  if(!Array.isArray(ALL_RESTS))return;
+  const cats=await api('GET','/categories');
+  const em={'Fruits de mer':'🦞','Pizza':'🍕','Fast Food':'🍔','Local':'🥘','Grillades':'🌯','Japonais':'🍱'};
+  if(Array.isArray(cats)){$('c-cats').innerHTML=`<div class="cat active" onclick="cLoadRests('all',this)"><span class="cat-em">🍽️</span><span class="cat-lb">Tout</span></div>`+cats.map(c=>`<div class="cat" onclick="cLoadRests('${c.replace(/'/g,"\\'")}',this)"><span class="cat-em">${em[c]||'🍽️'}</span><span class="cat-lb">${c}</span></div>`).join('');}
+  cRenderRests(ALL_RESTS);
+}
+function cSearchRests(q){cRenderRests(q?ALL_RESTS_DATA.filter(r=>r.name.toLowerCase().includes(q.toLowerCase())):ALL_RESTS_DATA);}
+function cRenderRests(rests){
+  if(!rests.length){$('c-rests-list').innerHTML='<div class="empty-state"><div class="empty-ic">🔍</div><div class="empty-title">Aucun résultat</div></div>';return;}
+  $('c-rests-list').innerHTML=rests.map(r=>`<div class="rest-card" onclick="cOpenRest('${r.id}')"><div class="rest-img">${r.logo_emoji||'🍽️'}${!r.is_open?'<div style="position:absolute;top:8px;left:8px;background:var(--mid);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px">Fermé</div>':''}</div><div class="rest-info"><div class="rest-name">${r.name}</div><div class="rest-meta">${r.rating>0?`<span class="rmeta gold">⭐ ${r.rating.toFixed(1)}</span>`:''}<span class="rmeta">🕐 ${r.delivery_time}</span><span class="rmeta">${r.category}</span><span class="rmeta">${r.delivery_fee} FDJ livr.</span></div></div></div>`).join('');
+}
+
+async function cOpenRest(id){
+  const r=await api('GET','/restaurants/'+id);if(r.error){alert(r.error);return;}
+  CURRENT_REST=r;
+  $('c-rest-hero').innerHTML=`<span style="font-size:74px">${r.logo_emoji||'🍽️'}</span><button style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:18px;cursor:pointer;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center" onclick="cGoPage('c-home')">←</button>`;
+  $('c-rest-name').textContent=r.name;
+  $('c-rest-tags').innerHTML=[r.category,r.quartier?'📍 '+r.quartier:null,!r.is_open?'🔴 Fermé':null].filter(Boolean).map(t=>`<span class="badge b-pu">${t}</span>`).join('');
+  $('c-rest-stats').innerHTML=(r.rating>0?`<div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">⭐ ${r.rating.toFixed(1)}</div><div style="font-size:10px;color:var(--mid)">Note</div></div>`:'')+`<div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">${r.delivery_time}</div><div style="font-size:10px;color:var(--mid)">Livraison</div></div><div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">${r.delivery_fee} FDJ</div><div style="font-size:10px;color:var(--mid)">Frais</div></div>`;
+  $('c-rest-menu').innerHTML=(r.menu||[]).map(cat=>`<div class="menu-sec">${cat.name}</div><div>${cat.items.map(item=>`<div class="menu-row"><span class="me-em">${item.emoji||'🍽️'}</span><div class="me-body"><div class="me-name">${item.name}</div><div class="me-desc">${item.description||''}</div><div class="me-price">${(item.price||0).toLocaleString()} FDJ</div>${!item.is_available?'<div style="font-size:10px;color:var(--re);font-weight:700;margin-top:2px">⛔ Indisponible</div>':''}</div><div id="ctrl-${item.id}">${item.is_available?cRenderCtrl(item):''}</div></div>`).join('')}</div>`).join('');
+  cGoPage('c-rest');cUpdateCartFloat();
+}
+function cRenderCtrl(item){const qty=CART[item.id]?.qty||0;if(qty===0)return`<button class="add-btn" onclick="cAddItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">+</button>`;return`<div class="qty-ctrl"><button class="qty-btn" onclick="cRemItem('${item.id}')">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="cAddItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">+</button></div>`;}
+function cAddItem(it){if(CART[it.id])CART[it.id].qty++;else CART[it.id]={...it,qty:1};cRefreshCtrl(it.id);cUpdateCartFloat();}
+function cRemItem(id){if(!CART[id])return;CART[id].qty--;if(CART[id].qty<=0)delete CART[id];cRefreshCtrl(id);cUpdateCartFloat();}
+function cRefreshCtrl(id){const it=CURRENT_REST?.menu?.flatMap(c=>c.items).find(i=>i.id===id);const el=$('ctrl-'+id);if(el&&it)el.innerHTML=cRenderCtrl(it);}
+function cUpdateCartFloat(){const cnt=Object.values(CART).reduce((s,i)=>s+i.qty,0),tot=Object.values(CART).reduce((s,i)=>s+i.price*i.qty,0)+(CURRENT_REST?.delivery_fee||0);$('c-cart-count').textContent=cnt;$('c-cart-total-float').textContent=tot.toLocaleString()+' FDJ';$('c-cart-float').style.display=cnt>0&&$('c-rest').classList.contains('active')?'block':'none';}
+
+async function cGoToCart(){
+  if(!Object.keys(CART).length){alert('Panier vide');return;}
+  const pf=await api('GET','/client/profile');const addrs=pf.addresses||[];
+  const items=Object.values(CART);const sub=items.reduce((s,i)=>s+i.price*i.qty,0);const fee=CURRENT_REST?.delivery_fee||300;
+  $('c-cart-rest-name').textContent=CURRENT_REST?.name||'—';
+  $('c-cart-items').innerHTML=items.map(i=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><span style="font-size:28px">${i.emoji||'🍽️'}</span><div style="flex:1"><div style="font-size:13px;font-weight:700">${i.name}</div><div style="font-size:11px;color:var(--mid)">${i.price.toLocaleString()} FDJ × ${i.qty}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="qty-ctrl"><button class="qty-btn" onclick="cRemItem('${i.id}');cGoToCart()">−</button><span class="qty-num">${i.qty}</span><button class="qty-btn" onclick="cAddItem(${JSON.stringify(i).replace(/"/g,'&quot;')});cGoToCart()">+</button></div><span style="font-size:13px;font-weight:800;color:var(--pu)">${(i.price*i.qty).toLocaleString()}</span></div></div>`).join('');
+  $('c-cart-summary').innerHTML=`<div style="padding:14px 16px;border-top:1.5px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px"><span style="color:var(--mid)">Sous-total</span><span>${sub.toLocaleString()} FDJ</span></div><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px"><span style="color:var(--mid)">Livraison</span><span>${fee} FDJ</span></div><div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--pu);border-top:1.5px solid var(--border);padding-top:10px"><span>Total</span><span>${(sub+fee).toLocaleString()} FDJ</span></div></div>`;
+  const defAddr=addrs.find(a=>a.is_default)||addrs[0];
+  $('c-cart-addrs').innerHTML=addrs.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid ${a.id===defAddr?.id?'var(--pu)':'var(--border)'};border-radius:12px;margin-bottom:8px;cursor:pointer;background:${a.id===defAddr?.id?'var(--pu-ll)':'var(--white)'}" onclick="cSelAddr(this,'${a.id}')"><span>${a.label==='Bureau'?'💼':'🏠'}</span><div><div style="font-size:13px;font-weight:700">${a.label}</div><div style="font-size:11px;color:var(--mid)">${a.quartier}${a.street?', '+a.street:''}</div></div>${a.id===defAddr?.id?'<span style="margin-left:auto;color:var(--pu);font-size:16px">✓</span>':''}</div>`).join('')+'<input type="hidden" id="sel-addr" value="'+(defAddr?.id||'')+'">';
+  $('c-cart-cta').innerHTML=`<button class="btn-pu" onclick="cPlaceOrder(${sub+fee})">Commander · ${(sub+fee).toLocaleString()} FDJ</button>`;
+  $('c-cart-float').style.display='none';
+  cGoPage('c-cart');
+}
+function cSelAddr(el,id){document.querySelectorAll('#c-cart-addrs>div').forEach(e=>{e.style.borderColor='var(--border)';e.style.background='var(--white)';const t=e.querySelector('span:last-child');if(t&&t.textContent==='✓')t.remove();});el.style.borderColor='var(--pu)';el.style.background='var(--pu-ll)';const sp=document.createElement('span');sp.style.cssText='margin-left:auto;color:var(--pu);font-size:16px';sp.textContent='✓';el.appendChild(sp);$('sel-addr').value=id;}
+async function cPlaceOrder(total){
+  if(!CURRENT_REST)return;
+  const addrId=$('sel-addr')?.value;
+  const r=await api('POST','/client/orders',{restaurant_id:CURRENT_REST.id,items:Object.values(CART).map(i=>({menu_item_id:i.id,quantity:i.qty})),address_id:addrId||undefined});
+  if(r.error){alert(r.error);return;}
+  CART={};cUpdateCartFloat();
+  $('c-succ-num').textContent=r.order_number;
+  const steps=[{n:'Commande reçue',s:'Quelques secondes',on:true},{n:'En préparation',s:'Le restaurant prépare',on:true},{n:'Livreur en route',s:'Estimation: '+CURRENT_REST.delivery_time,on:false},{n:'Livré',s:'Bientôt !',on:false}];
+  $('c-track').innerHTML=steps.map((s,i)=>`<div style="display:flex;gap:12px;${i<steps.length-1?'margin-bottom:14px':''}"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:16px;height:16px;border-radius:50%;background:${s.on?'var(--pu)':'var(--border)'};flex-shrink:0"></div>${i<steps.length-1?'<div style="width:2px;flex:1;min-height:18px;background:var(--border);margin:3px 0"></div>':''}</div><div><div style="font-size:13px;font-weight:700">${s.n}</div><div style="font-size:11px;color:var(--mid);margin-top:2px">${s.s}</div></div></div>`).join('');
+  cGoPage('c-success');cLoadOrders();
+}
+
+async function cLoadOrders(){
+  const orders=await api('GET','/client/orders');if(!Array.isArray(orders))return;
+  if(!orders.length){$('c-orders-list').innerHTML='<div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande</div></div>';return;}
+  $('c-orders-list').innerHTML=orders.map(o=>`<div style="padding:14px 16px;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><div style="font-size:14px;font-weight:800">${o.logo_emoji||'🍽️'} ${o.restaurant_name||'—'}</div><div style="font-size:11px;color:var(--mid)">${o.order_number} · ${(o.created_at||'').slice(0,16).replace('T',' ')}</div></div>${osBadge(o.status)}</div><div style="font-size:11px;color:var(--mid);margin-bottom:6px">${(o.items||[]).map(i=>i.name+'×'+i.quantity).join(' · ')}</div><div style="font-size:15px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()} FDJ</div></div>`).join('');
+}
+
+function cGoPage(id){document.querySelectorAll('#portal-client .page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');cUpdateCartFloat();}
+function cTab(t){const m={home:'c-home',orders:'c-orders',profile:'c-profile'};cGoPage(m[t]);document.querySelectorAll('#c-nav .btm-tab').forEach(b=>b.classList.remove('active'));$('c-tab-'+t)?.classList.add('active');if(t==='orders')cLoadOrders();if(t==='profile')cLoadProfile();}
+
+// ─── RESTAURANT ───────────────────────────────────────────────────────────────
+let R_IS_OPEN=true;
+async function rLoad(){
+  const me=await api('GET','/restaurant/me');if(me.error){logout();return;}
+  $('r-name').textContent=me.logo_emoji+' '+me.name;$('r-code').textContent=me.code+' · Partenaire BoltDj';
+  R_IS_OPEN=!!me.is_open;rUpdateOpenBtn();
+  rLoadStats();rLoadOrders();rLoadMenu();
+  if($('rss-rat'))$('rss-rat').textContent=me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
+  pollInterval=setInterval(()=>{rLoadOrders();rLoadStats();},15000);
+}
+function rUpdateOpenBtn(){$('r-open-btn').style.background=R_IS_OPEN?'rgba(255,255,255,.2)':'rgba(231,113,113,.4)';$('r-open-dot').style.background=R_IS_OPEN?'var(--gr)':'var(--re)';$('r-open-lbl').textContent=R_IS_OPEN?'Ouvert':'Fermé';}
+async function rToggleOpen(){const r=await api('PATCH','/restaurant/toggle-open');if(!r.error){R_IS_OPEN=!!r.is_open;rUpdateOpenBtn();}}
+
+async function rLoadStats(){
+  const s=await api('GET','/restaurant/stats');if(s.error)return;
+  $('rs-new').textContent=s.pendingOrders||0;$('rs-prep').textContent=s.preparingOrders||0;$('rs-done').textContent=s.todayOrders||0;$('rs-rev').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';
+  const nb=$('r-new-badge');nb.textContent=s.pendingOrders||0;nb.style.display=s.pendingOrders>0?'inline':'none';
+  if($('rss-mo'))$('rss-mo').textContent=s.monthOrders||0;
+  if($('rss-rev'))$('rss-rev').textContent=(s.monthRevenue||0).toLocaleString()+' FDJ';
+  if($('rss-pend'))$('rss-pend').textContent=s.pendingOrders||0;
+  const vals=[34,51,63,47,72,68,s.todayOrders||87];const mx=Math.max(...vals);if($('r-chart'))$('r-chart').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'today':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
+}
+
+async function rLoadOrders(){
+  const orders=await api('GET','/restaurant/orders');if(!Array.isArray(orders))return;
+  const active=orders.filter(o=>!['delivered','cancelled'].includes(o.status));
+  if(!active.length){$('r-orders-list').innerHTML='<div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande active</div></div>';return;}
+  $('r-orders-list').innerHTML='<div style="padding:10px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--pu2)">COMMANDES EN COURS</div>'+active.map(o=>`
+    <div class="order-card ${o.status==='pending'?'new-ord':''}" id="ord-${o.id}" style="margin:8px 16px">
+      <div class="oc-head">
+        <div><span style="font-size:13px;font-weight:800">#${o.order_number} — ${o.client_name||'Client'}</span>${o.status==='pending'?'<span class="badge b-pu pulse" style="margin-left:8px;font-size:9px">NOUVELLE</span>':''}<div style="font-size:11px;color:var(--mid);margin-top:2px">${o.client_phone||''} · ${o.delivery_address||'Adresse non précisée'}</div></div>
+        ${osBadge(o.status)}
+      </div>
+      <div class="oc-body">
+        <div class="oc-items">${(o.items||[]).map(i=>`${i.emoji||'•'} ${i.name} × ${i.quantity} — ${(i.price*i.quantity).toLocaleString()} FDJ`).join('<br>')}</div>
+        <div class="oc-footer">
+          <span class="oc-total">${(o.total||0).toLocaleString()} FDJ</span>
+          <div class="oc-acts">
+            ${o.status==='pending'?`<button class="btn-sm btn-sm-re" onclick="rUpdOrd('${o.id}','cancelled')">✗ Refuser</button><button class="btn-sm btn-sm-pu" onclick="rUpdOrd('${o.id}','accepted')">✓ Accepter</button>`:''}
+            ${o.status==='accepted'?`<button class="btn-sm btn-sm-pu" onclick="rUpdOrd('${o.id}','preparing')">🍳 En prépa.</button>`:''}
+            ${o.status==='preparing'?`<button class="btn-sm btn-sm-gr" onclick="rUpdOrd('${o.id}','ready')">✅ Prêt !</button>`:''}
+            ${o.status==='ready'?'<span style="font-size:11px;color:var(--mid)">🛵 Livreur en route</span>':''}
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function rUpdOrd(id,status){const r=await api('PATCH',`/restaurant/orders/${id}/status`,{status});if(!r.error){rLoadOrders();rLoadStats();}}
+
+async function rLoadMenu(){
+  R_MENU=await api('GET','/restaurant/menu');if(!Array.isArray(R_MENU))return;
+  const catSel=$('i-cat');catSel.innerHTML=R_MENU.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  $('r-menu-list').innerHTML=R_MENU.map(cat=>`
+    <div style="border-bottom:2px solid var(--border)">
+      <div class="card-head card-title" style="display:flex;justify-content:space-between">${cat.name}<button class="btn-sm btn-sm-pu" onclick="rOpenAddItemCat('${cat.id}')">+</button></div>
+      ${cat.items.length?cat.items.map(item=>`
+        <div class="menu-row" id="item-${item.id}">
+          <span class="me-em">${item.emoji||'🍽️'}</span>
+          <div class="me-body"><div class="me-name">${item.name}</div><div class="me-desc">${item.description||''}</div><div class="me-price">${(item.price||0).toLocaleString()} FDJ</div></div>
+          <label class="tog"><input type="checkbox" ${item.is_available?'checked':''} onchange="rTogItem('${item.id}',this.checked)"><div class="tog-track"></div><div class="tog-thumb"></div></label>
+          <button class="btn-sm btn-sm-or" style="margin-left:6px" onclick="rOpenEditItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">✏️</button>
+          <button class="btn-sm btn-sm-re" style="margin-left:3px" onclick="rDelItem('${item.id}')">🗑</button>
+        </div>`).join('')
+      :`<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun plat — <span style="color:var(--pu);cursor:pointer" onclick="rOpenAddItemCat('${cat.id}')">Ajouter</span></div>`}
+    </div>`).join('');
+}
+
+async function rTogItem(id,av){await api('PATCH',`/restaurant/menu/items/${id}`,{is_available:av});}
+async function rDelItem(id){if(!confirm('Supprimer ce plat ?'))return;await api('DELETE',`/restaurant/menu/items/${id}`);rLoadMenu();}
+function rOpenAddItem(){$('item-modal-title').textContent='Ajouter un plat';$('edit-item-id').value='';['i-name','i-desc'].forEach(f=>$(f).value='');$('i-price').value='';$('i-emoji').value='🍽️';$('r-modal-item').style.display='flex';}
+function rOpenAddItemCat(catId){rOpenAddItem();$('i-cat').value=catId;}
+function rOpenEditItem(it){$('item-modal-title').textContent='Modifier';$('edit-item-id').value=it.id;$('i-name').value=it.name||'';$('i-price').value=it.price||'';$('i-emoji').value=it.emoji||'🍽️';$('i-desc').value=it.description||'';$('i-cat').value=it.category_id||'';$('r-modal-item').style.display='flex';}
+async function rSaveItem(){const eid=$('edit-item-id').value,body={name:$('i-name').value,price:parseInt($('i-price').value),emoji:$('i-emoji').value,description:$('i-desc').value,category_id:$('i-cat').value};if(!body.name||!body.price){alert('Nom et prix requis');return;}if(eid)await api('PATCH',`/restaurant/menu/items/${eid}`,body);else await api('POST','/restaurant/menu/items',body);$('r-modal-item').style.display='none';rLoadMenu();}
+function rOpenAddCat(){$('r-modal-cat').style.display='flex';}
+async function rSaveCat(){const name=$('cat-name').value.trim();if(!name)return;await api('POST','/restaurant/menu/categories',{name});$('r-modal-cat').style.display='none';$('cat-name').value='';rLoadMenu();}
+
+function rTab(t){const tabs={orders:'r-orders-tab',menu:'r-menu-tab',stats:'r-stats-tab'};Object.entries(tabs).forEach(([k,v])=>{$(v).style.display=k===t?'block':'none';$('rt-'+k)?.classList.toggle('active',k===t);});if(t==='menu')rLoadMenu();if(t==='stats')rLoadStats();}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+async function aLoadAll(){aLoadStats();aLoadRestaurants();aLoadOrders();aLoadClients();aLoadLivreurs();}
+async function aLoadStats(){
+  const s=await api('GET','/admin/stats');if(s.error)return;
+  $('as-active').textContent=s.activeRests||0;$('as-today').textContent=s.todayOrders||0;$('as-pend').textContent=s.pendingRests||0;$('as-rev').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';$('a-pend-badge').textContent=s.pendingRests||0;
+  const vals=[34,51,63,47,72,68,s.todayOrders||87];const mx=Math.max(...vals);
+  $('a-chart').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'today':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
+}
+async function aLoadRestaurants(){
+  A_RESTS=await api('GET','/admin/restaurants');if(!Array.isArray(A_RESTS))return;
+  aRenderRests();
+  const pend=A_RESTS.filter(r=>r.status==='pending');
+  $('a-pending-rests').innerHTML=pend.length?pend.map(r=>`<div class="list-row"><div class="row-ic">${r.logo_emoji||'🍽️'}</div><div><div class="row-title">${r.name}</div><div class="row-sub">${r.manager_name} · ${r.phone}</div></div><div style="display:flex;gap:5px;margin-left:auto"><button class="btn-sm btn-sm-gr" onclick="aUpdStatus('${r.id}','active')">✓</button><button class="btn-sm btn-sm-re" onclick="aUpdStatus('${r.id}','rejected')">✗</button></div></div>`).join(''):'<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun restaurant en attente ✅</div>';
+}
+function aRenderRests(){
+  let data=A_RESTS;if(A_STATUS_FILTER!=='all')data=data.filter(r=>r.status===A_STATUS_FILTER);
+  $('a-rest-tbody').innerHTML=data.map(r=>`<tr><td style="font-size:11px;color:var(--mid)">${r.code}</td><td><strong>${r.logo_emoji} ${r.name}</strong><br><small style="color:var(--mid)">${r.quartier||''}</small></td><td>${r.manager_name}</td><td>${sBadge(r.status)}</td><td style="display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px">${r.status==='pending'?`<button class="btn-sm btn-sm-gr" onclick="aUpdStatus('${r.id}','active')">✓ Valider</button><button class="btn-sm btn-sm-re" onclick="aUpdStatus('${r.id}','rejected')">✗</button>`:''} ${r.status==='active'?`<button class="btn-sm btn-sm-or" onclick="aUpdStatus('${r.id}','suspended')">Suspendre</button>`:''} ${r.status==='suspended'?`<button class="btn-sm btn-sm-gr" onclick="aUpdStatus('${r.id}','active')">Réactiver</button>`:''}</td></tr>`).join('');
+}
+function aFilterStatus(s,el){A_STATUS_FILTER=s;document.querySelectorAll('.a-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');aRenderRests();}
+async function aUpdStatus(id,status){if(!confirm({active:'Valider ?',suspended:'Suspendre ?',rejected:'Refuser définitivement ?'}[status]||'Confirmer ?'))return;const r=await api('PATCH',`/admin/restaurants/${id}/status`,{status});if(!r.error){await aLoadRestaurants();aLoadStats();}}
+async function aLoadOrders(){const orders=await api('GET','/admin/orders');if(!Array.isArray(orders))return;$('a-orders-tbody').innerHTML=orders.map(o=>`<tr><td style="font-size:11px"><code style="background:var(--pu-ll);padding:2px 5px;border-radius:4px">${o.order_number}</code></td><td>${o.client_name||'—'}<br><small style="color:var(--mid)">${o.client_phone||''}</small></td><td>${o.restaurant_name||'—'}</td><td style="font-weight:800">${(o.total||0).toLocaleString()} FDJ</td><td>${osBadge(o.status)}</td></tr>`).join('');$('a-recent-orders').innerHTML=orders.slice(0,5).map(o=>`<div class="list-row"><div class="row-ic">📦</div><div><div class="row-title">${o.restaurant_name||'—'} — ${o.order_number}</div><div class="row-sub">${o.client_name||'—'} · ${(o.created_at||'').slice(11,16)}</div></div><span style="margin-left:auto;font-size:13px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()} FDJ</span></div>`).join('')||'<div style="padding:16px;text-align:center;color:var(--mid)">Aucune commande</div>';}
+async function aLoadClients(){const c=await api('GET','/admin/clients');if(!Array.isArray(c))return;$('a-clients-tbody').innerHTML=c.map(cl=>`<tr><td><strong>${cl.first_name||''} ${cl.last_name||''}</strong></td><td>${cl.phone}</td><td>${cl.total_orders||0}</td><td style="font-weight:800">${(cl.total_spent||0).toLocaleString()} FDJ</td></tr>`).join('');}
+async function aLoadLivreurs(){const l=await api('GET','/admin/livreurs');if(!Array.isArray(l))return;const sm={available:'<span class="badge b-gr">Disponible</span>',delivering:'<span class="badge b-pu">Livraison</span>',offline:'<span class="badge b-mid">Hors ligne</span>'};$('a-livreurs-tbody').innerHTML=l.map(li=>`<tr><td><strong>${li.name}</strong></td><td>${li.phone}</td><td>${li.zone||'—'}</td><td>${li.total_deliveries||0}</td><td>${sm[li.status]||li.status}</td></tr>`).join('');}
+function aOpenNewRest(){$('a-rest-created').style.display='none';$('a-modal-rest').style.display='flex';}
+async function aCreateRest(){const body={name:$('ar-name').value,category:$('ar-cat').value,manager_name:$('ar-mgr').value,phone:$('ar-tel').value,address:$('ar-addr').value,quartier:$('ar-q').value,logo_emoji:$('ar-emoji').value};if(!body.name||!body.manager_name||!body.phone){alert('Champs * obligatoires');return;}const r=await api('POST','/admin/restaurants',body);if(r.error){alert(r.error);return;}const el=$('a-rest-created');el.style.display='block';el.innerHTML=`✅ Restaurant créé !<br><strong>Code:</strong> ${r.code}<br><strong>MDP temp:</strong> ${r.temp_password}`;aLoadRestaurants();aLoadStats();}
+function aOpenNewLiv(){$('a-modal-liv').style.display='flex';}
+async function aCreateLiv(){const r=await api('POST','/admin/livreurs',{name:$('al-name').value,phone:$('al-tel').value,zone:$('al-zone').value});if(r.error){alert(r.error);return;}alert('Livreur créé ! MDP: '+r.temp_password);$('a-modal-liv').style.display='none';aLoadLivreurs();}
+function aTab(t,btn){document.querySelectorAll('.admin-page').forEach(p=>p.classList.remove('active'));$('a-'+t).classList.add('active');document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const titles={overview:'Vue d\'ensemble',restaurants:'Restaurants',orders:'Commandes',clients:'Clients',livreurs:'Livreurs'};$('a-page-title').textContent=titles[t]||t;}
+
+// ─── LIVREUR ─────────────────────────────────────────────────────────────────
+let L_STATUS='available';
+async function lInit(){
+  const me=await api('GET','/livreur/me');if(me.error){logout();return;}
+  $('l-name').textContent=me.name;$('l-zone').textContent=(me.zone||'Djibouti-Ville')+' · BoltDj';
+  $('lh-total').textContent=me.total_deliveries||0;$('lh-rating').textContent=me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
+  L_STATUS=me.status||'available';lUpdateStatusBtn();
+  lLoadMissions();pollInterval=setInterval(lLoadMissions,20000);
+}
+function lUpdateStatusBtn(){const on=L_STATUS!=='offline';$('l-status-dot').style.background=on?'var(--gr)':'var(--re)';$('l-status-lbl').textContent=on?'Disponible':'Hors ligne';$('l-eta').textContent=on?'En service':'Hors ligne';}
+async function lToggleStatus(){const r=await api('PATCH','/livreur/toggle-status');if(!r.error){L_STATUS=r.status;lUpdateStatusBtn();}}
+async function lLoadMissions(){
+  const missions=await api('GET','/livreur/missions');if(!Array.isArray(missions))return;
+  const active=missions.find(m=>m.status==='delivering');
+  const available=missions.filter(m=>m.status==='ready');
+  if(active){$('l-eta').textContent='~15 min';
+    $('l-active-mission').innerHTML=`<div style="padding:10px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--pu2)">EN COURS</div><div class="mission-card active-m"><div class="mc-h"><span class="mc-id">${active.order_number}</span><span class="badge b-pu">🛵 En route</span></div><div class="mc-b"><div class="addr-s"><div class="addr-dot-col"><div class="addr-dot" style="background:var(--pu)"></div><div class="addr-line"></div></div><div><div class="addr-lbl">Récupérer</div><div class="addr-val">${active.rest_name||'Restaurant'}</div><div style="font-size:11px;color:var(--mid)">${active.rest_address||''}</div></div></div><div class="addr-s"><div class="addr-dot-col"><div class="addr-dot" style="background:var(--gr)"></div></div><div><div class="addr-lbl">Livrer à</div><div class="addr-val">${active.client_name||'Client'}</div><div style="font-size:11px;color:var(--mid)">${active.delivery_address||''}<br><span style="color:var(--pu);font-weight:700">${active.client_phone||''}</span></div></div></div></div><div class="mc-f"><div style="flex:1"><div style="font-size:11px;color:var(--mid)">Montant</div><div style="font-size:16px;font-weight:800;color:var(--pu)">${(active.total||0).toLocaleString()} FDJ</div></div><button class="btn-gr" style="width:auto;padding:10px 18px;font-size:13px" onclick="lDeliver('${active.id}')">✓ Confirmer livraison</button></div></div>`;
+  } else $('l-active-mission').innerHTML='';
+  if(available.length){$('l-available-missions').innerHTML=`<div style="padding:10px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mid)">${available.length} MISSION${available.length>1?'S':''} DISPONIBLE${available.length>1?'S':''}</div>`+available.map(m=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><div class="row-ic">${m.logo_emoji||'📦'}</div><div style="flex:1"><div class="row-title">${m.order_number}</div><div class="row-sub">🍽️ ${m.rest_name||'—'} · 📍 ${m.delivery_address||'—'}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--pu)">${(m.total||0).toLocaleString()} FDJ</div><button class="btn-sm btn-sm-pu" style="margin-top:5px" onclick="lPickup('${m.id}')">Prendre</button></div></div>`).join('');}
+  else if(!active)$('l-available-missions').innerHTML='<div class="empty-state"><div class="empty-ic">⏳</div><div class="empty-title">En attente de missions</div><div class="empty-sub">Les commandes prêtes apparaîtront ici</div></div>';
+}
+async function lPickup(id){const r=await api('PATCH',`/livreur/missions/${id}/pickup`);if(r.error){alert(r.error);return;}lLoadMissions();}
+async function lDeliver(id){if(!confirm('Confirmer la livraison ?'))return;const r=await api('PATCH',`/livreur/missions/${id}/deliver`);if(r.error){alert(r.error);return;}lLoadMissions();alert('✅ Livraison confirmée !');}
+async function lLoadHistory(){
+  const h=await api('GET','/livreur/history');if(!Array.isArray(h)||!h.length){$('l-history-list').innerHTML='<div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune livraison</div></div>';return;}
+  $('l-history-list').innerHTML=h.map(hi=>`<div style="padding:13px 16px;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:800">${hi.logo_emoji||'📦'} ${hi.rest_name||'—'}</div><span class="badge b-gr">✓ Livrée</span></div><div style="font-size:11px;color:var(--mid)">${hi.order_number} · ${(hi.created_at||'').slice(0,10)}</div><div style="font-size:14px;font-weight:800;color:var(--pu);margin-top:5px">+${hi.delivery_fee||300} FDJ</div></div>`).join('');
+}
+function lTab(t){$('l-missions-tab').style.display=t==='missions'?'block':'none';$('l-history-tab').style.display=t==='history'?'block':'none';document.querySelectorAll('.portal#portal-livreur .btm-tab').forEach(b=>b.classList.remove('active'));$('lt-'+t)?.classList.add('active');if(t==='history')lLoadHistory();}
+</script>
+</body>
+</html>
