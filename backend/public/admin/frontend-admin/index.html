@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BoltDj — Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF5A1F;--or-l:#FFF0EB;--or-d:#CC4400;--bg:#F7F6F3;--card:#fff;--border:#E8E6DF;--text:#1A1A1A;--muted:#6B6965;--side:210px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px;width:360px}
+.login-logo{font-size:22px;font-weight:700;margin-bottom:6px}.login-logo span{color:var(--or)}
+.login-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.field{margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.inp{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--card);color:var(--text)}
+.inp:focus{border-color:var(--or)}
+.btn-primary{width:100%;padding:12px;background:var(--or);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-primary:hover{background:var(--or-d)}
+.error-msg{color:#E24B4A;font-size:12px;margin-top:8px;display:none}
+
+/* APP SHELL */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:row}
+.sidebar{width:var(--side);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh}
+.sb-header{padding:18px 14px 12px;border-bottom:1px solid var(--border)}
+.brand{font-size:15px;font-weight:700}.brand span{color:var(--or)}
+.role-badge{font-size:10px;background:var(--or-l);color:var(--or-d);padding:2px 7px;border-radius:10px;display:inline-block;margin-top:4px;font-weight:600}
+.sb-nav{padding:10px 8px;flex:1;overflow-y:auto}
+.nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--muted);text-align:left;font-family:inherit;margin-bottom:2px;transition:all .15s}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.active{background:var(--or-l);color:var(--or-d);font-weight:600}
+.nav-ic{font-size:15px;width:20px;text-align:center}
+.nb{margin-left:auto;background:#E24B4A;color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:9px}
+.sb-footer{padding:10px 8px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;background:var(--bg)}
+.av{width:28px;height:28px;border-radius:50%;background:var(--or-l);color:var(--or-d);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.page-h{font-size:16px;font-weight:600}
+.topbar-actions{display:flex;gap:8px}
+.btn{padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--card);font-size:12px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:500}
+.btn:hover{background:var(--bg)}
+.btn-or{background:var(--or);color:#fff;border-color:var(--or)}.btn-or:hover{background:var(--or-d)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.content{flex:1;padding:20px;overflow-y:auto}
+.pane{display:none}.pane.active{display:block}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--bg);border-radius:10px;padding:14px}
+.stat-l{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-v{font-size:22px;font-weight:700}
+.stat-d{font-size:11px;margin-top:3px;color:var(--muted)}
+
+/* CARDS / TABLES */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th{padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.4px}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF8}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.b-green{background:#EAF3DE;color:#27500A}.b-amber{background:#FAEEDA;color:#633806}
+.b-red{background:#FCEBEB;color:#791F1F}.b-blue{background:#E6F1FB;color:#0C447C}
+.b-gray{background:var(--bg);color:var(--muted)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:3px}
+.dot-g{background:#639922}.dot-a{background:#EF9F27}.dot-r{background:#E24B4A}
+.act-row{display:flex;gap:4px}
+.ab{padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:none;font-size:10px;cursor:pointer;font-family:inherit;font-weight:600}
+.ab-gr{background:#EAF3DE;border-color:#639922;color:#27500A}.ab-gr:hover{background:#C0DD97}
+.ab-rd{background:#FCEBEB;border-color:#E24B4A;color:#791F1F}.ab-rd:hover{background:#F7C1C1}
+.ab-am{background:#FAEEDA;border-color:#EF9F27;color:#633806}.ab-am:hover{background:#FAC775}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.filter-bar{display:flex;gap:8px;margin-bottom:14px}
+.fchip{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;color:var(--muted);font-weight:500}
+.fchip.active{background:var(--or-l);border-color:var(--or);color:var(--or-d)}
+.loading{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:16px;width:440px;max-width:95vw;border:1px solid var(--border)}
+.modal-h{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted)}
+.modal-body{padding:20px;max-height:70vh;overflow-y:auto}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.info-box{background:var(--bg);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:6px}
+select.inp option{background:var(--card)}
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A1A;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Bolt<span>Dj</span> Admin</div>
+    <div class="login-sub">Panneau d'administration — accès restreint</div>
+    <div class="field"><label>Email</label><input class="inp" id="login-email" type="email" value="admin@boltdj.dj" placeholder="admin@boltdj.dj"></div>
+    <div class="field"><label>Mot de passe</label><input class="inp" id="login-pwd" type="password" value="admin123" placeholder="••••••••"></div>
+    <div class="error-msg" id="login-err">Identifiants incorrects</div>
+    <button class="btn-primary" style="margin-top:8px" onclick="login()">Se connecter</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:flex">
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="brand">Bolt<span>Dj</span> Admin</div>
+      <div class="role-badge" id="admin-role">Super Admin</div>
+    </div>
+    <div class="sb-nav">
+      <button class="nav-btn active" onclick="showPane('overview',this)"><span class="nav-ic">📊</span>Vue d'ensemble</button>
+      <button class="nav-btn" onclick="showPane('restaurants',this)"><span class="nav-ic">🏪</span>Restaurants<span class="nb" id="pending-nb">0</span></button>
+      <button class="nav-btn" onclick="showPane('orders',this)"><span class="nav-ic">📦</span>Commandes</button>
+      <button class="nav-btn" onclick="showPane('clients',this)"><span class="nav-ic">👥</span>Clients</button>
+      <button class="nav-btn" onclick="showPane('livreurs',this)"><span class="nav-ic">🛵</span>Livreurs</button>
+    </div>
+    <div class="sb-footer">
+      <div class="user-row">
+        <div class="av" id="admin-av">AD</div>
+        <div><div style="font-size:12px;font-weight:600" id="admin-name">Admin</div><div style="font-size:10px;color:var(--muted)" id="admin-email"></div></div>
+        <button class="btn btn-sm" style="margin-left:auto" onclick="logout()">↩</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="page-h" id="page-h">Vue d'ensemble</div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="refreshCurrent()">↻ Actualiser</button>
+        <button class="btn btn-or" onclick="openCreateRestaurant()">+ Nouveau restaurant</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="pane active" id="pane-overview">
+        <div class="stats-grid" id="stats-grid"><div class="loading">Chargement...</div></div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Dernières commandes</span></div>
+            <div id="recent-orders"><div class="loading">Chargement...</div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Restaurants en attente</span><button class="btn btn-sm" onclick="showPane('restaurants',document.querySelectorAll('.nav-btn')[1])">Voir tout</button></div>
+            <div id="pending-rests"><div class="loading">Chargement...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESTAURANTS -->
+      <div class="pane" id="pane-restaurants">
+        <div class="filter-bar" id="rest-filter-bar">
+          <span class="fchip active" onclick="filterRest('',this)">Tous</span>
+          <span class="fchip" onclick="filterRest('active',this)">Actifs</span>
+          <span class="fchip" onclick="filterRest('pending',this)">En attente</span>
+          <span class="fchip" onclick="filterRest('suspended',this)">Suspendus</span>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title" id="rest-count">Restaurants</span><input class="inp" style="width:180px;padding:5px 10px;font-size:12px" placeholder="Rechercher..." oninput="searchRest(this.value)"></div>
+          <div id="rest-table"><div class="loading">Chargement...</div></div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="pane" id="pane-orders">
+        <div class="stats-grid" id="order-stats"><div class="loading">Chargement...</div></div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Toutes les commandes</span></div>
+          <div id="orders-table"><div class="loading">Chargement...</div></div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div class="pane" id="pane-clients">
+        <div class="card">
+          <div class="card-head"><span class="card-title">Clients inscrits</span></div>
+          <div id="clients-table"><div class="loading">Chargement...</div></div>
+        </div>
+      </div>
+
+      <!-- LIVREURS -->
+      <div class="pane" id="pane-livreurs">
+        <div class="card">
+          <div class="card-head"><span class="card-title">Livreurs</span><button class="btn btn-or" onclick="openAddLivreur()">+ Ajouter</button></div>
+          <div id="livreurs-table"><div class="loading">Chargement...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Create Restaurant -->
+<div class="overlay" id="modal-rest">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title">Créer un restaurant</span><button class="modal-close" onclick="closeModal('modal-rest')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nom du restaurant *</label><input class="inp" id="m-name" placeholder="Ex: Le Palais du Golf"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>Catégorie</label><select class="inp" id="m-cat"><option>Fruits de mer</option><option>Fast Food</option><option>Pizza</option><option>Local / Djiboutien</option><option>Grillades</option><option>Asiatique</option><option>Gastronomique</option></select></div>
+        <div class="field"><label>Quartier</label><select class="inp" id="m-quartier"><option>Bender Djedid</option><option>Plateau du Serpent</option><option>Quartier 1</option><option>Quartier 3</option><option>Quartier 7</option><option>Balbala</option></select></div>
+      </div>
+      <div class="field"><label>Nom du gérant *</label><input class="inp" id="m-mgr" placeholder="Prénom Nom"></div>
+      <div class="field"><label>Téléphone du gérant *</label><input class="inp" id="m-tel" placeholder="+253 77 XX XX XX"></div>
+      <div class="field"><label>Adresse</label><input class="inp" id="m-addr" placeholder="Rue, bâtiment..."></div>
+      <div class="field"><label>Description</label><input class="inp" id="m-desc" placeholder="Courte description..."></div>
+      <div class="info-box">📱 Un SMS sera envoyé automatiquement avec les identifiants de connexion.</div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-rest')">Annuler</button><button class="btn btn-or" onclick="createRestaurant()">Créer & Envoyer SMS</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Add Livreur -->
+<div class="overlay" id="modal-livreur">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title">Ajouter un livreur</span><button class="modal-close" onclick="closeModal('modal-livreur')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nom complet *</label><input class="inp" id="l-name" placeholder="Prénom Nom"></div>
+      <div class="field"><label>Téléphone *</label><input class="inp" id="l-tel" placeholder="+253 77 XX XX XX"></div>
+      <div class="field"><label>Zone de livraison</label><select class="inp" id="l-zone"><option>Centre-ville</option><option>Bender Djedid</option><option>Plateau du Serpent</option><option>Quartier 7</option><option>Balbala</option></select></div>
+      <div class="field"><label>Mot de passe</label><input class="inp" id="l-pwd" type="password" placeholder="livr123" value="livr123"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-livreur')">Annuler</button><button class="btn btn-or" onclick="addLivreur()">Ajouter</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:3001/api';
+let token = localStorage.getItem('boltdj_admin_token');
+let allRestaurants = [];
+let currentPane = 'overview';
+
+// ── Auth ──────────────────────────────────────────────
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const pwd = document.getElementById('login-pwd').value;
+  try {
+    const r = await fetch(`${API}/admin/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pwd })
+    });
+    const data = await r.json();
+    if (!r.ok) { document.getElementById('login-err').style.display='block'; document.getElementById('login-err').textContent = data.error; return; }
+    token = data.token;
+    localStorage.setItem('boltdj_admin_token', token);
+    document.getElementById('admin-name').textContent = data.admin.name;
+    document.getElementById('admin-email').textContent = data.admin.email;
+    document.getElementById('admin-av').textContent = data.admin.name.slice(0,2).toUpperCase();
+    document.getElementById('admin-role').textContent = data.admin.role;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadOverview();
+  } catch(e) { document.getElementById('login-err').style.display='block'; document.getElementById('login-err').textContent = 'Serveur inaccessible'; }
+}
+
+function logout() {
+  localStorage.removeItem('boltdj_admin_token');
+  token = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+async function apiFetch(path, opts={}) {
+  const r = await fetch(`${API}${path}`, { ...opts, headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}`, ...(opts.headers||{}) } });
+  if (r.status === 401) { logout(); return null; }
+  return r;
+}
+
+// ── Nav ───────────────────────────────────────────────
+function showPane(id, btn) {
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const titles = {overview:'Vue d\'ensemble',restaurants:'Restaurants',orders:'Commandes',clients:'Clients',livreurs:'Livreurs'};
+  document.getElementById('page-h').textContent = titles[id]||id;
+  currentPane = id;
+  if(id==='overview') loadOverview();
+  else if(id==='restaurants') loadRestaurants();
+  else if(id==='orders') loadOrders();
+  else if(id==='clients') loadClients();
+  else if(id==='livreurs') loadLivreurs();
+}
+
+function refreshCurrent() { showPane(currentPane, null); toast('Actualisé !'); }
+
+// ── OVERVIEW ─────────────────────────────────────────
+async function loadOverview() {
+  const [stats, orders] = await Promise.all([
+    apiFetch('/admin/restaurants/stats').then(r=>r&&r.json()),
+    apiFetch('/admin/orders?').then(r=>r&&r.json()),
+  ]);
+  if(stats) {
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat"><div class="stat-l">Restaurants actifs</div><div class="stat-v">${stats.activeRestaurants}</div><div class="stat-d">sur ${stats.totalRestaurants} total</div></div>
+      <div class="stat"><div class="stat-l">Commandes aujourd'hui</div><div class="stat-v">${stats.ordersToday}</div></div>
+      <div class="stat"><div class="stat-l">Chiffre d'affaires</div><div class="stat-v">${(stats.revenueToday||0).toLocaleString()}</div><div class="stat-d">FDJ aujourd'hui</div></div>
+      <div class="stat"><div class="stat-l">En attente validation</div><div class="stat-v" style="color:var(--or)">${stats.pendingRestaurants}</div></div>
+    `;
+    document.getElementById('pending-nb').textContent = stats.pendingRestaurants;
+  }
+  if(orders && orders.length) {
+    document.getElementById('recent-orders').innerHTML = orders.slice(0,5).map(o=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <div><div style="font-weight:600;font-size:13px">#${o.order_number} — ${o.restaurant_name}</div><div style="font-size:11px;color:var(--muted)">${o.first_name} ${o.last_name}</div></div>
+        <div style="text-align:right"><div style="font-weight:600;font-size:13px;color:var(--or-d)">${o.total.toLocaleString()} FDJ</div><span class="badge ${statusBadge(o.status)}">${statusLabel(o.status)}</span></div>
+      </div>`).join('');
+  }
+  loadPendingRests();
+}
+
+async function loadPendingRests() {
+  const r = await apiFetch('/admin/restaurants?status=pending');
+  const data = r ? await r.json() : [];
+  const el = document.getElementById('pending-rests');
+  if(!data.length) { el.innerHTML='<div class="empty">Aucun restaurant en attente</div>'; return; }
+  el.innerHTML = data.map(rest=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+      <div style="flex:1"><div style="font-weight:600;font-size:13px">${rest.name}</div><div style="font-size:11px;color:var(--muted)">${rest.manager_name} · ${rest.manager_phone}</div></div>
+      <div class="act-row">
+        <button class="ab ab-gr" onclick="setStatus('${rest.id}','active',this)">✓</button>
+        <button class="ab ab-rd" onclick="setStatus('${rest.id}','rejected',this)">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── RESTAURANTS ───────────────────────────────────────
+async function loadRestaurants(status='', search='') {
+  let url = '/admin/restaurants?';
+  if(status) url += `status=${status}&`;
+  if(search) url += `search=${encodeURIComponent(search)}&`;
+  const r = await apiFetch(url);
+  allRestaurants = r ? await r.json() : [];
+  renderRestTable(allRestaurants);
+  document.getElementById('rest-count').textContent = `Restaurants (${allRestaurants.length})`;
+}
+
+function renderRestTable(list) {
+  const el = document.getElementById('rest-table');
+  if(!list.length) { el.innerHTML='<div class="empty">Aucun restaurant trouvé</div>'; return; }
+  el.innerHTML = `<table><thead><tr>
+    <th style="width:8%">Code</th><th style="width:22%">Restaurant</th><th style="width:13%">Catégorie</th>
+    <th style="width:15%">Gérant</th><th style="width:12%">Commandes</th><th style="width:13%">Statut</th><th style="width:17%">Actions</th>
+  </tr></thead><tbody>${list.map(r=>`
+    <tr>
+      <td style="color:var(--muted);font-size:11px">${r.restaurant_code}</td>
+      <td><strong style="font-weight:600">${r.name}</strong><br><span style="font-size:10px;color:var(--muted)">${r.quartier||''}</span></td>
+      <td><span class="badge b-blue">${r.category||'—'}</span></td>
+      <td style="font-size:12px">${r.manager_name||'—'}</td>
+      <td style="font-size:12px">${r.orders_this_month||0}/mois</td>
+      <td>${statusBadgeHTML(r.status)}</td>
+      <td><div class="act-row">${actionButtons(r)}</div></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function statusBadgeHTML(status) {
+  const map = {active:`<span class="badge b-green"><span class="dot dot-g"></span>Actif</span>`,pending:`<span class="badge b-amber"><span class="dot dot-a"></span>En attente</span>`,suspended:`<span class="badge b-red"><span class="dot dot-r"></span>Suspendu</span>`,rejected:`<span class="badge b-gray">Refusé</span>`};
+  return map[status]||`<span class="badge b-gray">${status}</span>`;
+}
+
+function actionButtons(r) {
+  if(r.status==='pending') return `<button class="ab ab-gr" onclick="setStatus('${r.id}','active',this)">Valider</button><button class="ab ab-rd" onclick="setStatus('${r.id}','rejected',this)">Refuser</button>`;
+  if(r.status==='active') return `<button class="ab ab-am" onclick="setStatus('${r.id}','suspended',this)">Suspendre</button>`;
+  if(r.status==='suspended') return `<button class="ab ab-gr" onclick="setStatus('${r.id}','active',this)">Réactiver</button>`;
+  return '';
+}
+
+let currentStatus = '';
+function filterRest(status, chip) {
+  document.querySelectorAll('#rest-filter-bar .fchip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  currentStatus = status;
+  loadRestaurants(status);
+}
+
+function searchRest(val) {
+  if(val.length > 1) loadRestaurants(currentStatus, val);
+  else if(val.length === 0) loadRestaurants(currentStatus);
+}
+
+async function setStatus(id, status, btn) {
+  const r = await apiFetch(`/admin/restaurants/${id}/status`, { method:'PATCH', body: JSON.stringify({status}) });
+  if(!r) return;
+  if(r.ok) { toast(`Statut mis à jour : ${status}`); loadRestaurants(currentStatus); loadPendingRests(); }
+  else { const d=await r.json(); toast('Erreur: '+d.error); }
+}
+
+async function createRestaurant() {
+  const body = { name:document.getElementById('m-name').value, category:document.getElementById('m-cat').value, quartier:document.getElementById('m-quartier').value, manager_name:document.getElementById('m-mgr').value, manager_phone:document.getElementById('m-tel').value, address:document.getElementById('m-addr').value, description:document.getElementById('m-desc').value };
+  if(!body.name||!body.manager_phone) { toast('Remplissez les champs obligatoires'); return; }
+  const r = await apiFetch('/admin/restaurants', { method:'POST', body:JSON.stringify(body) });
+  const d = await r.json();
+  if(r.ok) { closeModal('modal-rest'); toast(`✅ ${body.name} créé ! SMS envoyé. ID: ${d.restaurant_code} / MDP: ${d.temp_password}`); loadRestaurants(); }
+  else toast('Erreur: '+d.error);
+}
+
+// ── ORDERS ───────────────────────────────────────────
+async function loadOrders() {
+  const [stats, orders] = await Promise.all([
+    apiFetch('/admin/restaurants/stats').then(r=>r&&r.json()),
+    apiFetch('/admin/orders').then(r=>r&&r.json()),
+  ]);
+  if(stats) {
+    document.getElementById('order-stats').innerHTML = `
+      <div class="stat"><div class="stat-l">Total aujourd'hui</div><div class="stat-v">${stats.ordersToday}</div></div>
+      <div class="stat"><div class="stat-l">Revenu du jour</div><div class="stat-v">${(stats.revenueToday||0).toLocaleString()}</div><div class="stat-d">FDJ</div></div>
+    `;
+  }
+  if(orders) {
+    document.getElementById('orders-table').innerHTML = `<table><thead><tr>
+      <th style="width:8%">N°</th><th style="width:18%">Client</th><th style="width:20%">Restaurant</th>
+      <th style="width:11%">Total</th><th style="width:11%">Heure</th><th style="width:14%">Statut</th><th style="width:18%">Livreur</th>
+    </tr></thead><tbody>${(orders||[]).map(o=>`
+      <tr>
+        <td style="font-size:11px;color:var(--muted)">${o.order_number}</td>
+        <td>${o.first_name||''} ${o.last_name||''}</td>
+        <td>${o.restaurant_name}</td>
+        <td style="font-weight:600">${(o.total||0).toLocaleString()} FDJ</td>
+        <td style="font-size:11px">${new Date(o.created_at).toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'})}</td>
+        <td><span class="badge ${statusBadge(o.status)}">${statusLabel(o.status)}</span></td>
+        <td style="font-size:11px">${o.livreur_name||'—'}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+}
+
+// ── CLIENTS ───────────────────────────────────────────
+async function loadClients() {
+  const r = await apiFetch('/admin/clients');
+  const data = r ? await r.json() : [];
+  document.getElementById('clients-table').innerHTML = `<table><thead><tr>
+    <th style="width:22%">Nom</th><th style="width:22%">Téléphone</th><th style="width:20%">Adresse</th>
+    <th style="width:12%">Commandes</th><th style="width:15%">Total dépensé</th><th style="width:9%">Statut</th>
+  </tr></thead><tbody>${data.map(c=>`
+    <tr>
+      <td>${c.first_name||''} ${c.last_name||''}</td>
+      <td style="font-size:12px">${c.phone}</td>
+      <td style="font-size:11px;color:var(--muted)">—</td>
+      <td>${c.orders_count||0}</td>
+      <td style="font-weight:600">${(c.total_spent||0).toLocaleString()} FDJ</td>
+      <td><span class="badge ${c.is_verified?'b-green':'b-amber'}">${c.is_verified?'Vérifié':'Non vérifié'}</span></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ── LIVREURS ─────────────────────────────────────────
+async function loadLivreurs() {
+  const r = await apiFetch('/admin/livreurs');
+  const data = r ? await r.json() : [];
+  document.getElementById('livreurs-table').innerHTML = `<table><thead><tr>
+    <th style="width:22%">Nom</th><th style="width:22%">Téléphone</th><th style="width:18%">Zone</th>
+    <th style="width:13%">Livraisons</th><th style="width:10%">Note</th><th style="width:15%">Statut</th>
+  </tr></thead><tbody>${data.map(l=>`
+    <tr>
+      <td>${l.name}</td><td style="font-size:12px">${l.phone}</td><td>${l.zone||'—'}</td>
+      <td>${l.total_deliveries}</td><td>⭐ ${l.rating}</td>
+      <td><span class="badge ${l.is_online?'b-green':'b-gray'}">${l.is_online?'En ligne':'Hors ligne'}</span></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+async function addLivreur() {
+  const body = { name:document.getElementById('l-name').value, phone:document.getElementById('l-tel').value, zone:document.getElementById('l-zone').value, password:document.getElementById('l-pwd').value };
+  if(!body.name||!body.phone) { toast('Nom et téléphone requis'); return; }
+  const r = await apiFetch('/admin/livreurs', { method:'POST', body:JSON.stringify(body) });
+  if(r&&r.ok) { closeModal('modal-livreur'); toast('Livreur ajouté !'); loadLivreurs(); }
+  else { const d=r?await r.json():{error:'Erreur'}; toast('Erreur: '+d.error); }
+}
+
+// ── Helpers ───────────────────────────────────────────
+function statusBadge(s) { return {pending:'b-amber',accepted:'b-blue',in_preparation:'b-amber',ready:'b-blue',in_delivery:'b-blue',delivered:'b-green',cancelled:'b-red'}[s]||'b-gray'; }
+function statusLabel(s) { return {pending:'En attente',accepted:'Acceptée',in_preparation:'En préparation',ready:'Prêt',in_delivery:'En livraison',delivered:'Livrée',cancelled:'Annulée'}[s]||s; }
+function openCreateRestaurant() { document.getElementById('modal-rest').classList.add('open'); }
+function openAddLivreur() { document.getElementById('modal-livreur').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
+
+// ── Init ─────────────────────────────────────────────
+if(token) {
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  try { const p=JSON.parse(atob(token.split('.')[1])); document.getElementById('admin-name').textContent=p.name; document.getElementById('admin-email').textContent=p.email; document.getElementById('admin-av').textContent=p.name.slice(0,2).toUpperCase(); } catch(e){}
+  loadOverview();
+} else {
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+</script>
+</body>
+</html>
