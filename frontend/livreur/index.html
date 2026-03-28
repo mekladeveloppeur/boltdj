@@ -245,7 +245,11 @@ async function requestOtp(){
   currentPhone=raw.startsWith('+')?raw:'+253'+raw.replace(/\s/g,'');
   const r=await fetch(API+'/livreur/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:currentPhone})}).then(r=>r.json());
   if(r.error){alert(r.error);return;}
-  document.getElementById('otp-sub').textContent='Code envoyé au '+currentPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
+  if (r.dev_otp) {
+    document.getElementById('otp-sub').innerHTML = 'Numéro: <strong>' + currentPhone + '</strong><br><span style="background:#6C5CE7;color:#fff;font-size:20px;font-weight:900;padding:4px 18px;border-radius:10px;display:inline-block;margin-top:6px;letter-spacing:4px">' + r.dev_otp + '</span>';
+  } else {
+    document.getElementById('otp-sub').textContent = 'SMS envoyé au ' + currentPhone + ' ✅';
+  }
   showPage('pg-otp');
 }
 function nextOtp(el,nid){if(el.value.length===1)document.getElementById(nid).focus();}

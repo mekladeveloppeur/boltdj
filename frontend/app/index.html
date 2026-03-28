@@ -294,7 +294,7 @@ select.inp{appearance:none}
           <div style="text-align:center;margin-bottom:14px">
             <div style="font-size:28px;margin-bottom:8px">📱</div>
             <div style="font-size:15px;font-weight:800;color:var(--dark)">Code SMS</div>
-            <div style="font-size:12px;color:var(--mid);margin-top:4px" id="c-otp-hint">Code envoyé</div>
+            <div style="font-size:12px;color:var(--mid);margin-top:6px;line-height:1.8;text-align:center" id="c-otp-hint">Code envoyé</div>
           </div>
           <div class="otp-row">
             <input class="otp-box" maxlength="1" id="co1" oninput="nxt(this,'co2')" inputmode="numeric">
@@ -545,7 +545,7 @@ select.inp{appearance:none}
           <button class="btn btn-pu" onclick="lReqOtp()">Recevoir le code →</button>
         </div>
         <div id="l-s2" style="display:none">
-          <div style="text-align:center;margin-bottom:14px"><div style="font-size:28px;margin-bottom:8px">📱</div><div style="font-size:15px;font-weight:800">Code SMS</div><div style="font-size:12px;color:var(--mid);margin-top:4px" id="l-oh">Code envoyé</div></div>
+          <div style="text-align:center;margin-bottom:14px"><div style="font-size:28px;margin-bottom:8px">📱</div><div style="font-size:15px;font-weight:800">Code SMS</div><div style="font-size:12px;color:var(--mid);margin-top:6px;line-height:1.8;text-align:center" id="l-oh">Code envoyé</div></div>
           <div class="otp-row">
             <input class="otp-box" maxlength="1" id="lo1" oninput="nxt(this,'lo2')" inputmode="numeric">
             <input class="otp-box" maxlength="1" id="lo2" oninput="nxt(this,'lo3')" inputmode="numeric">
@@ -880,7 +880,11 @@ async function cReqOtp(){
   hideErr('c-err');
   const r=await fetch(API+'/client/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:cPhone})}).then(r=>r.json());
   if(r.error){err('c-err',r.error);return;}
-  g('c-otp-hint').textContent='Code envoyé au '+cPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
+  if (r.dev_otp) {
+    g('c-otp-hint').innerHTML = 'Code envoyé au <strong>' + cPhone + '</strong><br><span style="background:#6C5CE7;color:#fff;font-size:18px;font-weight:900;padding:4px 16px;border-radius:10px;display:inline-block;margin-top:6px;letter-spacing:4px">' + r.dev_otp + '</span>';
+  } else {
+    g('c-otp-hint').textContent = 'SMS envoyé au ' + cPhone + ' ✅';
+  }
   sh('c-step1','none');sh('c-step2','block');
 }
 function cChkOtp(){const c=['co1','co2','co3','co4'].map(id=>g(id).value).join('');if(c.length===4)setTimeout(cVrfOtp,150);}
@@ -1150,7 +1154,11 @@ async function lReqOtp(){
   hideErr('l-err');
   const r=await fetch(API+'/livreur/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:lPhone})}).then(r=>r.json());
   if(r.error){err('l-err',r.error);return;}
-  g('l-oh').textContent='Code envoyé au '+lPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
+  if (r.dev_otp) {
+    g('l-oh').innerHTML = 'Code envoyé au <strong>' + lPhone + '</strong><br><span style="background:#6C5CE7;color:#fff;font-size:18px;font-weight:900;padding:4px 16px;border-radius:10px;display:inline-block;margin-top:6px;letter-spacing:4px">' + r.dev_otp + '</span>';
+  } else {
+    g('l-oh').textContent = 'SMS envoyé au ' + lPhone + ' ✅';
+  }
   sh('l-s1','none');sh('l-s2','block');
 }
 function lChkOtp(){const c=['lo1','lo2','lo3','lo4'].map(id=>g(id).value).join('');if(c.length===4)setTimeout(lVrfOtp,150);}

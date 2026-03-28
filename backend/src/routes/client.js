@@ -8,8 +8,12 @@ module.exports = function(router) {
 router.post('/client/request-otp', async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.status(400).json({ error: 'Numéro requis' });
-  const isDev = process.env.NODE_ENV !== 'production';
-  const otp = isDev ? '1234' : String(Math.floor(1000 + Math.random() * 9000));
+
+  // OTP: always 1234 in dev OR when no SMS provider configured
+  const smsProvider = process.env.SMS_PROVIDER || 'dev';
+  const noSmsConfigured = smsProvider === 'dev' || (!process.env.TWILIO_SID && !process.env.AT_API_KEY && !process.env.CALLMEBOT_API_KEY);
+  const otp = noSmsConfigured ? '1234' : String(Math.floor(1000 + Math.random() * 9000));
+  
   const expires = new Date(Date.now() + 10*60*1000).toISOString();
   const exists = db.prepare('SELECT id FROM clients WHERE phone=?').get(phone);
   if (exists) {
@@ -17,14 +21,27 @@ router.post('/client/request-otp', async (req, res) => {
   } else {
     db.prepare('INSERT INTO clients (id,phone,otp_code,otp_expires_at) VALUES (?,?,?,?)').run(uuid(), phone, otp, expires);
   }
-  try {
-    await new Promise((resolve, reject) => {
-      sendOTP(phone, otp).then(resolve).catch(reject);
-    });
-  } catch(e) {
-    console.error('[SMS] Failed:', e.message);
+
+  // Try to send SMS — if fails or not configured, continue anyway
+  let smsSent = false;
+  if (!noSmsConfigured) {
+    try {
+      await sendOTP(phone, otp);
+      smsSent = true;
+      console.log('[SMS] Sent OTP to', phone);
+    } catch(e) {
+      console.error('[SMS] Failed:', e.message, '— returning OTP in response as fallback');
+    }
+  } else {
+    console.log('[SMS DEV] OTP for', phone, ':', otp);
   }
-  res.json({ success: true, ...(isDev ? { dev_otp: otp } : {}) });
+
+  // Always return dev_otp if SMS not configured or failed — safe for testing with any number
+  res.json({ 
+    success: true, 
+    dev_otp: (!smsSent) ? otp : undefined,
+    sms_sent: smsSent
+  });
 });
 
 router.post('/client/verify-otp', (req, res) => {

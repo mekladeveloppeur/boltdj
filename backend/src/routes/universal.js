@@ -4,7 +4,7 @@ const db = require('../config/database');
 module.exports = function(router) {
 
 // POST /api/auth/login — détecte automatiquement le rôle
-router.post('/auth/login', (req, res) => {
+router.post('/auth/login', async (req, res) => {
   const { identifier, password, otp, phone } = req.body;
 
   // 1. Tenter login ADMIN par email
@@ -57,18 +57,33 @@ router.post('/auth/login', (req, res) => {
     if (!client && !livreur) {
       // Nouveau client — créer
       const { uuid } = require('../config/crypto');
+      const smsOk2 = process.env.TWILIO_SID || process.env.AT_API_KEY;
+      const newOtp = smsOk2 ? String(Math.floor(1000 + Math.random() * 9000)) : '1234';
       db.prepare('INSERT INTO clients (id, phone, otp_code, otp_expires_at) VALUES (?,?,?,?)').run(
-        uuid(), phone, '1234', new Date(Date.now()+10*60*1000).toISOString()
+        uuid(), phone, newOtp, new Date(Date.now()+10*60*1000).toISOString()
       );
-      console.log(`[SMS DEV] Nouveau client OTP ${phone}: 1234`);
-      return res.json({ needs_otp: true, user_type: 'client', dev_otp: '1234' });
+      let newSmsSent = false;
+      if (smsOk2) { try { const {sendOTP}=require('../config/sms'); await sendOTP(phone,newOtp); newSmsSent=true; } catch(e){} }
+      console.log(`[SMS] Nouveau client OTP ${phone}: ${newOtp} (sent=${newSmsSent})`);
+      return res.json({ needs_otp: true, user_type: 'client', dev_otp: newSmsSent ? undefined : newOtp });
     }
-    const otp_code = '1234';
+    const smsOk = process.env.TWILIO_SID || process.env.AT_API_KEY || process.env.CALLMEBOT_API_KEY;
+    const otp_code = smsOk ? String(Math.floor(1000 + Math.random() * 9000)) : '1234';
     const expires = new Date(Date.now()+10*60*1000).toISOString();
     if (client) db.prepare('UPDATE clients SET otp_code=?, otp_expires_at=? WHERE phone=?').run(otp_code, expires, phone);
     if (livreur) db.prepare('UPDATE livreurs SET otp_code=?, otp_expires_at=? WHERE phone=?').run(otp_code, expires, phone);
-    console.log(`[SMS DEV] OTP pour ${phone}: ${otp_code} (${livreur?'livreur':'client'})`);
-    return res.json({ needs_otp: true, user_type: livreur ? 'livreur' : 'client', dev_otp: otp_code });
+    // Try real SMS if configured
+    let smsSent = false;
+    if (smsOk) {
+      try {
+        const { sendOTP } = require('../config/sms');
+        await sendOTP(phone, otp_code);
+        smsSent = true;
+      } catch(e) { console.error('[SMS]', e.message); }
+    }
+    console.log(`[SMS] OTP pour ${phone}: ${otp_code} (sent=${smsSent})`);
+    // Always return otp in response if SMS not sent — works with any number for testing
+    return res.json({ needs_otp: true, user_type: livreur ? 'livreur' : 'client', dev_otp: smsSent ? undefined : otp_code });
   }
 
   return res.status(401).json({ error: 'Identifiants incorrects' });
