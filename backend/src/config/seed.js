@@ -3,6 +3,26 @@ const { hashPassword, uuid } = require('./crypto');
 
 console.log('[SEED] Initialisation BoltDj...');
 
+// Run migrations first (adds new columns if missing)
+try {
+  const migrations = [
+    "ALTER TABLE restaurants ADD COLUMN image_url TEXT DEFAULT ''",
+    "ALTER TABLE menu_items ADD COLUMN image_url TEXT DEFAULT ''",
+    "ALTER TABLE livreurs ADD COLUMN otp_code TEXT",
+    "ALTER TABLE livreurs ADD COLUMN otp_expires_at TEXT",
+    "ALTER TABLE livreurs ADD COLUMN latitude REAL",
+    "ALTER TABLE livreurs ADD COLUMN longitude REAL",
+    "ALTER TABLE livreurs ADD COLUMN last_seen TEXT",
+    "ALTER TABLE orders ADD COLUMN livreur_id TEXT",
+    "ALTER TABLE orders ADD COLUMN livreur_lat REAL",
+    "ALTER TABLE orders ADD COLUMN livreur_lng REAL",
+  ];
+  for (const sql of migrations) {
+    try { db.exec(sql); } catch(e) {}
+  }
+} catch(e) {}
+
+
 const adminHash = hashPassword('Admin2026!');
 try {
   db.prepare('INSERT OR IGNORE INTO admins (id,email,password_hash,name) VALUES (?,?,?,?)').run(uuid(),'admin@boltdj.dj',adminHash,'Super Admin BoltDj');

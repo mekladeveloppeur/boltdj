@@ -2,14 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const url = require('node:url');
-// 🔥 ANTI-CRASH
-process.on('uncaughtException', err => {
-  console.error('🔥 UNCAUGHT ERROR:', err);
-});
 
-process.on('unhandledRejection', err => {
-  console.error('🔥 UNHANDLED PROMISE:', err);
-});
 // Load .env manually (no dotenv needed)
 const envPath = path.join(__dirname, '../.env');
 if (fs.existsSync(envPath)) {
@@ -19,13 +12,8 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-// Auto-seed database on first launch (SAFE VERSION)
-try {
-  require('./config/auto-seed')();
-  console.log("✅ Auto-seed executed");
-} catch (e) {
-  console.error("❌ Auto-seed failed:", e.message);
-}
+// Auto-seed database on first launch
+require('./config/auto-seed')();
 
 // ── Router ────────────────────────────────────────────────────────────────────
 const routes = { GET:{}, POST:{}, PATCH:{}, DELETE:{} };
@@ -41,6 +29,8 @@ require('./routes/client')(router);
 require('./routes/livreur')(router);
 require('./routes/public')(router);
 require('./routes/universal')(router);
+require('./routes/upload')(router);
+require('./routes/gps')(router);
 
 function matchRoute(method, pathname) {
   const table = routes[method] || {};

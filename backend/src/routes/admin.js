@@ -37,14 +37,14 @@ router.get('/admin/restaurants', auth(['admin']), (req, res) => {
 });
 
 router.post('/admin/restaurants', auth(['admin']), (req, res) => {
-  const { name, category, manager_name, phone, address, quartier, description, logo_emoji } = req.body;
+  const { name, category, manager_name, phone, address, quartier, description, logo_emoji, image_url } = req.body;
   if (!name || !manager_name || !phone) return res.status(400).json({ error: 'Champs obligatoires manquants' });
   const count = db.prepare('SELECT COUNT(*) as c FROM restaurants').get().c;
   const code = 'REST' + String(count + 1).padStart(3, '0');
   const tempPwd = 'BoltDj' + Math.random().toString(36).slice(2,8).toUpperCase() + '!';
   const id = uuid();
-  db.prepare('INSERT INTO restaurants (id,code,name,description,category,address,quartier,phone,manager_name,password_hash,logo_emoji) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
-    .run(id, code, name, description||'', category||'Local', address||'', quartier||'', phone, manager_name, hashPassword(tempPwd), logo_emoji||'🍽️');
+  db.prepare('INSERT INTO restaurants (id,code,name,description,category,address,quartier,phone,manager_name,password_hash,logo_emoji,image_url) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+    .run(id, code, name, description||'', category||'Local', address||'', quartier||'', phone, manager_name, hashPassword(tempPwd), logo_emoji||'🍽️', image_url||'');
   console.log(`[SMS] Envoyer à ${phone}: Votre accès BoltDj — Code: ${code} | Mot de passe: ${tempPwd} | partner.boltdj.dj`);
   res.status(201).json({ id, code, temp_password: tempPwd, sms_preview: `Code: ${code} | MDP: ${tempPwd}` });
 });

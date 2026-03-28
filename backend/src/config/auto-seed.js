@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 function autoSeed() {
+  // Always run migrations (safe, skips existing columns)
+  try { require('./migrate'); } catch(e) { console.log('[AUTO-SEED] Migration note:', e.message.slice(0,60)); }
   const dbPath = path.resolve(process.env.DB_PATH || './data/boltdj.db');
   const isNew = !fs.existsSync(dbPath);
   if (isNew) {

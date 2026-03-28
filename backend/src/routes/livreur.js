@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 module.exports = function(router) {
 
 // POST /api/livreur/request-otp
-router.post('/livreur/request-otp', (req, res) => {
+router.post('/livreur/request-otp', async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.status(400).json({ error: 'Numéro requis' });
   const liv = db.prepare('SELECT id FROM livreurs WHERE phone=?').get(phone);

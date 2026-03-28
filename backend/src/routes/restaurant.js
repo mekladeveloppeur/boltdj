@@ -36,7 +36,7 @@ router.patch('/restaurant/toggle-open', auth(['restaurant']), (req, res) => {
 
 router.get('/restaurant/menu', auth(['restaurant']), (req, res) => {
   const cats = db.prepare('SELECT * FROM menu_categories WHERE restaurant_id=? ORDER BY sort_order').all(req.user.id);
-  for (const c of cats) c.items = db.prepare('SELECT * FROM menu_items WHERE category_id=? ORDER BY sort_order').all(c.id);
+  for (const c of cats) c.items = db.prepare('SELECT id,name,description,price,emoji,image_url,is_available,category_id,sort_order FROM menu_items WHERE category_id=? ORDER BY sort_order').all(c.id);
   res.json(cats);
 });
 
@@ -50,19 +50,19 @@ router.post('/restaurant/menu/categories', auth(['restaurant']), (req, res) => {
 });
 
 router.post('/restaurant/menu/items', auth(['restaurant']), (req, res) => {
-  const { category_id, name, description, price, emoji } = req.body;
+  const { category_id, name, description, price, emoji, image_url } = req.body;
   if (!name || !price) return res.status(400).json({ error: 'Nom et prix requis' });
   const id = uuid();
-  db.prepare('INSERT INTO menu_items (id,restaurant_id,category_id,name,description,price,emoji) VALUES (?,?,?,?,?,?,?)').run(id, req.user.id, category_id||null, name, description||'', parseInt(price), emoji||'🍽️');
-  res.status(201).json({ id, name, description: description||'', price: parseInt(price), emoji: emoji||'🍽️', is_available: 1 });
+  db.prepare('INSERT INTO menu_items (id,restaurant_id,category_id,name,description,price,emoji,image_url) VALUES (?,?,?,?,?,?,?,?)').run(id, req.user.id, category_id||null, name, description||'', parseInt(price), emoji||'🍽️', image_url||'');
+  res.status(201).json({ id, name, description: description||'', price: parseInt(price), emoji: emoji||'🍽️', image_url: image_url||'', is_available: 1 });
 });
 
 router.patch('/restaurant/menu/items/:id', auth(['restaurant']), (req, res) => {
-  const { name, description, price, emoji, is_available } = req.body;
+  const { name, description, price, emoji, image_url, is_available } = req.body;
   const item = db.prepare('SELECT * FROM menu_items WHERE id=? AND restaurant_id=?').get(req.params.id, req.user.id);
   if (!item) return res.status(404).json({ error: 'Plat introuvable' });
-  db.prepare('UPDATE menu_items SET name=?, description=?, price=?, emoji=?, is_available=? WHERE id=? AND restaurant_id=?')
-    .run(name??item.name, description??item.description, price?parseInt(price):item.price, emoji??item.emoji, is_available!==undefined?(is_available?1:0):item.is_available, req.params.id, req.user.id);
+  db.prepare('UPDATE menu_items SET name=?, description=?, price=?, emoji=?, image_url=?, is_available=? WHERE id=? AND restaurant_id=?')
+    .run(name??item.name, description??item.description, price?parseInt(price):item.price, emoji??item.emoji, image_url??item.image_url, is_available!==undefined?(is_available?1:0):item.is_available, req.params.id, req.user.id);
   res.json({ success: true });
 });
 

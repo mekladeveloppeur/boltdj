@@ -1,13 +1,15 @@
 const { signToken, uuid } = require('../config/crypto');
+const { sendOTP } = require('../config/sms');
 const db = require('../config/database');
 const auth = require('../middleware/auth');
 
 module.exports = function(router) {
 
-router.post('/client/request-otp', (req, res) => {
+router.post('/client/request-otp', async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.status(400).json({ error: 'Numéro requis' });
-  const otp = '1234'; // DEV: always 1234. PROD: Math.floor(1000+Math.random()*9000).toString()
+  const isDev = process.env.NODE_ENV !== 'production';
+  const otp = isDev ? '1234' : String(Math.floor(1000 + Math.random() * 9000));
   const expires = new Date(Date.now() + 10*60*1000).toISOString();
   const exists = db.prepare('SELECT id FROM clients WHERE phone=?').get(phone);
   if (exists) {
@@ -15,8 +17,14 @@ router.post('/client/request-otp', (req, res) => {
   } else {
     db.prepare('INSERT INTO clients (id,phone,otp_code,otp_expires_at) VALUES (?,?,?,?)').run(uuid(), phone, otp, expires);
   }
-  console.log(`[SMS DEV] OTP pour ${phone}: ${otp}`);
-  res.json({ success: true, dev_otp: otp }); // Remove dev_otp in production!
+  try {
+    await new Promise((resolve, reject) => {
+      sendOTP(phone, otp).then(resolve).catch(reject);
+    });
+  } catch(e) {
+    console.error('[SMS] Failed:', e.message);
+  }
+  res.json({ success: true, ...(isDev ? { dev_otp: otp } : {}) });
 });
 
 router.post('/client/verify-otp', (req, res) => {

@@ -3,867 +3,1295 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>BoltDj</title>
+<title>BoltDj ⚡</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BoltDj">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --pu:#6C5CE7;--pu2:#5A4BD1;--pu3:#4834C0;--pu-l:#EEF0FF;--pu-ll:#F8F7FF;
   --gr:#00B894;--gr-l:#E8FBF6;--re:#E17055;--re-l:#FFF0EE;--or:#FDCB6E;--or-l:#FFF5E0;
-  --dark:#2D3436;--mid:#636E72;--light:#B2BEC3;--border:#EDE9FF;--white:#fff
+  --dark:#2D3436;--mid:#636E72;--light:#B2BEC3;--bd:#EDE9FF;--wh:#fff
 }
 body{font-family:system-ui,-apple-system,sans-serif;background:var(--pu-ll);color:var(--dark);font-size:14px;min-height:100vh}
-/* ── LAYOUT ── */
-.app-wrap{max-width:430px;margin:0 auto;min-height:100vh;background:var(--white);display:flex;flex-direction:column;position:relative;overflow-x:hidden}
-.portal{display:none;flex-direction:column;flex:1}
+.shell{max-width:430px;margin:0 auto;min-height:100vh;background:var(--wh);display:flex;flex-direction:column;overflow-x:hidden}
+.portal{display:none;flex:1;flex-direction:column}
 .portal.active{display:flex}
-.page{display:none;flex-direction:column;flex:1;padding-bottom:68px;overflow-y:auto;min-height:100vh}
-.page.active{display:flex}
+.pg{display:none;flex:1;flex-direction:column;overflow-y:auto;padding-bottom:68px;min-height:100svh}
+.pg.active{display:flex}
+
+/* ── LANDING ── */
+#land{display:flex;min-height:100svh;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,var(--pu) 0%,var(--pu3) 100%)}
+.land-card{background:var(--wh);border-radius:24px;padding:30px 24px;width:100%;max-width:400px}
+.land-logo{font-size:32px;font-weight:900;color:var(--pu);letter-spacing:-1px;text-align:center;margin-bottom:2px}
+.land-sub{text-align:center;font-size:12px;color:var(--mid);margin-bottom:24px}
+.portal-link{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border:1.5px solid var(--bd);border-radius:14px;background:var(--wh);cursor:pointer;font-family:inherit;text-decoration:none;color:var(--dark);margin-bottom:10px;transition:all .15s}
+.portal-link:hover{border-color:var(--pu);background:var(--pu-ll)}
+.pl-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.pl-title{font-size:14px;font-weight:800;color:var(--dark)}
+.pl-sub{font-size:11px;color:var(--mid);margin-top:2px}
+
+/* ── HASH PILL ── */
+.hash-pill{display:inline-block;background:var(--pu-l);color:var(--pu2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:monospace}
+
+/* ── AUTH ── */
+.auth-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 20px;background:linear-gradient(160deg,var(--pu),var(--pu3))}
+.auth-card{background:var(--wh);border-radius:22px;padding:22px}
+.auth-back{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.8);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:16px}
+.auth-back:hover{color:#fff}
+.err-box{background:var(--re-l);color:var(--re);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px;display:none}
+
+/* ── INPUTS ── */
+.f{margin-bottom:14px}
+.f label{display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.inp{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:12px;font-size:14px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit;transition:border-color .15s}
+.inp:focus{border-color:var(--pu);background:var(--wh)}
+select.inp{appearance:none}
+.phone-wrap{display:flex;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;background:var(--pu-ll)}
+.phone-wrap:focus-within{border-color:var(--pu);background:var(--wh)}
+.phone-flag{padding:11px 12px;font-size:13px;color:var(--mid);background:rgba(108,92,231,.07);border-right:1.5px solid var(--bd);white-space:nowrap;font-weight:700;flex-shrink:0}
+.phone-wrap input{border:none;flex:1;padding:11px 12px;font-size:14px;background:transparent;color:var(--dark);font-family:inherit;outline:none}
+.otp-row{display:flex;gap:10px;justify-content:center;margin:18px 0}
+.otp-box{width:54px;height:58px;border:2px solid var(--bd);border-radius:14px;text-align:center;font-size:24px;font-weight:800;background:var(--pu-ll);color:var(--dark);font-family:inherit;outline:none}
+.otp-box:focus{border-color:var(--pu);background:var(--wh)}
+
 /* ── BUTTONS ── */
-.btn-pu{background:var(--pu);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit;transition:background .15s}
-.btn-pu:hover,.btn-pu:active{background:var(--pu2)}
-.btn-gr{background:var(--gr);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
-.btn-out{background:none;border:2px solid var(--pu);color:var(--pu);border-radius:14px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit}
-.btn-sm{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;border:none;cursor:pointer;font-family:inherit}
-.btn-sm-pu{background:var(--pu);color:#fff}
-.btn-sm-gr{background:var(--gr-l);color:#007A60;border:1px solid #A8EFD8}
-.btn-sm-re{background:var(--re-l);color:#A8432A;border:1px solid #FFC5B5}
-.btn-sm-or{background:var(--or-l);color:#9A6E00;border:1px solid var(--or)}
-/* ── FORMS ── */
-.field{margin-bottom:14px}
-.field label{display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit;transition:border-color .15s}
-.inp:focus{border-color:var(--pu);background:var(--white)}
-/* ── HEADER GRADIENT ── */
-.pu-header{background:linear-gradient(135deg,var(--pu) 0%,var(--pu3) 100%);padding:16px 18px;color:#fff}
-.header-title{font-size:18px;font-weight:800;color:#fff}
-.header-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
-.header-row{display:flex;justify-content:space-between;align-items:center}
+.btn{width:100%;padding:13px;border:none;border-radius:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:background .15s;margin-bottom:10px}
+.btn:last-child{margin-bottom:0}
+.btn-pu{background:var(--pu);color:#fff}.btn-pu:active{background:var(--pu2)}
+.btn-gr{background:var(--gr);color:#fff}
+.btn-out{background:none;border:2px solid var(--pu);color:var(--pu)}
+.btn-re{background:var(--re-l);color:var(--re);border:1.5px solid #FFCBB8}
+.bsm{padding:5px 12px;border-radius:9px;font-size:12px;font-weight:800;border:none;cursor:pointer;font-family:inherit}
+.bsm-pu{background:var(--pu);color:#fff}
+.bsm-gr{background:var(--gr-l);color:#007A60;border:1px solid #A8EFD8}
+.bsm-re{background:var(--re-l);color:#A8432A;border:1px solid #FFCBB8}
+.bsm-or{background:var(--or-l);color:#9A6E00;border:1px solid var(--or)}
+
+/* ── HEADER ── */
+.pu-head{background:linear-gradient(135deg,var(--pu),var(--pu3));padding:14px 18px;color:#fff;flex-shrink:0}
+.head-row{display:flex;justify-content:space-between;align-items:center}
+.head-title{font-size:18px;font-weight:800;color:#fff}
+.head-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
+.av-circle{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;cursor:pointer;flex-shrink:0}
+
 /* ── BOTTOM NAV ── */
-.btm-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--white);border-top:1px solid var(--border);display:flex;z-index:300;padding-bottom:env(safe-area-inset-bottom)}
-.btm-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;cursor:pointer;border:none;background:none;font-family:inherit}
-.btm-tab .ti{font-size:21px;color:var(--light)}
-.btm-tab .tl{font-size:10px;color:var(--light);font-weight:600}
-.btm-tab.active .ti,.btm-tab.active .tl{color:var(--pu)}
-.btm-tab.active .tl{font-weight:800}
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.b-pu{background:var(--pu-l);color:var(--pu2)}
-.b-gr{background:var(--gr-l);color:#007A60}
-.b-or{background:var(--or-l);color:#9A6E00}
-.b-re{background:var(--re-l);color:#A8432A}
-.b-mid{background:var(--pu-ll);color:var(--mid)}
-/* ── OTP BOXES ── */
-.otp-row{display:flex;gap:12px;justify-content:center;margin:20px 0}
-.otp-box{width:56px;height:60px;border:2px solid var(--border);border-radius:14px;text-align:center;font-size:26px;font-weight:800;background:var(--pu-ll);color:var(--dark);font-family:inherit;outline:none}
-.otp-box:focus{border-color:var(--pu);background:var(--white)}
+.btm{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--wh);border-top:1px solid var(--bd);display:flex;z-index:300;padding-bottom:env(safe-area-inset-bottom)}
+.btab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;cursor:pointer;border:none;background:none;font-family:inherit}
+.btab .ti{font-size:21px;color:var(--light)}
+.btab .tl{font-size:10px;color:var(--light);font-weight:600}
+.btab.on .ti,.btab.on .tl{color:var(--pu)}
+.btab.on .tl{font-weight:800}
+
 /* ── CARDS ── */
-.card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px}
-.card-head{padding:12px 16px;background:var(--pu-ll);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.card-title{font-size:13px;font-weight:800;color:var(--pu2)}
-/* ── STAT CARDS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px 16px}
-.stat-c{background:var(--pu-ll);border-radius:14px;padding:14px;border:1px solid var(--border)}
-.stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mid);margin-bottom:5px}
-.stat-val{font-size:22px;font-weight:800}
-.c-pu{color:var(--pu)}.c-gr{color:var(--gr)}.c-or{color:#9A6E00}.c-re{color:var(--re)}.c-dark{color:var(--dark)}
-/* ── TABLE ── */
-.data-table{width:100%;border-collapse:collapse;font-size:13px}
-.data-table th{padding:9px 16px;background:var(--pu-ll);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--pu2);text-align:left;border-bottom:1px solid var(--border)}
-.data-table td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
-.data-table tr:last-child td{border-bottom:none}
-.data-table tr:hover td{background:var(--pu-ll)}
-/* ── ROWS ── */
-.list-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
-.list-row:hover{background:var(--pu-ll)}
-.list-row:last-child{border-bottom:none}
-.row-ic{width:40px;height:40px;border-radius:12px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.row-title{font-size:13px;font-weight:700;color:var(--dark)}
-.row-sub{font-size:11px;color:var(--mid);margin-top:2px}
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.card-h{padding:11px 14px;background:var(--pu-ll);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.card-t{font-size:12px;font-weight:800;color:var(--pu2);text-transform:uppercase;letter-spacing:.4px}
+
+/* ── STAT GRID ── */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px 16px}
+.sc{background:var(--pu-ll);border-radius:12px;padding:12px;border:1px solid var(--bd)}
+.sl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mid);margin-bottom:4px}
+.sv{font-size:21px;font-weight:800}
+.sv.pu{color:var(--pu)}.sv.gr{color:var(--gr)}.sv.or{color:#9A6E00}.sv.re{color:var(--re)}
+
+/* ── BADGES ── */
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.b-pu{background:var(--pu-l);color:var(--pu2)}.b-gr{background:var(--gr-l);color:#007A60}
+.b-or{background:var(--or-l);color:#9A6E00}.b-re{background:var(--re-l);color:#A8432A}
+.b-md{background:var(--pu-ll);color:var(--mid)}
+
+/* ── LIST ROWS ── */
+.lrow{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s}
+.lrow:hover{background:var(--pu-ll)}.lrow:last-child{border-bottom:none}
+.lic{width:38px;height:38px;border-radius:10px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* ── RESTAURANT CARDS ── */
+.rc{border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;margin:0 16px 14px;transition:border-color .15s}
+.rc:hover{border-color:var(--pu)}
+.rc-img{height:130px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:54px;position:relative;overflow:hidden}
+.rc-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.rc-img .em{position:relative;z-index:1}
+.rc-info{padding:12px 14px}
+.rc-name{font-size:15px;font-weight:800;margin-bottom:5px}
+.rc-meta{display:flex;gap:5px;flex-wrap:wrap}
+.rm{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--pu-ll);color:var(--pu2)}
+.rm.gold{background:var(--or-l);color:#9A6E00}
+
 /* ── MENU ITEMS ── */
-.menu-sec{padding:9px 16px;background:var(--pu-ll);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--pu2)}
-.menu-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
-.menu-row:last-child{border-bottom:none}
-.me-em{font-size:30px;flex-shrink:0;width:38px;text-align:center}
-.me-body{flex:1;min-width:0}
-.me-name{font-size:13px;font-weight:700}
-.me-desc{font-size:11px;color:var(--mid);margin-top:2px;line-height:1.4}
-.me-price{font-size:13px;font-weight:800;color:var(--pu);margin-top:3px}
-.add-btn{width:32px;height:32px;border-radius:10px;background:var(--pu);color:#fff;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
-.qty-ctrl{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.qty-btn{width:28px;height:28px;border-radius:8px;background:var(--pu);color:#fff;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800}
-.qty-num{font-size:14px;font-weight:800;min-width:16px;text-align:center}
+.ms{padding:9px 16px;background:var(--pu-ll);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--pu2)}
+.mi{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--bd)}
+.mi:last-child{border-bottom:none}
+.mi-img{width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden}
+.mi-img img{width:100%;height:100%;object-fit:cover}
+.mi-body{flex:1;min-width:0}
+.mi-name{font-size:13px;font-weight:700}
+.mi-desc{font-size:11px;color:var(--mid);margin-top:2px;line-height:1.4}
+.mi-price{font-size:13px;font-weight:800;color:var(--pu);margin-top:3px}
+.mi-unavail{font-size:10px;color:var(--re);font-weight:700;margin-top:2px}
+.add-btn{width:32px;height:32px;border-radius:9px;background:var(--pu);color:#fff;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+.qty-ctrl{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.qty-btn{width:27px;height:27px;border-radius:8px;background:var(--pu);color:#fff;border:none;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800}
+.qty-n{font-size:14px;font-weight:800;min-width:16px;text-align:center}
+
+/* ── IMAGE UPLOAD ── */
+.upload-zone{border:2px dashed var(--bd);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .15s;background:var(--pu-ll);position:relative;overflow:hidden}
+.upload-zone:hover{border-color:var(--pu);background:var(--pu-l)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone .upreview{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
+.upload-zone .upreview.show{display:block}
+
+/* ── MAPS ── */
+.map-real{width:100%;height:200px;border-radius:14px;overflow:hidden;border:1.5px solid var(--bd);margin-bottom:12px;position:relative}
+.map-css{width:100%;height:200px;background:#E8E4FF;border-radius:14px;overflow:hidden;border:1.5px solid var(--bd);position:relative;margin-bottom:12px}
+.mr-h{position:absolute;background:rgba(255,255,255,.85);left:0;right:0;height:15px}
+.mr-v{position:absolute;background:rgba(255,255,255,.85);top:0;bottom:0;width:15px}
+.mb-blk{position:absolute;background:rgba(108,92,231,.1);border-radius:6px}
+.m-lbl{position:absolute;font-size:10px;font-weight:700;color:var(--pu2);background:rgba(255,255,255,.92);padding:2px 6px;border-radius:6px}
+.mpin{position:absolute;font-size:28px;z-index:5;cursor:grab;user-select:none;top:50%;left:50%;transform:translate(-50%,-100%)}
+.mpulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:rgba(108,92,231,.15);border:2px solid rgba(108,92,231,.35);animation:mpa 2s infinite}
+@keyframes mpa{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(1.4);opacity:.4}}
+
+/* ── TRACKING MAP ── */
+.track-map{width:100%;height:170px;background:#1a1a2e;border-radius:12px;overflow:hidden;position:relative;margin-bottom:12px}
+.tr-road-h{position:absolute;background:rgba(255,255,255,.08);left:0;right:0;height:12px}
+.tr-road-v{position:absolute;background:rgba(255,255,255,.08);top:0;bottom:0;width:12px}
+.tr-route{position:absolute;border:2px dashed rgba(108,92,231,.6)}
+.tr-pin{position:absolute;font-size:20px;z-index:10;transition:all 2s ease}
+.tr-dest{position:absolute;font-size:22px;z-index:10}
+
 /* ── TOGGLE ── */
 .tog{position:relative;width:38px;height:22px;cursor:pointer;flex-shrink:0}
 .tog input{opacity:0;width:0;height:0;position:absolute}
-.tog-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
-.tog input:checked+.tog-track{background:var(--pu)}
-.tog-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
-.tog input:checked~.tog-thumb{transform:translateX(16px)}
-/* ── MAP ── */
-.map-box{width:100%;height:190px;background:#E8E4FF;position:relative;overflow:hidden}
-.mr-h{position:absolute;background:rgba(255,255,255,.85);left:0;right:0;height:16px}
-.mr-v{position:absolute;background:rgba(255,255,255,.85);top:0;bottom:0;width:16px}
-.mb{position:absolute;background:rgba(108,92,231,.1);border-radius:6px}
-.ml{position:absolute;font-size:10px;font-weight:700;color:var(--pu2);background:rgba(255,255,255,.9);padding:2px 6px;border-radius:6px}
-.map-pin{position:absolute;font-size:28px;z-index:5;cursor:grab;user-select:none;top:50%;left:50%;transform:translate(-50%,-100%)}
-.map-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:rgba(108,92,231,.15);border:2px solid rgba(108,92,231,.35);animation:mpulse 2s infinite}
-@keyframes mpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(1.4);opacity:.4}}
-/* ── MISC ── */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;flex:1;color:var(--mid)}
-.empty-ic{font-size:48px;margin-bottom:14px}
-.empty-title{font-size:17px;font-weight:800;color:var(--dark);margin-bottom:6px}
-.promo-bar{margin:0 16px 14px;background:var(--pu);border-radius:14px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.search-box{position:relative;padding:12px 16px}
-.search-box input{width:100%;padding:11px 14px 11px 40px;border:1.5px solid var(--border);border-radius:12px;font-size:13px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit}
-.search-box input:focus{border-color:var(--pu);background:var(--white)}
-.search-box::before{content:"🔍";position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:15px}
-.cats-row{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
-.cats-row::-webkit-scrollbar{display:none}
-.cat{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;min-width:62px;background:var(--white);transition:all .15s}
-.cat.active{background:var(--pu);border-color:var(--pu)}
-.cat.active span:last-child{color:#fff}
-.cat-em{font-size:19px}
-.cat-lb{font-size:10px;font-weight:700;color:var(--mid)}
-.sec-title{padding:0 16px 8px;font-size:14px;font-weight:800;color:var(--dark)}
-.rest-card{border:1.5px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;margin:0 16px 14px}
-.rest-img{height:120px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
-.rest-info{padding:12px 14px}
-.rest-name{font-size:15px;font-weight:800;margin-bottom:5px}
-.rest-meta{display:flex;gap:5px;flex-wrap:wrap}
-.rmeta{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--pu-ll);color:var(--pu2)}
-.rmeta.gold{background:var(--or-l);color:#9A6E00}
-.order-card{border:1.5px solid var(--border);border-radius:14px;margin:0 16px 12px;overflow:hidden}
-.order-card.new-ord{border-color:var(--pu);border-width:2px}
-.oc-head{padding:10px 14px;background:var(--pu-ll);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.oc-body{padding:12px 14px}
-.oc-items{font-size:12px;color:var(--mid);background:var(--pu-ll);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.7}
-.oc-footer{display:flex;justify-content:space-between;align-items:center}
-.oc-total{font-size:15px;font-weight:800;color:var(--pu)}
-.oc-acts{display:flex;gap:6px}
-/* ── ANIMATION ── */
-@keyframes pulse-new{0%,100%{opacity:1}50%{opacity:.5}}
-.pulse{animation:pulse-new 1.5s infinite}
-/* ── SIDEBAR ADMIN ── */
-.admin-layout{display:flex;flex:1;overflow:hidden;max-height:calc(100vh - 0px)}
-.admin-sidebar{width:200px;background:var(--pu);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-.admin-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.admin-content{flex:1;overflow-y:auto;padding:16px}
-.sb-logo{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.15)}
-.sb-brand{font-size:16px;font-weight:800;color:#fff}
-.sb-role{font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:10px;display:inline-block}
-.sb-nav{padding:10px 8px;flex:1}
-.sb-btn{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;margin-bottom:2px;font-size:13px;color:rgba(255,255,255,.7);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:600;transition:all .15s}
+.tog-tr{position:absolute;inset:0;border-radius:11px;background:var(--bd);transition:background .2s}
+.tog input:checked+.tog-tr{background:var(--pu)}
+.tog-th{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
+.tog input:checked~.tog-th{transform:translateX(16px)}
+
+/* ── ADMIN SIDEBAR ── */
+.a-layout{display:flex;flex:1;height:100svh;overflow:hidden}
+.a-sb{width:195px;background:var(--pu);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.a-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.a-content{flex:1;overflow-y:auto;padding:16px}
+.sb-btn{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;margin-bottom:2px;font-size:13px;color:rgba(255,255,255,.7);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:600}
 .sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-.sb-btn.active{background:rgba(255,255,255,.2);color:#fff}
-.sb-ic{font-size:15px;width:18px;text-align:center}
-.sb-badge{margin-left:auto;background:var(--re);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px}
-.admin-topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
-.admin-page{display:none}.admin-page.active{display:block}
-.a-filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.a-chip{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:12px;cursor:pointer;color:var(--mid);font-weight:600}
-.a-chip.active{background:var(--pu-l);border-color:var(--pu);color:var(--pu2)}
-.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 2px}
-.cbar{flex:1;border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;background:var(--pu-l);border-top:2px solid var(--pu)}
-.cbar.today{background:var(--pu-ll);border-top-color:var(--pu2)}
-/* ── MISSION (LIVREUR) ── */
-.mission-card{border:2px solid var(--border);border-radius:16px;overflow:hidden;margin:12px 16px}
-.mission-card.active-m{border-color:var(--pu)}
-.mc-h{background:var(--pu-ll);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
-.mc-id{font-size:13px;font-weight:800;color:var(--pu2)}
+.sb-btn.on{background:rgba(255,255,255,.2);color:#fff}
+.apg{display:none}.apg.on{display:block}
+.a-chip{padding:5px 14px;border-radius:20px;border:1.5px solid var(--bd);background:var(--wh);font-size:12px;cursor:pointer;color:var(--mid);font-weight:600}
+.a-chip.on{background:var(--pu-l);border-color:var(--pu);color:var(--pu2)}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px}
+.dtbl th{padding:8px 12px;background:var(--pu-ll);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--pu2);text-align:left;border-bottom:1px solid var(--bd)}
+.dtbl td{padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:var(--pu-ll)}
+.cbars{display:flex;align-items:flex-end;gap:5px;height:70px}
+.cbar{flex:1;border-radius:4px 4px 0 0;min-height:3px;background:var(--pu-l);border-top:2px solid var(--pu)}
+.cbar.td{background:var(--pu-ll);border-top-color:var(--pu2)}
+
+/* ── MISC ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;flex:1;color:var(--mid)}
+.empty-ic{font-size:44px;margin-bottom:12px}
+.promo{margin:0 16px 14px;background:var(--pu);border-radius:14px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.sb-box{position:relative;padding:0 16px;margin-bottom:12px}
+.sb-box::before{content:"🔍";position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:14px}
+.sb-inp{width:100%;padding:10px 13px 10px 38px;border:1.5px solid var(--bd);border-radius:12px;font-size:13px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit}
+.sb-inp:focus{border-color:var(--pu);background:var(--wh)}
+.cats{display:flex;gap:7px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--bd);cursor:pointer;flex-shrink:0;min-width:60px;background:var(--wh)}
+.cat.on{background:var(--pu);border-color:var(--pu)}
+.cat.on .cat-lb{color:#fff}
+.cat-em{font-size:18px}.cat-lb{font-size:10px;font-weight:700;color:var(--mid)}
+.cart-float{position:sticky;bottom:68px;padding:0 16px 10px;display:none}
+.cf-btn{width:100%;background:var(--pu);color:#fff;border:none;border-radius:14px;padding:13px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;box-shadow:0 4px 18px rgba(108,92,231,.4)}
+.sum-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+.sum-row.tot{font-weight:800;font-size:16px;color:var(--pu);border-top:1.5px solid var(--bd);padding-top:10px;margin-top:6px}
+/* Mission card */
+.mc{border:2px solid var(--bd);border-radius:16px;overflow:hidden;margin:10px 16px}
+.mc.am{border-color:var(--pu)}
+.mc-h{background:var(--pu-ll);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd)}
 .mc-b{padding:12px 14px}
 .addr-s{display:flex;gap:10px;margin-bottom:10px}
 .addr-s:last-child{margin-bottom:0}
-.addr-dot-col{display:flex;flex-direction:column;align-items:center;padding-top:2px}
+.addr-dc{display:flex;flex-direction:column;align-items:center;padding-top:2px}
 .addr-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
-.addr-line{width:2px;height:20px;background:var(--border);margin:3px 0}
-.addr-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mid)}
-.addr-val{font-size:12px;font-weight:700;color:var(--dark);margin-top:2px}
-.mc-f{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.addr-ln{width:2px;height:20px;background:var(--bd);margin:3px 0}
+.mc-f{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:center}
+/* Rest hero image */
+.rest-hero{height:180px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:74px;position:relative;overflow:hidden}
+.rest-hero img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.rest-hero .em{position:relative;z-index:1}
+/* Order card */
+.oc{border:1.5px solid var(--bd);border-radius:14px;margin:0 16px 12px;overflow:hidden}
+.oc.nw{border-color:var(--pu);border-width:2px}
+.oc-h{padding:10px 14px;background:var(--pu-ll);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:flex-start}
+.oc-b{padding:12px 14px}
+.oc-items{font-size:12px;color:var(--mid);background:var(--pu-ll);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.7}
+.oc-f{display:flex;justify-content:space-between;align-items:center}
+.oc-t{font-size:15px;font-weight:800;color:var(--pu)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 1.5s infinite}
+/* Profile hero */
+.pf-hero{background:linear-gradient(135deg,var(--pu),var(--pu3));padding:24px 20px 22px;text-align:center}
+.pf-av{width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.25);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;border:3px solid rgba(255,255,255,.4)}
 </style>
 </head>
 <body>
-<div class="app-wrap">
+<div class="shell" id="app">
 
-<!-- ══════════════════════════════════════════
-     PORTAL: LOGIN (détection de rôle auto)
-═══════════════════════════════════════════ -->
-<div class="portal active" id="portal-login" style="background:var(--pu)">
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px 24px">
-    <div style="text-align:center;margin-bottom:32px">
-      <div style="font-size:54px;margin-bottom:12px">⚡</div>
-      <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:-.5px">BoltDj</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:6px">Plateforme de livraison — Djibouti 🇩🇯</div>
-    </div>
-    <div style="background:var(--white);border-radius:22px;padding:24px">
-      <div id="login-step-1">
-        <div style="font-size:17px;font-weight:800;color:var(--dark);margin-bottom:4px">Connexion</div>
-        <div style="font-size:12px;color:var(--mid);margin-bottom:18px">Admin · Restaurant · Client · Livreur</div>
-        <div style="background:var(--pu-ll);border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--mid)">
-          💡 <strong style="color:var(--pu2)">Démo :</strong><br>
-          Admin: <code style="color:var(--pu2)">admin@boltdj.dj</code> / <code style="color:var(--pu2)">Admin2026!</code><br>
-          Restaurant: <code style="color:var(--pu2)">REST001</code> / <code style="color:var(--pu2)">Restaurant2026!</code><br>
-          Client/Livreur: numéro <code style="color:var(--pu2)">+25377112233</code> → OTP <code style="color:var(--pu2)">1234</code>
-        </div>
-        <div id="login-err" style="background:var(--re-l);color:var(--re);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:14px;display:none"></div>
-        <!-- Phone login -->
-        <div id="phone-section">
-          <div class="field"><label>Numéro de téléphone (Client / Livreur)</label>
-            <div style="display:flex;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;background:var(--pu-ll)">
-              <span style="padding:12px 12px;font-size:13px;color:var(--mid);background:rgba(108,92,231,.07);border-right:1.5px solid var(--border);white-space:nowrap;font-weight:700">🇩🇯 +253</span>
-              <input style="border:none;flex:1;padding:12px;font-size:14px;background:transparent;color:var(--dark);font-family:inherit;outline:none" placeholder="77 XX XX XX" id="ph-inp" type="tel" inputmode="tel">
-            </div>
-          </div>
-          <button class="btn-pu" onclick="doPhoneLogin()" style="margin-bottom:12px">Recevoir le code SMS →</button>
-          <div style="text-align:center;font-size:12px;color:var(--mid)">— ou —</div>
-        </div>
-        <!-- Email/Code login -->
-        <div style="margin-top:12px">
-          <div class="field"><label>Email (Admin) ou Code REST (Restaurant)</label>
-            <input class="inp" id="id-inp" placeholder="admin@boltdj.dj  ou  REST001">
-          </div>
-          <div class="field"><label>Mot de passe</label>
-            <input class="inp" id="pwd-inp" type="password" placeholder="••••••••">
-          </div>
-          <button class="btn-pu" onclick="doIdLogin()">Se connecter →</button>
-        </div>
-      </div>
-      <!-- OTP Step -->
-      <div id="login-step-2" style="display:none">
-        <div style="text-align:center;margin-bottom:18px">
-          <div style="font-size:30px;margin-bottom:8px">📱</div>
-          <div style="font-size:16px;font-weight:800;color:var(--dark)">Code SMS</div>
-          <div style="font-size:12px;color:var(--mid);margin-top:4px" id="otp-hint">Code envoyé</div>
-        </div>
-        <div class="otp-row">
-          <input class="otp-box" maxlength="1" id="o1" oninput="nOtp(this,'o2')" inputmode="numeric">
-          <input class="otp-box" maxlength="1" id="o2" oninput="nOtp(this,'o3')" inputmode="numeric">
-          <input class="otp-box" maxlength="1" id="o3" oninput="nOtp(this,'o4')" inputmode="numeric">
-          <input class="otp-box" maxlength="1" id="o4" oninput="checkOtp()" inputmode="numeric">
-        </div>
-        <button class="btn-pu" onclick="doOtpLogin()" style="margin-bottom:10px">Confirmer →</button>
-        <button class="btn-out" onclick="backToStep1()">← Retour</button>
-      </div>
-      <!-- New client profile -->
-      <div id="login-step-3" style="display:none">
-        <div style="font-size:16px;font-weight:800;color:var(--dark);margin-bottom:4px">Votre profil</div>
-        <div style="font-size:12px;color:var(--mid);margin-bottom:18px">Bienvenue ! Quelques infos pour commencer.</div>
-        <div class="field"><label>Prénom *</label><input class="inp" id="np-first" placeholder="Ex: Hodan"></div>
-        <div class="field"><label>Nom *</label><input class="inp" id="np-last" placeholder="Ex: Abdi"></div>
-        <button class="btn-pu" onclick="saveNewProfile()">Commencer →</button>
-      </div>
-    </div>
+<!-- ══ LANDING PAGE ══ -->
+<div id="land">
+  <div class="land-card">
+    <div class="land-logo">⚡ BoltDj</div>
+    <div class="land-sub">Choisissez votre portail</div>
+    <a class="portal-link" href="#client" onclick="route()">
+      <div class="pl-ic" style="background:#FFF0EB">📱</div>
+      <div><div class="pl-title">App Client</div><div class="pl-sub">Commander de la nourriture</div></div>
+      <span class="hash-pill">#client</span>
+    </a>
+    <a class="portal-link" href="#restaurant" onclick="route()">
+      <div class="pl-ic" style="background:var(--pu-l)">🏪</div>
+      <div><div class="pl-title">Restaurant</div><div class="pl-sub">Gérer mon restaurant</div></div>
+      <span class="hash-pill">#restaurant</span>
+    </a>
+    <a class="portal-link" href="#livreur" onclick="route()">
+      <div class="pl-ic" style="background:var(--gr-l)">🛵</div>
+      <div><div class="pl-title">Livreur</div><div class="pl-sub">Mes missions de livraison</div></div>
+      <span class="hash-pill">#livreur</span>
+    </a>
+    <a class="portal-link" href="#admin" onclick="route()">
+      <div class="pl-ic" style="background:var(--pu-l)">🔐</div>
+      <div><div class="pl-title">Admin</div><div class="pl-sub">Tableau de bord plateforme</div></div>
+      <span class="hash-pill">#admin</span>
+    </a>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     PORTAL: CLIENT
-═══════════════════════════════════════════ -->
-<div class="portal" id="portal-client">
-  <!-- HOME -->
-  <div class="page active" id="c-home">
-    <div class="pu-header">
-      <div class="header-row">
-        <div><div style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600">📍 <span id="c-loc">Bender Djedid ▾</span></div><div style="font-size:20px;font-weight:800;color:#fff;margin-top:2px" id="c-greeting">Bonjour 👋</div></div>
-        <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;cursor:pointer" id="c-av" onclick="cTab('profile')">H</div>
+<!-- ══ PORTAL: CLIENT ══ -->
+<div class="portal" id="p-client">
+  <!-- AUTH: phone -->
+  <div class="pg active" id="c-auth">
+    <div class="auth-wrap" style="justify-content:flex-end">
+      <div class="auth-back" onclick="goLanding()">← Retour à l'accueil</div>
+      <div class="auth-card">
+        <div style="font-size:20px;font-weight:800;color:var(--pu);margin-bottom:2px">📱 App Client</div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:16px">Connectez-vous avec votre numéro</div>
+        <div class="err-box" id="c-err"></div>
+        <div style="background:var(--pu-ll);border-radius:10px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--mid);line-height:1.6">
+          💡 <strong style="color:var(--pu2)">Démo:</strong> +25377112233 → OTP <strong style="color:var(--pu2)">1234</strong>
+        </div>
+        <div id="c-step1">
+          <div class="f"><label>Numéro de téléphone</label>
+            <div class="phone-wrap"><span class="phone-flag">🇩🇯 +253</span><input placeholder="77 XX XX XX" id="c-ph" type="tel" inputmode="tel"></div>
+          </div>
+          <button class="btn btn-pu" onclick="cReqOtp()">Recevoir le code SMS →</button>
+        </div>
+        <div id="c-step2" style="display:none">
+          <div style="text-align:center;margin-bottom:14px">
+            <div style="font-size:28px;margin-bottom:8px">📱</div>
+            <div style="font-size:15px;font-weight:800;color:var(--dark)">Code SMS</div>
+            <div style="font-size:12px;color:var(--mid);margin-top:4px" id="c-otp-hint">Code envoyé</div>
+          </div>
+          <div class="otp-row">
+            <input class="otp-box" maxlength="1" id="co1" oninput="nxt(this,'co2')" inputmode="numeric">
+            <input class="otp-box" maxlength="1" id="co2" oninput="nxt(this,'co3')" inputmode="numeric">
+            <input class="otp-box" maxlength="1" id="co3" oninput="nxt(this,'co4')" inputmode="numeric">
+            <input class="otp-box" maxlength="1" id="co4" oninput="cChkOtp()" inputmode="numeric">
+          </div>
+          <button class="btn btn-pu" onclick="cVrfOtp()">Confirmer →</button>
+          <button class="btn btn-out" onclick="g('c-step1').style.display='block';g('c-step2').style.display='none'">← Retour</button>
+        </div>
+        <div id="c-step3" style="display:none">
+          <div style="font-size:15px;font-weight:800;margin-bottom:14px">Votre profil</div>
+          <div class="f"><label>Prénom *</label><input class="inp" id="c-fn" placeholder="Hodan"></div>
+          <div class="f"><label>Nom *</label><input class="inp" id="c-ln" placeholder="Abdi"></div>
+          <button class="btn btn-pu" onclick="cSavePf()">Continuer →</button>
+        </div>
       </div>
-    </div>
-    <div style="background:var(--white);flex:1;overflow-y:auto">
-      <div class="search-box"><input placeholder="Chercher un plat ou restaurant..." id="c-search" oninput="cSearchRests(this.value)"></div>
-      <div class="promo-bar"><div><div style="color:#fff;font-size:13px;font-weight:800;margin-bottom:2px">-30% ce soir ! 🔥</div><div style="color:rgba(255,255,255,.8);font-size:11px">Jusqu'à 21h</div></div><div style="background:#fff;color:var(--pu2);font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px">Profiter</div></div>
-      <div class="sec-title">Catégories</div>
-      <div class="cats-row" id="c-cats"><div class="cat active" onclick="cLoadRests('all',this)"><span class="cat-em">🍽️</span><span class="cat-lb">Tout</span></div></div>
-      <div class="sec-title">Restaurants</div>
-      <div id="c-rests-list"><div style="text-align:center;padding:40px;color:var(--mid)">Chargement...</div></div>
     </div>
   </div>
-  <!-- REST DETAIL -->
-  <div class="page" id="c-rest">
-    <div style="overflow-y:auto;flex:1;padding-bottom:80px">
-      <div style="height:170px;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:74px;position:relative" id="c-rest-hero">
-        <button style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:18px;cursor:pointer;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center" onclick="cGoPage('c-home')">←</button>
+  <!-- HOME -->
+  <div class="pg" id="c-home">
+    <div class="pu-head">
+      <div class="head-row">
+        <div><div style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600">📍 <span id="c-loc">Bender Djedid ▾</span></div><div class="head-title" id="c-gr">Bonjour 👋</div></div>
+        <div class="av-circle" id="c-av" onclick="cTab('pf')">H</div>
       </div>
-      <div style="padding:14px 16px;border-bottom:1.5px solid var(--border)">
-        <div style="font-size:20px;font-weight:800;margin-bottom:6px" id="c-rest-name">—</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="c-rest-tags"></div>
-        <div style="display:flex;gap:18px" id="c-rest-stats"></div>
-      </div>
-      <div id="c-rest-menu"></div>
     </div>
-    <div id="c-cart-float" style="display:none;position:sticky;bottom:68px;padding:0 16px 10px;background:transparent">
-      <button style="width:100%;background:var(--pu);color:#fff;border:none;border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;box-shadow:0 4px 20px rgba(108,92,231,.4)" onclick="cGoPage('c-cart')">
-        <span>🛒 Panier (<span id="c-cart-count">0</span>)</span><span id="c-cart-total-float">0 FDJ</span>
+    <div style="flex:1;overflow-y:auto;background:var(--wh)">
+      <div class="sb-box" style="padding-top:12px"><input class="sb-inp" placeholder="Chercher plat ou restaurant..." oninput="cSrch(this.value)"></div>
+      <div class="promo"><div><div style="color:#fff;font-size:13px;font-weight:800;margin-bottom:2px">-30% ce soir ! 🔥</div><div style="color:rgba(255,255,255,.8);font-size:11px">Jusqu'à 21h00</div></div><div style="background:#fff;color:var(--pu2);font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px">Profiter</div></div>
+      <div style="padding:0 16px 8px;font-size:14px;font-weight:800">Catégories</div>
+      <div class="cats" id="c-cats"><div class="cat on" onclick="cLoadR('all',this)"><span class="cat-em">🍽️</span><span class="cat-lb">Tout</span></div></div>
+      <div style="padding:0 16px 8px;font-size:14px;font-weight:800">Restaurants</div>
+      <div id="c-rlist"><div style="text-align:center;padding:40px;color:var(--mid)">Chargement...</div></div>
+    </div>
+  </div>
+  <!-- RESTAURANT DETAIL -->
+  <div class="pg" id="c-rest">
+    <div style="overflow-y:auto;flex:1;padding-bottom:80px">
+      <div class="rest-hero" id="c-hero">
+        <span class="em">🍽️</span>
+        <button style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:18px;cursor:pointer;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center;z-index:5" onclick="cPg('c-home')">←</button>
+      </div>
+      <div style="padding:13px 16px;border-bottom:1.5px solid var(--bd)">
+        <div style="font-size:19px;font-weight:800;margin-bottom:6px" id="c-rname">—</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px" id="c-rtags"></div>
+        <div style="display:flex;gap:16px" id="c-rstats"></div>
+      </div>
+      <div id="c-rmenu"></div>
+    </div>
+    <div class="cart-float" id="c-cf">
+      <button class="cf-btn" onclick="cGoCart()">
+        <span>🛒 Panier (<span id="c-cc">0</span>)</span><span id="c-ct">0 FDJ</span>
       </button>
     </div>
   </div>
   <!-- CART -->
-  <div class="page" id="c-cart">
-    <div class="pu-header header-row">
-      <div style="display:flex;align-items:center;gap:10px"><button style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="cGoPage('c-rest')">←</button><div><div class="header-title">Mon panier</div><div class="header-sub" id="c-cart-rest-name">—</div></div></div>
+  <div class="pg" id="c-cart">
+    <div class="pu-head head-row">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="cPg('c-rest')">←</button>
+        <div><div class="head-title">Mon panier</div><div class="head-sub" id="c-cart-rn">—</div></div>
+      </div>
     </div>
     <div style="flex:1;overflow-y:auto">
-      <div id="c-cart-items"></div>
-      <div id="c-cart-summary"></div>
-      <div style="padding:14px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:10px">📍 Adresse de livraison</div><div id="c-cart-addrs"></div></div>
-      <div style="padding:0 16px 24px" id="c-cart-cta"></div>
+      <div id="c-citems"></div>
+      <div id="c-csum"></div>
+      <div style="padding:12px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:10px">📍 Adresse de livraison</div>
+        <!-- ADDRESS METHODS -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <div class="addr-method-btn on" id="am-saved" onclick="cSelAddrMethod('saved')" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid var(--pu);border-radius:12px;cursor:pointer;background:var(--pu-ll)">
+            <span style="font-size:18px">🏠</span><div><div style="font-size:13px;font-weight:700">Adresse enregistrée</div><div style="font-size:11px;color:var(--mid)">Utiliser une adresse sauvegardée</div></div>
+            <span style="margin-left:auto;color:var(--pu)">✓</span>
+          </div>
+          <div class="addr-method-btn" id="am-map" onclick="cSelAddrMethod('map')" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid var(--bd);border-radius:12px;cursor:pointer">
+            <span style="font-size:18px">🗺️</span><div><div style="font-size:13px;font-weight:700">Choisir sur la carte</div><div style="font-size:11px;color:var(--mid)">Google Maps ou OpenStreetMap</div></div>
+          </div>
+          <div class="addr-method-btn" id="am-gps" onclick="cSelAddrMethod('gps')" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid var(--bd);border-radius:12px;cursor:pointer">
+            <span style="font-size:18px">📡</span><div><div style="font-size:13px;font-weight:700">GPS automatique</div><div style="font-size:11px;color:var(--mid)">Ma position actuelle</div></div>
+          </div>
+        </div>
+        <!-- SAVED ADDRESSES -->
+        <div id="c-addr-saved"><div style="color:var(--mid);font-size:13px;text-align:center;padding:10px">Chargement...</div></div>
+        <!-- MAP -->
+        <div id="c-addr-map" style="display:none">
+          <div class="map-real" id="c-gmap"></div>
+          <div class="f"><label>Adresse détectée</label><input class="inp" id="c-map-addr" value="Bender Djedid, Djibouti"></div>
+        </div>
+        <!-- GPS -->
+        <div id="c-addr-gps" style="display:none">
+          <div style="background:var(--gr-l);border:1px solid #A8EFD8;border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;margin-bottom:12px">
+            <span style="font-size:18px">📡</span>
+            <div id="c-gps-status"><div style="font-size:13px;font-weight:700;color:#007A60">Localisation en cours...</div></div>
+          </div>
+          <div class="f"><label>Adresse précise</label><input class="inp" id="c-gps-addr" value="Bender Djedid"></div>
+        </div>
+        <input type="hidden" id="c-sel-addr-id">
+      </div>
+      <div style="padding:0 16px 24px" id="c-cta"></div>
     </div>
   </div>
-  <!-- ORDERS -->
-  <div class="page" id="c-orders">
-    <div class="pu-header"><div class="header-title">Mes commandes</div></div>
-    <div style="flex:1;overflow-y:auto;padding-top:12px" id="c-orders-list"><div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande</div></div></div>
-  </div>
-  <!-- SUCCESS -->
-  <div class="page" id="c-success" style="align-items:center;padding:50px 24px 30px;text-align:center">
-    <div style="width:88px;height:88px;border-radius:50%;background:var(--gr-l);display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:18px">✅</div>
+  <!-- SUCCESS + TRACKING -->
+  <div class="pg" id="c-succ" style="align-items:center;padding:40px 20px 30px;text-align:center">
+    <div style="width:84px;height:84px;border-radius:50%;background:var(--gr-l);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:16px">✅</div>
     <div style="font-size:22px;font-weight:800;margin-bottom:8px">Commande confirmée !</div>
-    <div style="font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:24px">Votre commande <strong id="c-succ-num" style="color:var(--pu)">#—</strong> est en préparation</div>
-    <div style="width:100%;background:var(--pu-ll);border-radius:16px;padding:16px;margin-bottom:24px;text-align:left" id="c-track"></div>
-    <button class="btn-pu" onclick="cTab('home')">Retour à l'accueil</button>
+    <div style="font-size:13px;color:var(--mid);margin-bottom:22px">Commande <strong id="c-onum" style="color:var(--pu)">#—</strong> en préparation</div>
+    <!-- Real-time tracking map -->
+    <div style="width:100%;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mid);margin-bottom:8px;text-align:left">🛵 Suivi en temps réel</div>
+      <div class="track-map" id="c-track-map">
+        <div class="tr-road-h" style="top:33%"></div><div class="tr-road-h" style="top:66%"></div>
+        <div class="tr-road-v" style="left:30%"></div><div class="tr-road-v" style="left:65%"></div>
+        <div class="tr-route" style="top:35%;left:25%;width:42%;transform:rotate(-12deg)"></div>
+        <div class="tr-pin" id="c-liv-pin" style="top:65%;left:25%">🛵</div>
+        <div class="tr-dest" style="top:15%;right:18%">🏠</div>
+        <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:var(--pu);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:10px" id="c-track-eta">~25 min</div>
+      </div>
+    </div>
+    <div style="width:100%;background:var(--pu-ll);border-radius:14px;padding:14px;margin-bottom:20px;text-align:left" id="c-steps"></div>
+    <button class="btn btn-pu" onclick="cTab('home')">Retour à l'accueil</button>
+  </div>
+  <!-- ORDERS HISTORY -->
+  <div class="pg" id="c-orders">
+    <div class="pu-head"><div class="head-title">Mes commandes</div></div>
+    <div style="flex:1;overflow-y:auto;padding-top:12px" id="c-olist"><div class="empty"><div class="empty-ic">📭</div><div>Aucune commande</div></div></div>
   </div>
   <!-- PROFILE -->
-  <div class="page" id="c-profile">
-    <div style="background:linear-gradient(135deg,var(--pu),var(--pu3));padding:28px 20px 24px;text-align:center">
-      <div style="width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.25);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;border:3px solid rgba(255,255,255,.4)" id="cpf-av">H</div>
-      <div style="font-size:19px;font-weight:800;color:#fff" id="cpf-name">—</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px" id="cpf-phone">—</div>
-      <div style="display:flex;justify-content:center;gap:28px;margin-top:14px">
-        <div><div style="font-size:20px;font-weight:800;color:#fff" id="cpf-orders">0</div><div style="font-size:10px;color:rgba(255,255,255,.65)">commandes</div></div>
-        <div><div style="font-size:20px;font-weight:800;color:#fff" id="cpf-addrs">0</div><div style="font-size:10px;color:rgba(255,255,255,.65)">adresses</div></div>
+  <div class="pg" id="c-pf">
+    <div class="pf-hero">
+      <div class="pf-av" id="cpf-av">H</div>
+      <div style="font-size:18px;font-weight:800;color:#fff" id="cpf-name">—</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px" id="cpf-phone">—</div>
+      <div style="display:flex;justify-content:center;gap:26px;margin-top:14px">
+        <div><div style="font-size:20px;font-weight:800;color:#fff" id="cpf-oc">0</div><div style="font-size:10px;color:rgba(255,255,255,.65)">commandes</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:#fff" id="cpf-ac">0</div><div style="font-size:10px;color:rgba(255,255,255,.65)">adresses</div></div>
       </div>
     </div>
-    <div id="cpf-addresses" style="padding-top:8px"></div>
-    <div class="list-row" onclick="cTab('orders')"><div class="row-ic">📦</div><div><div class="row-title">Mes commandes</div></div><span style="margin-left:auto;color:var(--light)">›</span></div>
-    <div class="list-row" style="color:var(--re)" onclick="logout()"><div class="row-ic" style="background:var(--re-l)">🚪</div><div style="font-size:13px;font-weight:700;color:var(--re)">Se déconnecter</div></div>
+    <div id="cpf-addrs" style="padding-top:6px"></div>
+    <div class="lrow" onclick="cTab('orders')"><div class="lic">📦</div><div style="font-size:13px;font-weight:700">Mes commandes</div><span style="margin-left:auto;color:var(--light)">›</span></div>
+    <div class="lrow" style="color:var(--re)" onclick="logout()"><div class="lic" style="background:var(--re-l)">🚪</div><div style="font-size:13px;font-weight:700;color:var(--re)">Se déconnecter</div></div>
   </div>
-  <!-- BOTTOM NAV CLIENT -->
-  <div class="btm-nav" id="c-nav">
-    <button class="btm-tab active" id="c-tab-home" onclick="cTab('home')"><span class="ti">🏠</span><span class="tl">Accueil</span></button>
-    <button class="btm-tab" id="c-tab-orders" onclick="cTab('orders')"><span class="ti">📦</span><span class="tl">Commandes</span></button>
-    <button class="btm-tab" id="c-tab-profile" onclick="cTab('profile')"><span class="ti">👤</span><span class="tl">Profil</span></button>
+  <div class="btm" id="c-nav">
+    <button class="btab on" id="c-th" onclick="cTab('home')"><span class="ti">🏠</span><span class="tl">Accueil</span></button>
+    <button class="btab" id="c-to" onclick="cTab('orders')"><span class="ti">📦</span><span class="tl">Commandes</span></button>
+    <button class="btab" id="c-tp" onclick="cTab('pf')"><span class="ti">👤</span><span class="tl">Profil</span></button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     PORTAL: RESTAURANT
-═══════════════════════════════════════════ -->
-<div class="portal" id="portal-restaurant">
-  <div class="page active" id="r-page">
-    <div style="background:linear-gradient(135deg,var(--pu),var(--pu3));padding:14px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><div style="font-size:15px;font-weight:800;color:#fff" id="r-name">Mon restaurant</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px" id="r-code">CODE</div></div>
+<!-- ══ PORTAL: RESTAURANT ══ -->
+<div class="portal" id="p-restaurant">
+  <div class="pg active" id="r-main">
+    <div class="pu-head">
+      <div class="head-row">
+        <div><div style="font-size:14px;font-weight:800;color:#fff" id="r-name">Restaurant</div><div style="font-size:11px;color:rgba(255,255,255,.7)" id="r-code">CODE</div></div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button id="r-open-btn" onclick="rToggleOpen()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit"><span id="r-open-dot" style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block"></span><span id="r-open-lbl">Ouvert</span></button>
-          <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700">⬤ Quitter</button>
+          <button id="r-ob" onclick="rTogOpen()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit"><span id="r-od" style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block"></span><span id="r-ol">Ouvert</span></button>
+          <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700">Quitter</button>
         </div>
       </div>
     </div>
-    <!-- TABS -->
-    <div style="display:flex;background:var(--pu-ll);border-bottom:1px solid var(--border)" id="r-tabs">
-      <button class="btm-tab active" id="rt-orders" onclick="rTab('orders')" style="padding:10px 0"><span class="ti" style="font-size:18px">📦</span><span class="tl">Commandes<span id="r-new-badge" style="display:none;background:var(--re);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px">0</span></span></button>
-      <button class="btm-tab" id="rt-menu" onclick="rTab('menu')" style="padding:10px 0"><span class="ti" style="font-size:18px">🍽️</span><span class="tl">Menu</span></button>
-      <button class="btm-tab" id="rt-stats" onclick="rTab('stats')" style="padding:10px 0"><span class="ti" style="font-size:18px">📊</span><span class="tl">Stats</span></button>
+    <div style="display:flex;background:var(--pu-ll);border-bottom:1px solid var(--bd)">
+      <button class="btab on" id="rt-o" onclick="rTab('o')" style="padding:9px 0"><span class="ti" style="font-size:18px">📦</span><span class="tl">Commandes<span id="r-nb" style="display:none;background:var(--re);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px">0</span></span></button>
+      <button class="btab" id="rt-m" onclick="rTab('m')" style="padding:9px 0"><span class="ti" style="font-size:18px">🍽️</span><span class="tl">Menu</span></button>
+      <button class="btab" id="rt-s" onclick="rTab('s')" style="padding:9px 0"><span class="ti" style="font-size:18px">📊</span><span class="tl">Stats</span></button>
     </div>
     <div style="flex:1;overflow-y:auto">
-      <!-- COMMANDES TAB -->
-      <div id="r-orders-tab">
-        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);gap:8px;padding:12px">
-          <div class="stat-c"><div class="stat-lbl">Nouvelles</div><div class="stat-val c-pu" id="rs-new">0</div></div>
-          <div class="stat-c"><div class="stat-lbl">En prépa.</div><div class="stat-val c-or" id="rs-prep">0</div></div>
-          <div class="stat-c"><div class="stat-lbl">Livrées auj.</div><div class="stat-val c-gr" id="rs-done">0</div></div>
-          <div class="stat-c" style="grid-column:auto"><div class="stat-lbl">Revenu</div><div class="stat-val c-dark" style="font-size:14px" id="rs-rev">0 FDJ</div></div>
+      <!-- ORDERS -->
+      <div id="r-ot">
+        <div class="sg" style="grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px">
+          <div class="sc"><div class="sl">Nouvelles</div><div class="sv pu" id="rs-n">0</div></div>
+          <div class="sc"><div class="sl">En prépa.</div><div class="sv or" id="rs-p">0</div></div>
+          <div class="sc"><div class="sl">Livrées</div><div class="sv gr" id="rs-d">0</div></div>
+          <div class="sc"><div class="sl">Revenu</div><div class="sv" style="font-size:13px;color:var(--dark)" id="rs-r">0</div></div>
         </div>
-        <div id="r-orders-list"><div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande active</div><div class="empty-sub">Les nouvelles commandes apparaissent ici</div></div></div>
+        <div id="r-ol-list"><div class="empty"><div class="empty-ic">📭</div><div>Aucune commande active</div></div></div>
       </div>
-      <!-- MENU TAB -->
-      <div id="r-menu-tab" style="display:none">
-        <div style="padding:12px 16px;display:flex;gap:8px;border-bottom:1px solid var(--border)">
-          <button class="btn-sm btn-sm-pu" onclick="rOpenAddItem()">+ Ajouter un plat</button>
-          <button class="btn-sm btn-sm-or" onclick="rOpenAddCat()">+ Catégorie</button>
+      <!-- MENU -->
+      <div id="r-mt" style="display:none">
+        <div style="padding:10px 14px;display:flex;gap:8px;border-bottom:1px solid var(--bd)">
+          <button class="bsm bsm-pu" onclick="rOpenAdd()">+ Ajouter plat</button>
+          <button class="bsm bsm-or" onclick="rOpenCat()">+ Catégorie</button>
         </div>
-        <div id="r-menu-list"><div style="text-align:center;padding:30px;color:var(--mid)">Chargement du menu...</div></div>
+        <div id="r-mlist"></div>
       </div>
-      <!-- STATS TAB -->
-      <div id="r-stats-tab" style="display:none">
-        <div class="stats-grid">
-          <div class="stat-c"><div class="stat-lbl">Ce mois</div><div class="stat-val c-pu" id="rss-mo">—</div></div>
-          <div class="stat-c"><div class="stat-lbl">Revenu mois</div><div class="stat-val c-gr" style="font-size:16px" id="rss-rev">—</div></div>
-          <div class="stat-c"><div class="stat-lbl">Note clients</div><div class="stat-val c-or" id="rss-rat">—</div></div>
-          <div class="stat-c"><div class="stat-lbl">En attente</div><div class="stat-val c-re" id="rss-pend">—</div></div>
+      <!-- STATS -->
+      <div id="r-st" style="display:none">
+        <div class="sg">
+          <div class="sc"><div class="sl">Ce mois</div><div class="sv pu" id="rss-m">—</div></div>
+          <div class="sc"><div class="sl">Revenu mois</div><div class="sv gr" style="font-size:15px" id="rss-r">—</div></div>
+          <div class="sc"><div class="sl">Note</div><div class="sv or" id="rss-rt">—</div></div>
+          <div class="sc"><div class="sl">En attente</div><div class="sv re" id="rss-p">—</div></div>
         </div>
-        <div style="padding:0 16px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:10px">Activité 7 jours</div><div class="chart-bars" id="r-chart"></div></div>
+        <div style="padding:12px 16px"><div style="font-size:12px;font-weight:800;margin-bottom:8px">Activité 7 jours</div><div class="cbars" id="r-chart"></div></div>
       </div>
     </div>
   </div>
-  <!-- MODALS -->
-  <div id="r-modal-item" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center">
-    <div style="background:var(--white);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;max-height:80vh;overflow-y:auto">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-size:16px;font-weight:800" id="item-modal-title">Ajouter un plat</span><button onclick="document.getElementById('r-modal-item').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mid)">✕</button></div>
-      <input type="hidden" id="edit-item-id">
-      <div class="field"><label>Nom *</label><input class="inp" id="i-name" placeholder="Ex: Homard grillé"></div>
+  <!-- MODAL: add item (with image upload) -->
+  <div id="r-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center">
+    <div style="background:var(--wh);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;max-height:85svh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:15px;font-weight:800" id="r-mt-title">Ajouter un plat</span><button onclick="g('r-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mid)">✕</button></div>
+      <input type="hidden" id="r-eid">
+      <div class="f"><label>Nom *</label><input class="inp" id="r-in" placeholder="Ex: Homard grillé"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="field"><label>Prix (FDJ) *</label><input class="inp" id="i-price" type="number" placeholder="2500"></div>
-        <div class="field"><label>Emoji</label><input class="inp" id="i-emoji" placeholder="🍽️" style="font-size:18px"></div>
+        <div class="f"><label>Prix (FDJ) *</label><input class="inp" id="r-ip" type="number" placeholder="2500"></div>
+        <div class="f"><label>Emoji</label><input class="inp" id="r-ie" placeholder="🍽️" style="font-size:18px"></div>
       </div>
-      <div class="field"><label>Catégorie</label><select class="inp" id="i-cat"></select></div>
-      <div class="field"><label>Description</label><input class="inp" id="i-desc" placeholder="Courte description..."></div>
-      <button class="btn-pu" onclick="rSaveItem()">Sauvegarder</button>
+      <div class="f"><label>Catégorie</label><select class="inp" id="r-ic"></select></div>
+      <div class="f"><label>Description</label><input class="inp" id="r-id" placeholder="Description courte..."></div>
+      <!-- IMAGE UPLOAD -->
+      <div class="f">
+        <label>Photo du plat</label>
+        <div class="upload-zone" id="r-img-zone">
+          <input type="file" accept="image/*" id="r-img-file" onchange="rUploadImg(this)">
+          <div style="font-size:22px;margin-bottom:6px">📸</div>
+          <div style="font-size:12px;font-weight:700;color:var(--pu2)">Appuyer pour ajouter une photo</div>
+          <div style="font-size:11px;color:var(--mid);margin-top:2px">JPG, PNG — max 5MB</div>
+          <div id="r-img-loading" style="display:none;font-size:12px;color:var(--pu2);font-weight:700;margin-top:6px">⏳ Upload...</div>
+          <img id="r-img-preview" class="upreview" src="" alt="">
+        </div>
+        <input type="hidden" id="r-img-url">
+      </div>
+      <button class="btn btn-pu" onclick="rSaveItem()">Sauvegarder</button>
     </div>
   </div>
-  <div id="r-modal-cat" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
-    <div style="background:var(--white);border-radius:16px;padding:20px;width:85%;max-width:320px">
-      <div style="font-size:15px;font-weight:800;margin-bottom:14px">Nouvelle catégorie</div>
-      <div class="field"><label>Nom</label><input class="inp" id="cat-name" placeholder="Ex: Desserts"></div>
-      <div style="display:flex;gap:8px"><button class="btn-out" onclick="document.getElementById('r-modal-cat').style.display='none'" style="flex:1">Annuler</button><button class="btn-pu" onclick="rSaveCat()" style="flex:1">Créer</button></div>
+  <div id="r-cmodal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+    <div style="background:var(--wh);border-radius:16px;padding:20px;width:85%;max-width:320px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:14px">Nouvelle catégorie</div>
+      <div class="f"><label>Nom</label><input class="inp" id="r-cn" placeholder="Ex: Desserts"></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-out" style="flex:1;margin:0" onclick="g('r-cmodal').style.display='none'">Annuler</button><button class="btn btn-pu" style="flex:1;margin:0" onclick="rSaveCat()">Créer</button></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     PORTAL: ADMIN
-═══════════════════════════════════════════ -->
-<div class="portal" id="portal-admin">
-  <div class="page active" id="a-page">
-    <div class="admin-layout" style="height:100vh">
-      <!-- Sidebar -->
-      <div class="admin-sidebar">
-        <div class="sb-logo"><div class="sb-brand">⚡ BoltDj</div><span class="sb-role">Super Admin</span></div>
-        <div class="sb-nav">
-          <button class="sb-btn active" onclick="aTab('overview',this)"><span class="sb-ic">📊</span>Vue d'ensemble</button>
-          <button class="sb-btn" onclick="aTab('restaurants',this)"><span class="sb-ic">🏪</span>Restaurants<span class="sb-badge" id="a-pend-badge">0</span></button>
-          <button class="sb-btn" onclick="aTab('orders',this)"><span class="sb-ic">📦</span>Commandes</button>
-          <button class="sb-btn" onclick="aTab('clients',this)"><span class="sb-ic">👥</span>Clients</button>
-          <button class="sb-btn" onclick="aTab('livreurs',this)"><span class="sb-ic">🛵</span>Livreurs</button>
+<!-- ══ PORTAL: LIVREUR ══ -->
+<div class="portal" id="p-livreur">
+  <div class="pg active" id="l-auth">
+    <div class="auth-wrap" style="justify-content:flex-end">
+      <div class="auth-back" onclick="goLanding()">← Retour à l'accueil</div>
+      <div class="auth-card">
+        <div style="font-size:20px;font-weight:800;color:var(--pu);margin-bottom:2px">🛵 App Livreur</div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:16px">Connectez-vous pour voir vos missions</div>
+        <div class="err-box" id="l-err"></div>
+        <div style="background:var(--pu-ll);border-radius:10px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--mid)">💡 <strong style="color:var(--pu2)">Démo:</strong> +25377102030 → OTP <strong style="color:var(--pu2)">1234</strong></div>
+        <div id="l-s1">
+          <div class="f"><label>Téléphone</label>
+            <div class="phone-wrap"><span class="phone-flag">🇩🇯 +253</span><input placeholder="77 XX XX XX" id="l-ph" type="tel" inputmode="tel"></div>
+          </div>
+          <button class="btn btn-pu" onclick="lReqOtp()">Recevoir le code →</button>
+        </div>
+        <div id="l-s2" style="display:none">
+          <div style="text-align:center;margin-bottom:14px"><div style="font-size:28px;margin-bottom:8px">📱</div><div style="font-size:15px;font-weight:800">Code SMS</div><div style="font-size:12px;color:var(--mid);margin-top:4px" id="l-oh">Code envoyé</div></div>
+          <div class="otp-row">
+            <input class="otp-box" maxlength="1" id="lo1" oninput="nxt(this,'lo2')" inputmode="numeric">
+            <input class="otp-box" maxlength="1" id="lo2" oninput="nxt(this,'lo3')" inputmode="numeric">
+            <input class="otp-box" maxlength="1" id="lo3" oninput="nxt(this,'lo4')" inputmode="numeric">
+            <input class="otp-box" maxlength="1" id="lo4" oninput="lChkOtp()" inputmode="numeric">
+          </div>
+          <button class="btn btn-pu" onclick="lVrfOtp()">Confirmer →</button>
+          <button class="btn btn-out" onclick="g('l-s1').style.display='block';g('l-s2').style.display='none'">← Retour</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" id="l-main">
+    <div class="pu-head">
+      <div class="head-row">
+        <div><div style="font-size:14px;font-weight:800;color:#fff" id="l-name">Livreur</div><div style="font-size:11px;color:rgba(255,255,255,.7)" id="l-zone">Zone BoltDj</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="l-sb" onclick="lTogStatus()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit"><span id="l-sd" style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block"></span><span id="l-sl">Disponible</span></button>
+          <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700">Quitter</button>
+        </div>
+      </div>
+    </div>
+    <!-- GPS MAP -->
+    <div style="height:180px;background:#1a1a2e;position:relative;overflow:hidden;flex-shrink:0" id="l-map">
+      <div class="tr-road-h" style="top:34%"></div><div class="tr-road-h" style="top:65%"></div>
+      <div class="tr-road-v" style="left:31%"></div><div class="tr-road-v" style="left:63%"></div>
+      <div style="position:absolute;font-size:20px;top:48%;left:28%;transition:all 2s ease" id="l-mypin">🟣</div>
+      <div style="position:absolute;font-size:22px;top:15%;right:18%">📍</div>
+      <div style="position:absolute;font-size:22px;bottom:16%;left:50%">🏠</div>
+      <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px">Bender Djedid</div>
+      <div style="position:absolute;top:8px;right:8px;background:var(--pu);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:10px" id="l-eta">En attente</div>
+    </div>
+    <div style="display:flex;background:var(--pu-ll);border-bottom:1px solid var(--bd)">
+      <button class="btab on" id="lt-m" onclick="lTab('m')" style="padding:9px 0"><span class="ti" style="font-size:18px">🗺️</span><span class="tl">Missions</span></button>
+      <button class="btab" id="lt-h" onclick="lTab('h')" style="padding:9px 0"><span class="ti" style="font-size:18px">📋</span><span class="tl">Historique</span></button>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <div id="l-mt">
+        <div id="l-active"></div>
+        <div id="l-avail"><div class="empty"><div class="empty-ic">⏳</div><div style="font-size:16px;font-weight:800;margin-bottom:6px">En attente de missions</div><div>Les commandes prêtes apparaîtront ici</div></div></div>
+      </div>
+      <div id="l-ht" style="display:none">
+        <div class="sg">
+          <div class="sc"><div class="sl">Total livrées</div><div class="sv pu" id="lh-t">0</div></div>
+          <div class="sc"><div class="sl">Note moyenne</div><div class="sv or" id="lh-r">N/A</div></div>
+        </div>
+        <div id="l-hlist"><div class="empty"><div class="empty-ic">📭</div><div>Aucune livraison</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PORTAL: ADMIN ══ -->
+<div class="portal" id="p-admin">
+  <div class="pg active" id="a-auth">
+    <div class="auth-wrap" style="justify-content:flex-end">
+      <div class="auth-back" onclick="goLanding()">← Retour à l'accueil</div>
+      <div class="auth-card">
+        <div style="font-size:20px;font-weight:800;color:var(--pu);margin-bottom:2px">🔐 Admin BoltDj</div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:16px">Accès restreint</div>
+        <div class="err-box" id="a-err"></div>
+        <div style="background:var(--pu-ll);border-radius:10px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--mid)">💡 <strong style="color:var(--pu2)">Démo:</strong> admin@boltdj.dj / Admin2026!</div>
+        <div class="f"><label>Email</label><input class="inp" id="a-em" value="admin@boltdj.dj" type="email"></div>
+        <div class="f"><label>Mot de passe</label><input class="inp" id="a-pw" value="Admin2026!" type="password"></div>
+        <button class="btn btn-pu" onclick="aLogin()">Se connecter →</button>
+      </div>
+    </div>
+  </div>
+  <div class="pg" id="a-main">
+    <div class="a-layout">
+      <div class="a-sb">
+        <div style="padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.15)">
+          <div style="font-size:15px;font-weight:800;color:#fff">⚡ BoltDj</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:10px;display:inline-block">Super Admin</div>
+        </div>
+        <div style="padding:10px 8px;flex:1">
+          <button class="sb-btn on" onclick="aTab('ov',this)"><span style="font-size:14px;width:16px;text-align:center">📊</span>Vue d'ensemble</button>
+          <button class="sb-btn" onclick="aTab('r',this)"><span style="font-size:14px;width:16px;text-align:center">🏪</span>Restaurants<span id="a-pb" style="margin-left:auto;background:var(--re);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px">0</span></button>
+          <button class="sb-btn" onclick="aTab('o',this)"><span style="font-size:14px;width:16px;text-align:center">📦</span>Commandes</button>
+          <button class="sb-btn" onclick="aTab('c',this)"><span style="font-size:14px;width:16px;text-align:center">👥</span>Clients</button>
+          <button class="sb-btn" onclick="aTab('l',this)"><span style="font-size:14px;width:16px;text-align:center">🛵</span>Livreurs</button>
         </div>
         <div style="padding:10px 8px;border-top:1px solid rgba(255,255,255,.15)">
           <button onclick="logout()" style="width:100%;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:none;border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">Déconnexion</button>
         </div>
       </div>
-      <!-- Main -->
-      <div class="admin-main">
-        <div class="admin-topbar">
-          <div style="font-size:15px;font-weight:800" id="a-page-title">Vue d'ensemble</div>
+      <div class="a-main">
+        <div style="background:var(--wh);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:14px;font-weight:800" id="a-pt">Vue d'ensemble</div>
           <div style="display:flex;gap:8px">
-            <button class="btn-sm btn-sm-pu" onclick="aOpenNewRest()">+ Nouveau restaurant</button>
-            <button class="btn-sm btn-sm-or" onclick="aLoadAll()">↻</button>
+            <button class="bsm bsm-pu" onclick="aOpenNewR()">+ Restaurant</button>
+            <button class="bsm bsm-or" onclick="aLoad()">↻</button>
           </div>
         </div>
-        <div class="admin-content">
+        <div class="a-content">
           <!-- OVERVIEW -->
-          <div class="admin-page active" id="a-overview">
-            <div class="stats-grid" style="padding:0;margin-bottom:14px">
-              <div class="stat-c"><div class="stat-lbl">Restaurants actifs</div><div class="stat-val c-pu" id="as-active">—</div></div>
-              <div class="stat-c"><div class="stat-lbl">Commandes auj.</div><div class="stat-val c-gr" id="as-today">—</div></div>
-              <div class="stat-c"><div class="stat-lbl">En attente</div><div class="stat-val c-or" id="as-pend">—</div></div>
-              <div class="stat-c"><div class="stat-lbl">Revenus livrés</div><div class="stat-val c-dark" style="font-size:14px" id="as-rev">—</div></div>
+          <div class="apg on" id="a-ov">
+            <div class="sg" style="padding:0;margin-bottom:14px">
+              <div class="sc"><div class="sl">Restaurants actifs</div><div class="sv pu" id="as-a">—</div></div>
+              <div class="sc"><div class="sl">Commandes auj.</div><div class="sv gr" id="as-t">—</div></div>
+              <div class="sc"><div class="sl">En attente</div><div class="sv or" id="as-p">—</div></div>
+              <div class="sc"><div class="sl">Revenus</div><div class="sv" style="font-size:13px" id="as-r">—</div></div>
             </div>
-            <div class="card"><div class="card-head"><span class="card-title">Commandes 7 jours</span></div><div style="padding:14px"><div class="chart-bars" id="a-chart"></div></div></div>
-            <div class="card"><div class="card-head"><span class="card-title">En attente de validation</span></div><div id="a-pending-rests"></div></div>
-            <div class="card"><div class="card-head"><span class="card-title">Dernières commandes</span></div><div id="a-recent-orders"></div></div>
+            <div class="card"><div class="card-h"><span class="card-t">Activité 7 jours</span></div><div style="padding:12px"><div class="cbars" id="a-chart"></div></div></div>
+            <div class="card"><div class="card-h"><span class="card-t">En attente validation</span></div><div id="a-pend"></div></div>
+            <div class="card"><div class="card-h"><span class="card-t">Dernières commandes</span></div><div id="a-rec"></div></div>
           </div>
           <!-- RESTAURANTS -->
-          <div class="admin-page" id="a-restaurants">
-            <div class="a-filter-row">
-              <span class="a-chip active" onclick="aFilterStatus('all',this)">Tous</span>
-              <span class="a-chip" onclick="aFilterStatus('active',this)">Actifs</span>
-              <span class="a-chip" onclick="aFilterStatus('pending',this)">En attente</span>
-              <span class="a-chip" onclick="aFilterStatus('suspended',this)">Suspendus</span>
+          <div class="apg" id="a-r">
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+              <span class="a-chip on" onclick="aFlt('all',this)">Tous</span>
+              <span class="a-chip" onclick="aFlt('active',this)">Actifs</span>
+              <span class="a-chip" onclick="aFlt('pending',this)">En attente</span>
+              <span class="a-chip" onclick="aFlt('suspended',this)">Suspendus</span>
             </div>
-            <div class="card" style="overflow-x:auto"><table class="data-table" id="a-rest-table"><thead><tr><th>Code</th><th>Restaurant</th><th>Gérant</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="a-rest-tbody"></tbody></table></div>
+            <div style="overflow-x:auto"><table class="dtbl" id="a-rtbl"><thead><tr><th>Code</th><th>Restaurant</th><th>Gérant</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="a-rtbd"></tbody></table></div>
           </div>
           <!-- ORDERS -->
-          <div class="admin-page" id="a-orders">
-            <div class="card" style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>Client</th><th>Restaurant</th><th>Montant</th><th>Statut</th></tr></thead><tbody id="a-orders-tbody"></tbody></table></div>
-          </div>
+          <div class="apg" id="a-o"><div style="overflow-x:auto"><table class="dtbl"><thead><tr><th>#</th><th>Client</th><th>Restaurant</th><th>Montant</th><th>Statut</th></tr></thead><tbody id="a-otbd"></tbody></table></div></div>
           <!-- CLIENTS -->
-          <div class="admin-page" id="a-clients">
-            <div class="card" style="overflow-x:auto"><table class="data-table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Commandes</th><th>Dépensé</th></tr></thead><tbody id="a-clients-tbody"></tbody></table></div>
-          </div>
+          <div class="apg" id="a-c"><div style="overflow-x:auto"><table class="dtbl"><thead><tr><th>Nom</th><th>Téléphone</th><th>Commandes</th><th>Dépensé</th></tr></thead><tbody id="a-ctbd"></tbody></table></div></div>
           <!-- LIVREURS -->
-          <div class="admin-page" id="a-livreurs">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn-sm btn-sm-pu" onclick="aOpenNewLiv()">+ Ajouter livreur</button></div>
-            <div class="card" style="overflow-x:auto"><table class="data-table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Zone</th><th>Livraisons</th><th>Statut</th></tr></thead><tbody id="a-livreurs-tbody"></tbody></table></div>
+          <div class="apg" id="a-l">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="bsm bsm-pu" onclick="aOpenNewL()">+ Livreur</button></div>
+            <div style="overflow-x:auto"><table class="dtbl"><thead><tr><th>Nom</th><th>Téléphone</th><th>Zone</th><th>Livraisons</th><th>Statut</th></tr></thead><tbody id="a-ltbd"></tbody></table></div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- MODAL new restaurant -->
-  <div id="a-modal-rest" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
-    <div style="background:var(--white);border-radius:18px;width:90%;max-width:420px;max-height:90vh;overflow-y:auto">
-      <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:800">Créer un restaurant</span><button onclick="document.getElementById('a-modal-rest').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--mid)">✕</button></div>
-      <div style="padding:18px">
-        <div id="a-rest-created" style="display:none;background:var(--gr-l);border:1px solid #A8EFD8;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:#007A60"></div>
-        <div class="field"><label>Nom *</label><input class="inp" id="ar-name" placeholder="Ex: La Scorpion"></div>
+  <!-- MODAL: new restaurant (with image) -->
+  <div id="a-rm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+    <div style="background:var(--wh);border-radius:18px;width:92%;max-width:420px;max-height:90svh;overflow-y:auto">
+      <div style="padding:16px 18px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:800">Créer un restaurant</span><button onclick="g('a-rm').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--mid)">✕</button></div>
+      <div style="padding:16px">
+        <div id="a-rc" style="display:none;background:var(--gr-l);border:1px solid #A8EFD8;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:#007A60"></div>
+        <div class="f"><label>Nom *</label><input class="inp" id="an-n" placeholder="Ex: La Scorpion"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field"><label>Catégorie</label><select class="inp" id="ar-cat"><option>Fruits de mer</option><option>Fast Food</option><option>Pizza</option><option>Local</option><option>Grillades</option></select></div>
-          <div class="field"><label>Emoji</label><input class="inp" id="ar-emoji" value="🍽️" style="font-size:18px"></div>
+          <div class="f"><label>Catégorie</label><select class="inp" id="an-c"><option>Fruits de mer</option><option>Fast Food</option><option>Pizza</option><option>Local</option><option>Grillades</option></select></div>
+          <div class="f"><label>Emoji logo</label><input class="inp" id="an-e" value="🍽️" style="font-size:18px"></div>
         </div>
-        <div class="field"><label>Gérant *</label><input class="inp" id="ar-mgr" placeholder="Prénom Nom"></div>
-        <div class="field"><label>Téléphone *</label><input class="inp" id="ar-tel" placeholder="+253 77 XX XX XX"></div>
+        <div class="f"><label>Photo du restaurant</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="aUploadRestImg(this)">
+            <div style="font-size:20px;margin-bottom:4px">📸</div>
+            <div style="font-size:12px;font-weight:700;color:var(--pu2)">Photo principale</div>
+            <div id="a-ri-loading" style="display:none;font-size:11px;color:var(--pu2);font-weight:700;margin-top:4px">⏳ Upload...</div>
+            <img id="a-ri-preview" class="upreview" src="" alt="">
+          </div>
+          <input type="hidden" id="a-ri-url">
+        </div>
+        <div class="f"><label>Gérant *</label><input class="inp" id="an-m" placeholder="Prénom Nom"></div>
+        <div class="f"><label>Téléphone *</label><input class="inp" id="an-t" placeholder="+253 77 XX XX XX"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field"><label>Quartier</label><input class="inp" id="ar-q" placeholder="Ex: Bender Djedid"></div>
-          <div class="field"><label>Adresse</label><input class="inp" id="ar-addr" placeholder="Rue, repère..."></div>
+          <div class="f"><label>Quartier</label><input class="inp" id="an-q" placeholder="Bender Djedid"></div>
+          <div class="f"><label>Adresse</label><input class="inp" id="an-a" placeholder="Rue, repère..."></div>
         </div>
-        <button class="btn-pu" onclick="aCreateRest()">Créer & Envoyer identifiants</button>
+        <button class="btn btn-pu" onclick="aCreateR()">Créer & Envoyer identifiants</button>
       </div>
     </div>
   </div>
-  <!-- MODAL new livreur -->
-  <div id="a-modal-liv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
-    <div style="background:var(--white);border-radius:18px;width:85%;max-width:360px;padding:20px">
-      <div style="font-size:15px;font-weight:800;margin-bottom:16px">Ajouter un livreur</div>
-      <div class="field"><label>Nom *</label><input class="inp" id="al-name" placeholder="Prénom Nom"></div>
-      <div class="field"><label>Téléphone *</label><input class="inp" id="al-tel" placeholder="+253 77 XX XX XX"></div>
-      <div class="field"><label>Zone</label><select class="inp" id="al-zone"><option>Centre-ville</option><option>Bender Djedid</option><option>Plateau du Serpent</option><option>Quartier 7</option><option>Balbala</option></select></div>
-      <div style="display:flex;gap:8px"><button class="btn-out" onclick="document.getElementById('a-modal-liv').style.display='none'" style="flex:1">Annuler</button><button class="btn-pu" onclick="aCreateLiv()" style="flex:1">Créer</button></div>
+  <!-- MODAL: new livreur -->
+  <div id="a-lm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+    <div style="background:var(--wh);border-radius:16px;padding:20px;width:88%;max-width:340px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:14px">Ajouter un livreur</div>
+      <div class="f"><label>Nom *</label><input class="inp" id="al-n" placeholder="Prénom Nom"></div>
+      <div class="f"><label>Téléphone *</label><input class="inp" id="al-t" placeholder="+253 77 XX XX XX"></div>
+      <div class="f"><label>Zone</label><select class="inp" id="al-z"><option>Centre-ville</option><option>Bender Djedid</option><option>Plateau du Serpent</option><option>Quartier 7</option><option>Balbala</option></select></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-out" style="flex:1;margin:0" onclick="g('a-lm').style.display='none'">Annuler</button><button class="btn btn-pu" style="flex:1;margin:0" onclick="aCreateL()">Créer</button></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     PORTAL: LIVREUR
-═══════════════════════════════════════════ -->
-<div class="portal" id="portal-livreur">
-  <div class="page active" id="l-page">
-    <div style="background:linear-gradient(135deg,var(--pu),var(--pu3));padding:14px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:15px;font-weight:800;color:#fff" id="l-name">Livreur</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px" id="l-zone">Zone BoltDj</div></div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="l-status-btn" onclick="lToggleStatus()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit">
-            <span id="l-status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block"></span><span id="l-status-lbl">Disponible</span>
-          </button>
-          <button onclick="logout()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700">Quitter</button>
-        </div>
-      </div>
-    </div>
-    <!-- Map -->
-    <div class="map-box">
-      <div class="mr-h" style="top:33%"></div><div class="mr-h" style="top:64%"></div>
-      <div class="mr-v" style="left:30%"></div><div class="mr-v" style="left:62%"></div>
-      <div class="mb" style="top:8%;left:32%;width:26%;height:22%"></div>
-      <div class="mb" style="top:40%;left:8%;width:18%;height:20%"></div>
-      <div class="mb" style="top:68%;left:65%;width:24%;height:24%"></div>
-      <div class="ml" style="top:6px;left:6px">Bender Djedid</div>
-      <div class="ml" style="top:35%;right:6px">Quartier 3</div>
-      <div class="ml" style="bottom:6px;left:6px">Plateau</div>
-      <div class="map-pulse"></div>
-      <div style="position:absolute;top:50%;left:26%;transform:translate(-50%,-50%);font-size:20px;color:var(--pu)">🟣</div>
-      <div style="position:absolute;top:16%;right:20%;font-size:22px">📍</div>
-      <div style="position:absolute;bottom:18%;left:52%;font-size:22px">🏠</div>
-      <div id="l-eta" style="position:absolute;top:10px;right:10px;background:var(--pu);color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:10px">En attente</div>
-    </div>
-    <!-- Tabs -->
-    <div style="display:flex;background:var(--pu-ll);border-bottom:1px solid var(--border)">
-      <button class="btm-tab active" id="lt-missions" onclick="lTab('missions')" style="padding:9px 0"><span class="ti" style="font-size:18px">🗺️</span><span class="tl">Missions</span></button>
-      <button class="btm-tab" id="lt-history" onclick="lTab('history')" style="padding:9px 0"><span class="ti" style="font-size:18px">📋</span><span class="tl">Historique</span></button>
-    </div>
-    <div style="flex:1;overflow-y:auto">
-      <div id="l-missions-tab">
-        <div id="l-active-mission"></div>
-        <div id="l-available-missions"><div class="empty-state"><div class="empty-ic">⏳</div><div class="empty-title">En attente de missions</div><div class="empty-sub">Les commandes prêtes apparaîtront ici</div></div></div>
-      </div>
-      <div id="l-history-tab" style="display:none">
-        <div class="stats-grid">
-          <div class="stat-c"><div class="stat-lbl">Total livrées</div><div class="stat-val c-pu" id="lh-total">0</div></div>
-          <div class="stat-c"><div class="stat-lbl">Note moyenne</div><div class="stat-val c-or" id="lh-rating">N/A</div></div>
-        </div>
-        <div id="l-history-list"><div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune livraison</div></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div><!-- end app-wrap -->
-
+</div><!-- end shell -->
 <script>
+// ══════════════════════════════════════════════════════════════════════
+// CORE
+// ══════════════════════════════════════════════════════════════════════
 const API='/api';
-let TOKEN='',ROLE='',CART={},CURRENT_REST=null,ALL_RESTS=[],ALL_RESTS_DATA=[],currentPhone='',R_MENU=[],pollInterval,A_RESTS=[],A_STATUS_FILTER='all';
+let TOK='',ROLE='',CART={},CUR_REST=null,ALL_R=[],R_MENU=[],cPhone='',lPhone='';
+let gpsWatch=null,trackInterval=null,rPollInterval=null,lPollInterval=null;
+let GMAPS_KEY='';
 
-// ─── UTILS ───────────────────────────────────────────────────────────────────
-const api=(m,p,b)=>fetch(API+p,{method:m,headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:b?JSON.stringify(b):undefined}).then(r=>r.json());
-const $=id=>document.getElementById(id);
-function showPortal(id){document.querySelectorAll('.portal').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');}
-function showErr(msg){const e=$('login-err');e.textContent=msg;e.style.display='block';}
-function hideErr(){$('login-err').style.display='none';}
-function sBadge(s){const m={active:'<span class="badge b-gr">Actif</span>',pending:'<span class="badge b-or">En attente</span>',suspended:'<span class="badge b-re">Suspendu</span>',rejected:'<span class="badge b-mid">Refusé</span>'};return m[s]||s;}
-function osBadge(s){const m={pending:'<span class="badge b-mid">En attente</span>',accepted:'<span class="badge b-pu">Acceptée</span>',preparing:'<span class="badge b-or">Préparation</span>',ready:'<span class="badge b-gr">Prête</span>',delivering:'<span class="badge b-pu">Livraison</span>',delivered:'<span class="badge b-gr">Livrée</span>',cancelled:'<span class="badge b-re">Annulée</span>'};return m[s]||s;}
+const g=id=>document.getElementById(id);
+const api=(m,p,b)=>fetch(API+p,{method:m,headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOK},body:b?JSON.stringify(b):undefined}).then(r=>r.json());
+const sh=(id,v)=>g(id)&&(g(id).style.display=v);
+const err=(id,msg)=>{const e=g(id);if(e){e.textContent=msg;e.style.display='block';}};
+const hideErr=(id)=>{const e=g(id);if(e)e.style.display='none';};
+function nxt(el,nid){if(el.value.length===1)g(nid)?.focus();}
 
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
-function nOtp(el,nid){if(el.value.length===1)$(nid).focus();}
-function checkOtp(){const c=['o1','o2','o3','o4'].map(id=>$(id).value).join('');if(c.length===4)setTimeout(doOtpLogin,150);}
-function backToStep1(){$('login-step-1').style.display='block';$('login-step-2').style.display='none';$('login-step-3').style.display='none';}
+// ── HASH ROUTING ────────────────────────────────────────────────────
+const PORTALS={client:'p-client',restaurant:'p-restaurant',livreur:'p-livreur',admin:'p-admin'};
 
-async function doPhoneLogin(){
-  const raw=$('ph-inp').value.trim();
-  if(!raw){showErr('Entrez un numéro de téléphone');return;}
-  currentPhone=raw.startsWith('+')?raw:'+253'+raw.replace(/\s/g,'');
-  const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:currentPhone})}).then(r=>r.json());
-  if(r.error){showErr(r.error);return;}
-  if(r.needs_otp){
-    hideErr();
-    $('otp-hint').textContent='Code envoyé au '+currentPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
-    $('login-step-1').style.display='none';$('login-step-2').style.display='block';
+function route(){
+  const hash=(location.hash||'').replace('#','');
+  document.querySelectorAll('.portal').forEach(p=>p.classList.remove('active'));
+  sh('land','none');
+  if(PORTALS[hash]){
+    const p=g(PORTALS[hash]);
+    if(p)p.classList.add('active');
+    const storedTok=localStorage.getItem('boltdj_'+hash+'_token');
+    const storedRole=localStorage.getItem('boltdj_role');
+    if(storedTok&&storedRole===hash){TOK=storedTok;ROLE=hash;enterPortal(hash);}
+  } else {
+    sh('land','flex');
   }
 }
 
-async function doIdLogin(){
-  const identifier=$('id-inp').value.trim();
-  const password=$('pwd-inp').value;
-  if(!identifier||!password){showErr('Remplissez les deux champs');return;}
-  const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier,password})}).then(r=>r.json());
-  if(r.error){showErr(r.error);return;}
-  enterApp(r);
+function goLanding(){location.hash='';sh('land','flex');document.querySelectorAll('.portal').forEach(p=>p.classList.remove('active'));}
+
+window.addEventListener('hashchange',route);
+window.addEventListener('load',()=>{
+  fetch(API+'/config/maps-key').then(r=>r.json()).then(d=>{GMAPS_KEY=d.key||'';}).catch(()=>{});
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  route();
+});
+
+function setToken(role,token){TOK=token;ROLE=role;localStorage.setItem('boltdj_'+role+'_token',token);localStorage.setItem('boltdj_role',role);}
+function logout(){
+  const role=ROLE;
+  localStorage.removeItem('boltdj_'+role+'_token');localStorage.removeItem('boltdj_role');
+  TOK='';ROLE='';
+  clearInterval(rPollInterval);clearInterval(lPollInterval);clearInterval(trackInterval);
+  if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
+  goLanding();
 }
 
-async function doOtpLogin(){
-  const otp=['o1','o2','o3','o4'].map(id=>$(id).value).join('');
-  const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:currentPhone,otp})}).then(r=>r.json());
-  if(r.error){showErr(r.error);return;}
-  if(r.role==='client'&&r.is_new){$('login-step-2').style.display='none';$('login-step-3').style.display='block';TOKEN=r.token;ROLE='client';}
-  else enterApp(r);
+function enterPortal(role){
+  if(role==='client')cInit();
+  else if(role==='restaurant')rLoad();
+  else if(role==='livreur')lInit();
+  else if(role==='admin')aLoad();
 }
 
-async function saveNewProfile(){
-  const first=$('np-first').value.trim(),last=$('np-last').value.trim();
-  if(!first||!last){alert('Prénom et nom requis');return;}
-  await api('PATCH','/client/profile',{first_name:first,last_name:last});
-  enterApp({role:'client',token:TOKEN});
+// ── IMAGE UPLOAD ─────────────────────────────────────────────────────
+async function uploadImg(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      try{
+        const r=await api('POST','/upload/image',{image:e.target.result});
+        if(r.error)reject(new Error(r.error));
+        else resolve(r.url);
+      }catch(err){reject(err);}
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-function enterApp(r){
-  TOKEN=r.token||TOKEN;ROLE=r.role;
-  localStorage.setItem('boltdj_token',TOKEN);localStorage.setItem('boltdj_role',ROLE);
-  if(ROLE==='admin'){showPortal('portal-admin');aLoadAll();}
-  else if(ROLE==='restaurant'){showPortal('portal-restaurant');rLoad();}
-  else if(ROLE==='client'){showPortal('portal-client');cInit();}
-  else if(ROLE==='livreur'){showPortal('portal-livreur');lInit();}
+// ── GOOGLE MAPS ───────────────────────────────────────────────────────
+let gmapsLoaded=false,gmapsCb=null;
+window.gmapsReady=function(){gmapsLoaded=true;if(gmapsCb)gmapsCb(window.google);};
+
+function loadGMaps(cb){
+  if(!GMAPS_KEY){cb(null);return;}
+  if(gmapsLoaded){cb(window.google);return;}
+  gmapsCb=cb;
+  const s=document.createElement('script');
+  s.src=`https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&libraries=places&callback=gmapsReady`;
+  s.async=true;document.head.appendChild(s);
 }
 
-function logout(){TOKEN='';ROLE='';localStorage.removeItem('boltdj_token');localStorage.removeItem('boltdj_role');clearInterval(pollInterval);showPortal('portal-login');backToStep1();}
+function initAddressMap(containerId,onLoc){
+  const container=g(containerId);
+  if(!container)return;
+  if(GMAPS_KEY){
+    loadGMaps(google=>{
+      if(!google)return fallbackMap(container,onLoc);
+      const dj={lat:11.5886,lng:43.1451};
+      const map=new google.maps.Map(container,{center:dj,zoom:15,disableDefaultUI:true,zoomControl:true});
+      const marker=new google.maps.Marker({position:dj,map,draggable:true});
+      const gc=new google.maps.Geocoder();
+      const doGeocode=pos=>{gc.geocode({location:pos},(r,s)=>{if(s==='OK'&&r[0])onLoc({lat:pos.lat(),lng:pos.lng(),address:r[0].formatted_address});});};
+      marker.addListener('dragend',()=>doGeocode(marker.getPosition()));
+      map.addListener('click',e=>{marker.setPosition(e.latLng);doGeocode(e.latLng);});
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(p=>{
+          const loc={lat:p.coords.latitude,lng:p.coords.longitude};
+          map.setCenter(loc);marker.setPosition(loc);
+          doGeocode(new google.maps.LatLng(loc.lat,loc.lng));
+        });
+      }
+    });
+  } else {
+    fallbackMap(container,onLoc);
+  }
+}
 
-// Auto-login from localStorage
-(function(){
-  const t=localStorage.getItem('boltdj_token'),ro=localStorage.getItem('boltdj_role');
-  if(t&&ro){TOKEN=t;ROLE=ro;enterApp({role:ro,token:t});}
-})();
+function fallbackMap(container,onLoc){
+  container.innerHTML=`<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=43.1,11.55,43.2,11.63&layer=mapnik&marker=11.5886,43.1451" style="width:100%;height:100%;border:none" loading="lazy"></iframe><div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:var(--pu);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:10px">📍 Drag pour bouger</div>`;
+  container.style.position='relative';
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(p=>{onLoc({lat:p.coords.latitude,lng:p.coords.longitude,address:'Position GPS détectée'});});
+  }
+}
 
-// ─── CLIENT ───────────────────────────────────────────────────────────────────
-async function cInit(){cLoadRests('all',document.querySelector('.cat.active'));cLoadProfile();}
+// ── GPS LIVREUR TRACKING ──────────────────────────────────────────────
+function startGpsTracking(orderId){
+  if(!navigator.geolocation)return;
+  gpsWatch=navigator.geolocation.watchPosition(pos=>{
+    api('PATCH','/gps/position',{latitude:pos.coords.latitude,longitude:pos.coords.longitude,order_id:orderId}).catch(()=>{});
+    // Animate livreur pin on map
+    const pin=g('l-mypin');
+    if(pin){const mapL=[43.10,43.20],mapLt=[11.55,11.62];
+      const x=Math.round(((pos.coords.longitude-mapL[0])/(mapL[1]-mapL[0]))*90)+5;
+      const y=Math.round((1-(pos.coords.latitude-mapLt[0])/(mapLt[1]-mapLt[0]))*90)+5;
+      pin.style.left=Math.max(5,Math.min(88,x))+'%';pin.style.top=Math.max(5,Math.min(88,y))+'%';}
+  },e=>console.log('[GPS]',e.message),{enableHighAccuracy:true,maximumAge:5000});
+}
+function stopGps(){if(gpsWatch){navigator.geolocation.clearWatch(gpsWatch);gpsWatch=null;}}
 
-async function cLoadProfile(){
+function startTracking(orderId){
+  trackInterval=setInterval(async()=>{
+    const r=await api('GET','/gps/order/'+orderId);
+    if(r.tracking&&r.lat){
+      const pin=g('c-liv-pin');
+      if(pin){const ml=[43.10,43.20],mlt=[11.55,11.62];
+        const x=Math.round(((r.lng-ml[0])/(ml[1]-ml[0]))*80)+5;
+        const y=Math.round((1-(r.lat-mlt[0])/(mlt[1]-mlt[0]))*80)+5;
+        pin.style.left=Math.max(5,Math.min(85,x))+'%';pin.style.top=Math.max(5,Math.min(85,y))+'%';}
+    }
+    if(r.status==='delivered'){clearInterval(trackInterval);g('c-track-eta').textContent='✅ Livré !';}
+  },5000);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// CLIENT
+// ══════════════════════════════════════════════════════════════════════
+async function cReqOtp(){
+  const raw=g('c-ph').value.trim();
+  cPhone=raw.startsWith('+')?raw:'+253'+raw.replace(/\s/g,'');
+  hideErr('c-err');
+  const r=await fetch(API+'/client/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:cPhone})}).then(r=>r.json());
+  if(r.error){err('c-err',r.error);return;}
+  g('c-otp-hint').textContent='Code envoyé au '+cPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
+  sh('c-step1','none');sh('c-step2','block');
+}
+function cChkOtp(){const c=['co1','co2','co3','co4'].map(id=>g(id).value).join('');if(c.length===4)setTimeout(cVrfOtp,150);}
+async function cVrfOtp(){
+  const otp=['co1','co2','co3','co4'].map(id=>g(id).value).join('');
+  const r=await fetch(API+'/client/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:cPhone,otp})}).then(r=>r.json());
+  if(r.error){err('c-err',r.error);return;}
+  setToken('client',r.token);
+  if(r.is_new){sh('c-step2','none');sh('c-step3','block');}else cInit();
+}
+async function cSavePf(){
+  const fn=g('c-fn').value.trim(),ln=g('c-ln').value.trim();
+  if(!fn||!ln){alert('Prénom et nom requis');return;}
+  await api('PATCH','/client/profile',{first_name:fn,last_name:ln});
+  cInit();
+}
+async function cInit(){
+  cPg('c-home');cLoadR('all',document.querySelector('#p-client .cat.on'));cLoadPf();
+}
+async function cLoadPf(){
   const p=await api('GET','/client/profile');if(p.error)return;
   const n=(p.first_name||'')+(p.last_name?' '+p.last_name:'');
-  $('c-greeting').textContent='Bonjour '+(p.first_name||'')+'  👋';
-  $('c-av').textContent=p.first_name?p.first_name[0].toUpperCase():'👤';
-  $('cpf-av').textContent=p.first_name?p.first_name[0].toUpperCase():'👤';
-  $('cpf-name').textContent=n||'—';$('cpf-phone').textContent=p.phone||'—';
-  $('cpf-orders').textContent=p.order_count||0;$('cpf-addrs').textContent=(p.addresses||[]).length;
-  $('cpf-addresses').innerHTML=(p.addresses||[]).map(a=>`<div class="list-row"><div class="row-ic">${a.label==='Bureau'?'💼':'🏠'}</div><div><div class="row-title">${a.label}</div><div class="row-sub">${a.quartier}${a.street?', '+a.street:''}</div></div>${a.is_default?'<span class="badge b-pu" style="margin-left:auto">Défaut</span>':''}</div>`).join('');
+  g('c-gr').textContent='Bonjour '+(p.first_name||'')+'  👋';
+  const av=p.first_name?p.first_name[0].toUpperCase():'👤';
+  g('c-av').textContent=av;g('cpf-av').textContent=av;
+  g('cpf-name').textContent=n||'—';g('cpf-phone').textContent=p.phone||'—';
+  g('cpf-oc').textContent=p.order_count||0;g('cpf-ac').textContent=(p.addresses||[]).length;
+  g('cpf-addrs').innerHTML=(p.addresses||[]).map(a=>`<div class="lrow"><div class="lic">${a.label==='Bureau'?'💼':'🏠'}</div><div><div style="font-size:13px;font-weight:700">${a.label}</div><div style="font-size:11px;color:var(--mid)">${a.quartier}${a.street?', '+a.street:''}</div></div>${a.is_default?'<span class="bdg b-pu" style="margin-left:auto">Défaut</span>':''}</div>`).join('')+`<div class="lrow" onclick="alert('Fonctionnalité bientôt disponible')"><div class="lic" style="background:var(--pu-l);color:var(--pu);font-size:18px;font-weight:800">+</div><div style="font-size:13px;font-weight:700;color:var(--pu)">Ajouter une adresse</div></div>`;
 }
-
-async function cLoadRests(cat,el){
-  if(el){document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+async function cLoadR(cat,el){
+  if(el){document.querySelectorAll('#p-client .cat').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
   const url=cat==='all'?'/restaurants':'/restaurants?category='+encodeURIComponent(cat);
-  ALL_RESTS=await api('GET',url);ALL_RESTS_DATA=ALL_RESTS;
-  if(!Array.isArray(ALL_RESTS))return;
+  ALL_R=await api('GET',url);if(!Array.isArray(ALL_R))return;
   const cats=await api('GET','/categories');
   const em={'Fruits de mer':'🦞','Pizza':'🍕','Fast Food':'🍔','Local':'🥘','Grillades':'🌯','Japonais':'🍱'};
-  if(Array.isArray(cats)){$('c-cats').innerHTML=`<div class="cat active" onclick="cLoadRests('all',this)"><span class="cat-em">🍽️</span><span class="cat-lb">Tout</span></div>`+cats.map(c=>`<div class="cat" onclick="cLoadRests('${c.replace(/'/g,"\\'")}',this)"><span class="cat-em">${em[c]||'🍽️'}</span><span class="cat-lb">${c}</span></div>`).join('');}
-  cRenderRests(ALL_RESTS);
+  if(Array.isArray(cats)){
+    g('c-cats').innerHTML=`<div class="cat on" onclick="cLoadR('all',this)"><span class="cat-em">🍽️</span><span class="cat-lb">Tout</span></div>`+cats.map(c=>`<div class="cat" onclick="cLoadR('${c.replace(/'/g,"\\'")}',this)"><span class="cat-em">${em[c]||'🍽️'}</span><span class="cat-lb">${c}</span></div>`).join('');
+  }
+  cRndrR(ALL_R);
 }
-function cSearchRests(q){cRenderRests(q?ALL_RESTS_DATA.filter(r=>r.name.toLowerCase().includes(q.toLowerCase())):ALL_RESTS_DATA);}
-function cRenderRests(rests){
-  if(!rests.length){$('c-rests-list').innerHTML='<div class="empty-state"><div class="empty-ic">🔍</div><div class="empty-title">Aucun résultat</div></div>';return;}
-  $('c-rests-list').innerHTML=rests.map(r=>`<div class="rest-card" onclick="cOpenRest('${r.id}')"><div class="rest-img">${r.logo_emoji||'🍽️'}${!r.is_open?'<div style="position:absolute;top:8px;left:8px;background:var(--mid);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px">Fermé</div>':''}</div><div class="rest-info"><div class="rest-name">${r.name}</div><div class="rest-meta">${r.rating>0?`<span class="rmeta gold">⭐ ${r.rating.toFixed(1)}</span>`:''}<span class="rmeta">🕐 ${r.delivery_time}</span><span class="rmeta">${r.category}</span><span class="rmeta">${r.delivery_fee} FDJ livr.</span></div></div></div>`).join('');
+function cSrch(q){cRndrR(q?ALL_R.filter(r=>r.name.toLowerCase().includes(q.toLowerCase())):ALL_R);}
+function cRndrR(rests){
+  if(!rests.length){g('c-rlist').innerHTML='<div class="empty"><div class="empty-ic">🔍</div><div>Aucun résultat</div></div>';return;}
+  g('c-rlist').innerHTML=rests.map(r=>`
+    <div class="rc" onclick="cOpenR('${r.id}')">
+      <div class="rc-img">
+        ${r.image_url?`<img src="${r.image_url}" alt="${r.name}">`:''}
+        <span class="em">${r.image_url?'':r.logo_emoji||'🍽️'}</span>
+        ${!r.is_open?'<div style="position:absolute;top:8px;left:8px;background:var(--mid);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px">Fermé</div>':''}
+      </div>
+      <div class="rc-info">
+        <div class="rc-name">${r.name}</div>
+        <div class="rc-meta">
+          ${r.rating>0?`<span class="rm gold">⭐ ${r.rating.toFixed(1)}</span>`:''}
+          <span class="rm">🕐 ${r.delivery_time}</span>
+          <span class="rm">${r.category}</span>
+          <span class="rm">${r.delivery_fee} FDJ livr.</span>
+        </div>
+      </div>
+    </div>`).join('');
 }
-
-async function cOpenRest(id){
-  const r=await api('GET','/restaurants/'+id);if(r.error){alert(r.error);return;}
-  CURRENT_REST=r;
-  $('c-rest-hero').innerHTML=`<span style="font-size:74px">${r.logo_emoji||'🍽️'}</span><button style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:18px;cursor:pointer;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center" onclick="cGoPage('c-home')">←</button>`;
-  $('c-rest-name').textContent=r.name;
-  $('c-rest-tags').innerHTML=[r.category,r.quartier?'📍 '+r.quartier:null,!r.is_open?'🔴 Fermé':null].filter(Boolean).map(t=>`<span class="badge b-pu">${t}</span>`).join('');
-  $('c-rest-stats').innerHTML=(r.rating>0?`<div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">⭐ ${r.rating.toFixed(1)}</div><div style="font-size:10px;color:var(--mid)">Note</div></div>`:'')+`<div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">${r.delivery_time}</div><div style="font-size:10px;color:var(--mid)">Livraison</div></div><div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">${r.delivery_fee} FDJ</div><div style="font-size:10px;color:var(--mid)">Frais</div></div>`;
-  $('c-rest-menu').innerHTML=(r.menu||[]).map(cat=>`<div class="menu-sec">${cat.name}</div><div>${cat.items.map(item=>`<div class="menu-row"><span class="me-em">${item.emoji||'🍽️'}</span><div class="me-body"><div class="me-name">${item.name}</div><div class="me-desc">${item.description||''}</div><div class="me-price">${(item.price||0).toLocaleString()} FDJ</div>${!item.is_available?'<div style="font-size:10px;color:var(--re);font-weight:700;margin-top:2px">⛔ Indisponible</div>':''}</div><div id="ctrl-${item.id}">${item.is_available?cRenderCtrl(item):''}</div></div>`).join('')}</div>`).join('');
-  cGoPage('c-rest');cUpdateCartFloat();
+async function cOpenR(id){
+  const r=await api('GET','/restaurants/'+id);if(r.error)return;
+  CUR_REST=r;
+  const hero=g('c-hero');
+  hero.innerHTML=`${r.image_url?`<img src="${r.image_url}" alt="${r.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:''}<span class="em">${r.image_url?'':r.logo_emoji||'🍽️'}</span><button style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:18px;cursor:pointer;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center;z-index:5" onclick="cPg('c-home')">←</button>`;
+  g('c-rname').textContent=r.name;
+  g('c-rtags').innerHTML=[r.category,r.quartier?'📍 '+r.quartier:null,!r.is_open?'🔴 Fermé':null].filter(Boolean).map(t=>`<span class="bdg b-pu">${t}</span>`).join('');
+  g('c-rstats').innerHTML=(r.rating>0?`<div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">⭐ ${r.rating.toFixed(1)}</div><div style="font-size:10px;color:var(--mid)">Note</div></div>`:'')+`<div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">${r.delivery_time}</div><div style="font-size:10px;color:var(--mid)">Livraison</div></div><div style="text-align:center"><div style="font-size:14px;font-weight:800;color:var(--pu)">${r.delivery_fee} FDJ</div><div style="font-size:10px;color:var(--mid)">Frais</div></div>`;
+  g('c-rmenu').innerHTML=(r.menu||[]).map(cat=>`<div class="ms">${cat.name}</div><div>${cat.items.map(item=>`<div class="mi"><div class="mi-img">${item.image_url?`<img src="${item.image_url}" alt="${item.name}">`:''}${!item.image_url?(item.emoji||'🍽️'):''}</div><div class="mi-body"><div class="mi-name">${item.name}</div><div class="mi-desc">${item.description||''}</div><div class="mi-price">${(item.price||0).toLocaleString()} FDJ</div>${!item.is_available?'<div class="mi-unavail">⛔ Indisponible</div>':''}</div><div id="ctrl-${item.id}">${item.is_available?cRCtrl(item):''}</div></div>`).join('')}</div>`).join('');
+  cPg('c-rest');cUpdCF();
 }
-function cRenderCtrl(item){const qty=CART[item.id]?.qty||0;if(qty===0)return`<button class="add-btn" onclick="cAddItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">+</button>`;return`<div class="qty-ctrl"><button class="qty-btn" onclick="cRemItem('${item.id}')">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="cAddItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">+</button></div>`;}
-function cAddItem(it){if(CART[it.id])CART[it.id].qty++;else CART[it.id]={...it,qty:1};cRefreshCtrl(it.id);cUpdateCartFloat();}
-function cRemItem(id){if(!CART[id])return;CART[id].qty--;if(CART[id].qty<=0)delete CART[id];cRefreshCtrl(id);cUpdateCartFloat();}
-function cRefreshCtrl(id){const it=CURRENT_REST?.menu?.flatMap(c=>c.items).find(i=>i.id===id);const el=$('ctrl-'+id);if(el&&it)el.innerHTML=cRenderCtrl(it);}
-function cUpdateCartFloat(){const cnt=Object.values(CART).reduce((s,i)=>s+i.qty,0),tot=Object.values(CART).reduce((s,i)=>s+i.price*i.qty,0)+(CURRENT_REST?.delivery_fee||0);$('c-cart-count').textContent=cnt;$('c-cart-total-float').textContent=tot.toLocaleString()+' FDJ';$('c-cart-float').style.display=cnt>0&&$('c-rest').classList.contains('active')?'block':'none';}
-
-async function cGoToCart(){
-  if(!Object.keys(CART).length){alert('Panier vide');return;}
+function cRCtrl(it){const q=CART[it.id]?.qty||0;if(q===0)return`<button class="add-btn" onclick="cAdd(${JSON.stringify(it).replace(/"/g,'&quot;')})">+</button>`;return`<div class="qty-ctrl"><button class="qty-btn" onclick="cRm('${it.id}')">−</button><span class="qty-n">${q}</span><button class="qty-btn" onclick="cAdd(${JSON.stringify(it).replace(/"/g,'&quot;')})">+</button></div>`;}
+function cAdd(it){if(CART[it.id])CART[it.id].qty++;else CART[it.id]={...it,qty:1};cRef(it.id);cUpdCF();}
+function cRm(id){if(!CART[id])return;CART[id].qty--;if(CART[id].qty<=0)delete CART[id];cRef(id);cUpdCF();}
+function cRef(id){const it=CUR_REST?.menu?.flatMap(c=>c.items).find(i=>i.id===id);const el=g('ctrl-'+id);if(el&&it)el.innerHTML=cRCtrl(it);}
+function cUpdCF(){
+  const cnt=Object.values(CART).reduce((s,i)=>s+i.qty,0);
+  const tot=Object.values(CART).reduce((s,i)=>s+i.price*i.qty,0)+(CUR_REST?.delivery_fee||0);
+  g('c-cc').textContent=cnt;g('c-ct').textContent=tot.toLocaleString()+' FDJ';
+  const cf=g('c-cf');cf.style.display=cnt>0&&g('c-rest').classList.contains('active')?'block':'none';
+}
+async function cGoCart(){
+  if(!Object.keys(CART).length)return;
   const pf=await api('GET','/client/profile');const addrs=pf.addresses||[];
-  const items=Object.values(CART);const sub=items.reduce((s,i)=>s+i.price*i.qty,0);const fee=CURRENT_REST?.delivery_fee||300;
-  $('c-cart-rest-name').textContent=CURRENT_REST?.name||'—';
-  $('c-cart-items').innerHTML=items.map(i=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><span style="font-size:28px">${i.emoji||'🍽️'}</span><div style="flex:1"><div style="font-size:13px;font-weight:700">${i.name}</div><div style="font-size:11px;color:var(--mid)">${i.price.toLocaleString()} FDJ × ${i.qty}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="qty-ctrl"><button class="qty-btn" onclick="cRemItem('${i.id}');cGoToCart()">−</button><span class="qty-num">${i.qty}</span><button class="qty-btn" onclick="cAddItem(${JSON.stringify(i).replace(/"/g,'&quot;')});cGoToCart()">+</button></div><span style="font-size:13px;font-weight:800;color:var(--pu)">${(i.price*i.qty).toLocaleString()}</span></div></div>`).join('');
-  $('c-cart-summary').innerHTML=`<div style="padding:14px 16px;border-top:1.5px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px"><span style="color:var(--mid)">Sous-total</span><span>${sub.toLocaleString()} FDJ</span></div><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px"><span style="color:var(--mid)">Livraison</span><span>${fee} FDJ</span></div><div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--pu);border-top:1.5px solid var(--border);padding-top:10px"><span>Total</span><span>${(sub+fee).toLocaleString()} FDJ</span></div></div>`;
-  const defAddr=addrs.find(a=>a.is_default)||addrs[0];
-  $('c-cart-addrs').innerHTML=addrs.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid ${a.id===defAddr?.id?'var(--pu)':'var(--border)'};border-radius:12px;margin-bottom:8px;cursor:pointer;background:${a.id===defAddr?.id?'var(--pu-ll)':'var(--white)'}" onclick="cSelAddr(this,'${a.id}')"><span>${a.label==='Bureau'?'💼':'🏠'}</span><div><div style="font-size:13px;font-weight:700">${a.label}</div><div style="font-size:11px;color:var(--mid)">${a.quartier}${a.street?', '+a.street:''}</div></div>${a.id===defAddr?.id?'<span style="margin-left:auto;color:var(--pu);font-size:16px">✓</span>':''}</div>`).join('')+'<input type="hidden" id="sel-addr" value="'+(defAddr?.id||'')+'">';
-  $('c-cart-cta').innerHTML=`<button class="btn-pu" onclick="cPlaceOrder(${sub+fee})">Commander · ${(sub+fee).toLocaleString()} FDJ</button>`;
-  $('c-cart-float').style.display='none';
-  cGoPage('c-cart');
+  const items=Object.values(CART);const sub=items.reduce((s,i)=>s+i.price*i.qty,0);const fee=CUR_REST?.delivery_fee||300;
+  g('c-cart-rn').textContent=CUR_REST?.name||'—';
+  g('c-citems').innerHTML=items.map(i=>`<div style="display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--bd)"><div style="width:44px;height:44px;border-radius:10px;overflow:hidden;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${i.image_url?`<img src="${i.image_url}" style="width:100%;height:100%;object-fit:cover">`:i.emoji||'🍽️'}</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${i.name}</div><div style="font-size:11px;color:var(--mid)">${i.price.toLocaleString()} FDJ × ${i.qty}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="qty-ctrl"><button class="qty-btn" onclick="cRm('${i.id}');cGoCart()">−</button><span class="qty-n">${i.qty}</span><button class="qty-btn" onclick="cAdd(${JSON.stringify(i).replace(/"/g,'&quot;')});cGoCart()">+</button></div><span style="font-size:13px;font-weight:800;color:var(--pu);min-width:60px;text-align:right">${(i.price*i.qty).toLocaleString()}</span></div></div>`).join('');
+  g('c-csum').innerHTML=`<div style="padding:12px 16px;border-top:1.5px solid var(--bd)"><div class="sum-row"><span style="color:var(--mid)">Sous-total</span><span>${sub.toLocaleString()} FDJ</span></div><div class="sum-row"><span style="color:var(--mid)">Livraison</span><span>${fee} FDJ</span></div><div class="sum-row tot"><span>Total</span><span>${(sub+fee).toLocaleString()} FDJ</span></div></div>`;
+  // Saved addresses
+  const defA=addrs.find(a=>a.is_default)||addrs[0];
+  g('c-addr-saved').innerHTML=addrs.length?addrs.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid ${a.id===defA?.id?'var(--pu)':'var(--bd)'};border-radius:12px;margin-bottom:8px;cursor:pointer;background:${a.id===defA?.id?'var(--pu-ll)':'var(--wh)'}" onclick="cSelA(this,'${a.id}')"><span>${a.label==='Bureau'?'💼':'🏠'}</span><div><div style="font-size:13px;font-weight:700">${a.label}</div><div style="font-size:11px;color:var(--mid)">${a.quartier}${a.street?', '+a.street:''}</div></div>${a.id===defA?.id?'<span style="margin-left:auto;color:var(--pu);font-size:16px">✓</span>':''}</div>`).join('')+'<input type="hidden" id="c-sel-addr-id" value="'+(defA?.id||'')+'">'
+  :'<div style="font-size:13px;color:var(--mid);text-align:center;padding:10px">Aucune adresse — utilisez la carte ou GPS</div><input type="hidden" id="c-sel-addr-id" value="">';
+  g('c-cta').innerHTML=`<button class="btn btn-pu" onclick="cPlaceOrder(${sub+fee})">Commander · ${(sub+fee).toLocaleString()} FDJ</button>`;
+  g('c-cf').style.display='none';
+  cPg('c-cart');
 }
-function cSelAddr(el,id){document.querySelectorAll('#c-cart-addrs>div').forEach(e=>{e.style.borderColor='var(--border)';e.style.background='var(--white)';const t=e.querySelector('span:last-child');if(t&&t.textContent==='✓')t.remove();});el.style.borderColor='var(--pu)';el.style.background='var(--pu-ll)';const sp=document.createElement('span');sp.style.cssText='margin-left:auto;color:var(--pu);font-size:16px';sp.textContent='✓';el.appendChild(sp);$('sel-addr').value=id;}
+function cSelAddrMethod(m){
+  ['saved','map','gps'].forEach(k=>{
+    const btn=g('am-'+k);if(!btn)return;
+    const on=k===m;
+    btn.style.border=on?'1.5px solid var(--pu)':'1.5px solid var(--bd)';
+    btn.style.background=on?'var(--pu-ll)':'var(--wh)';
+    const tick=btn.querySelector('span:last-child');if(tick)tick.style.display=on?'':'none';
+  });
+  sh('c-addr-saved',m==='saved'?'block':'none');
+  sh('c-addr-map',m==='map'?'block':'none');
+  sh('c-addr-gps',m==='gps'?'block':'none');
+  if(m==='map'&&!g('c-gmap').querySelector('iframe')&&!g('c-gmap').querySelector('canvas')){
+    initAddressMap('c-gmap',loc=>{g('c-map-addr').value=loc.address||'Djibouti';g('c-sel-addr-id').value='';});
+  }
+  if(m==='gps'){
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(p=>{
+        g('c-gps-status').innerHTML=`<div style="font-size:13px;font-weight:700;color:#007A60">✅ Position détectée</div><div style="font-size:11px;color:#007A60;margin-top:2px">${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}</div>`;
+        g('c-gps-addr').value='Position GPS ('+p.coords.latitude.toFixed(3)+', '+p.coords.longitude.toFixed(3)+')';
+        g('c-sel-addr-id').value='';
+      },()=>g('c-gps-status').innerHTML='<div style="font-size:13px;color:var(--re);font-weight:700">❌ GPS non disponible</div>');
+    }
+  }
+}
+function cSelA(el,id){
+  document.querySelectorAll('#c-addr-saved>div').forEach(e=>{e.style.borderColor='var(--bd)';e.style.background='var(--wh)';const t=e.querySelector('span:last-child');if(t&&t.textContent==='✓'){t.style.display='none';}});
+  el.style.borderColor='var(--pu)';el.style.background='var(--pu-ll)';
+  const sp=el.querySelector('span:last-child');if(sp)sp.style.display='';
+  g('c-sel-addr-id').value=id;
+}
 async function cPlaceOrder(total){
-  if(!CURRENT_REST)return;
-  const addrId=$('sel-addr')?.value;
-  const r=await api('POST','/client/orders',{restaurant_id:CURRENT_REST.id,items:Object.values(CART).map(i=>({menu_item_id:i.id,quantity:i.qty})),address_id:addrId||undefined});
+  if(!CUR_REST)return;
+  const addrId=g('c-sel-addr-id')?.value;
+  const mapAddr=g('c-map-addr')?.value;
+  const gpsAddr=g('c-gps-addr')?.value;
+  const deliveryAddress=(!addrId&&(mapAddr||gpsAddr))||undefined;
+  const r=await api('POST','/client/orders',{restaurant_id:CUR_REST.id,items:Object.values(CART).map(i=>({menu_item_id:i.id,quantity:i.qty})),address_id:addrId||undefined,delivery_address:deliveryAddress});
   if(r.error){alert(r.error);return;}
-  CART={};cUpdateCartFloat();
-  $('c-succ-num').textContent=r.order_number;
-  const steps=[{n:'Commande reçue',s:'Quelques secondes',on:true},{n:'En préparation',s:'Le restaurant prépare',on:true},{n:'Livreur en route',s:'Estimation: '+CURRENT_REST.delivery_time,on:false},{n:'Livré',s:'Bientôt !',on:false}];
-  $('c-track').innerHTML=steps.map((s,i)=>`<div style="display:flex;gap:12px;${i<steps.length-1?'margin-bottom:14px':''}"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:16px;height:16px;border-radius:50%;background:${s.on?'var(--pu)':'var(--border)'};flex-shrink:0"></div>${i<steps.length-1?'<div style="width:2px;flex:1;min-height:18px;background:var(--border);margin:3px 0"></div>':''}</div><div><div style="font-size:13px;font-weight:700">${s.n}</div><div style="font-size:11px;color:var(--mid);margin-top:2px">${s.s}</div></div></div>`).join('');
-  cGoPage('c-success');cLoadOrders();
+  CART={};cUpdCF();
+  g('c-onum').textContent=r.order_number;g('c-track-eta').textContent='~'+CUR_REST.delivery_time;
+  const stps=[{n:'Commande reçue',s:'Il y a quelques secondes',on:true},{n:'En préparation',s:'Le restaurant prépare',on:true},{n:'Livreur en route',s:'Estimation: '+CUR_REST.delivery_time,on:false},{n:'Livré',s:'Bientôt !',on:false}];
+  g('c-steps').innerHTML=stps.map((s,i)=>`<div style="display:flex;gap:12px;${i<stps.length-1?'margin-bottom:14px':''}"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:16px;height:16px;border-radius:50%;background:${s.on?'var(--pu)':'var(--bd)'};flex-shrink:0"></div>${i<stps.length-1?'<div style="width:2px;flex:1;min-height:16px;background:var(--bd);margin:3px 0"></div>':''}</div><div><div style="font-size:13px;font-weight:700">${s.n}</div><div style="font-size:11px;color:var(--mid);margin-top:2px">${s.s}</div></div></div>`).join('');
+  startTracking(r.id);
+  cPg('c-succ');cLoadOrds();
 }
-
-async function cLoadOrders(){
-  const orders=await api('GET','/client/orders');if(!Array.isArray(orders))return;
-  if(!orders.length){$('c-orders-list').innerHTML='<div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande</div></div>';return;}
-  $('c-orders-list').innerHTML=orders.map(o=>`<div style="padding:14px 16px;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><div style="font-size:14px;font-weight:800">${o.logo_emoji||'🍽️'} ${o.restaurant_name||'—'}</div><div style="font-size:11px;color:var(--mid)">${o.order_number} · ${(o.created_at||'').slice(0,16).replace('T',' ')}</div></div>${osBadge(o.status)}</div><div style="font-size:11px;color:var(--mid);margin-bottom:6px">${(o.items||[]).map(i=>i.name+'×'+i.quantity).join(' · ')}</div><div style="font-size:15px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()} FDJ</div></div>`).join('');
+async function cLoadOrds(){
+  const ords=await api('GET','/client/orders');if(!Array.isArray(ords))return;
+  const sl={pending:'var(--mid)',accepted:'var(--pu)',preparing:'#9A6E00',ready:'var(--gr)',delivering:'var(--pu)',delivered:'var(--gr)',cancelled:'var(--re)'};
+  const sl2={pending:'En attente',accepted:'Acceptée',preparing:'En préparation',ready:'Prête',delivering:'En livraison',delivered:'Livrée',cancelled:'Annulée'};
+  g('c-olist').innerHTML=!ords.length?'<div class="empty"><div class="empty-ic">📭</div><div>Aucune commande</div></div>'
+  :ords.map(o=>`<div style="padding:13px 16px;border-bottom:1px solid var(--bd)"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><div style="font-size:14px;font-weight:800">${o.logo_emoji||'🍽️'} ${o.restaurant_name||'—'}</div><div style="font-size:11px;color:var(--mid)">${o.order_number} · ${(o.created_at||'').slice(0,16).replace('T',' ')}</div></div><span style="font-size:11px;font-weight:700;color:${sl[o.status]||'var(--mid)'};background:${sl[o.status]||'var(--mid)'}18;padding:3px 8px;border-radius:20px">${sl2[o.status]||o.status}</span></div><div style="font-size:11px;color:var(--mid);margin-bottom:6px">${(o.items||[]).map(i=>i.name+'×'+i.quantity).join(' · ')}</div><div style="font-size:15px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()} FDJ</div></div>`).join('');
 }
+function cPg(id){document.querySelectorAll('#p-client .pg').forEach(p=>p.classList.remove('active'));g(id)?.classList.add('active');cUpdCF();}
+function cTab(t){const m={home:'c-home',orders:'c-orders',pf:'c-pf'};cPg(m[t]||'c-home');document.querySelectorAll('#c-nav .btab').forEach(b=>b.classList.remove('on'));g('c-t'+t.charAt(0))?.classList.add('on');if(t==='orders')cLoadOrds();if(t==='pf')cLoadPf();}
 
-function cGoPage(id){document.querySelectorAll('#portal-client .page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');cUpdateCartFloat();}
-function cTab(t){const m={home:'c-home',orders:'c-orders',profile:'c-profile'};cGoPage(m[t]);document.querySelectorAll('#c-nav .btm-tab').forEach(b=>b.classList.remove('active'));$('c-tab-'+t)?.classList.add('active');if(t==='orders')cLoadOrders();if(t==='profile')cLoadProfile();}
-
-// ─── RESTAURANT ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// RESTAURANT
+// ══════════════════════════════════════════════════════════════════════
 let R_IS_OPEN=true;
 async function rLoad(){
+  g('r-main')?.classList.add('active');g('r-main')?.classList.remove('pg');g('r-main').style.display='flex';
+  document.querySelectorAll('#p-restaurant .pg').forEach(p=>{if(p.id!=='r-main')p.classList.remove('active');});
+  g('r-main').classList.add('active');
   const me=await api('GET','/restaurant/me');if(me.error){logout();return;}
-  $('r-name').textContent=me.logo_emoji+' '+me.name;$('r-code').textContent=me.code+' · Partenaire BoltDj';
-  R_IS_OPEN=!!me.is_open;rUpdateOpenBtn();
+  g('r-name').textContent=me.logo_emoji+' '+me.name;g('r-code').textContent=me.code+' · Partenaire';
+  R_IS_OPEN=!!me.is_open;rUpdOpen();
   rLoadStats();rLoadOrders();rLoadMenu();
-  if($('rss-rat'))$('rss-rat').textContent=me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
-  pollInterval=setInterval(()=>{rLoadOrders();rLoadStats();},15000);
+  if(g('rss-rt'))g('rss-rt').textContent=me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
+  rPollInterval=setInterval(()=>{rLoadOrders();rLoadStats();},15000);
 }
-function rUpdateOpenBtn(){$('r-open-btn').style.background=R_IS_OPEN?'rgba(255,255,255,.2)':'rgba(231,113,113,.4)';$('r-open-dot').style.background=R_IS_OPEN?'var(--gr)':'var(--re)';$('r-open-lbl').textContent=R_IS_OPEN?'Ouvert':'Fermé';}
-async function rToggleOpen(){const r=await api('PATCH','/restaurant/toggle-open');if(!r.error){R_IS_OPEN=!!r.is_open;rUpdateOpenBtn();}}
-
+function rUpdOpen(){g('r-ob').style.background=R_IS_OPEN?'rgba(255,255,255,.2)':'rgba(231,113,113,.4)';g('r-od').style.background=R_IS_OPEN?'var(--gr)':'var(--re)';g('r-ol').textContent=R_IS_OPEN?'Ouvert':'Fermé';}
+async function rTogOpen(){const r=await api('PATCH','/restaurant/toggle-open');if(!r.error){R_IS_OPEN=!!r.is_open;rUpdOpen();}}
 async function rLoadStats(){
   const s=await api('GET','/restaurant/stats');if(s.error)return;
-  $('rs-new').textContent=s.pendingOrders||0;$('rs-prep').textContent=s.preparingOrders||0;$('rs-done').textContent=s.todayOrders||0;$('rs-rev').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';
-  const nb=$('r-new-badge');nb.textContent=s.pendingOrders||0;nb.style.display=s.pendingOrders>0?'inline':'none';
-  if($('rss-mo'))$('rss-mo').textContent=s.monthOrders||0;
-  if($('rss-rev'))$('rss-rev').textContent=(s.monthRevenue||0).toLocaleString()+' FDJ';
-  if($('rss-pend'))$('rss-pend').textContent=s.pendingOrders||0;
-  const vals=[34,51,63,47,72,68,s.todayOrders||87];const mx=Math.max(...vals);if($('r-chart'))$('r-chart').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'today':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
+  g('rs-n').textContent=s.pendingOrders||0;g('rs-p').textContent=s.preparingOrders||0;
+  g('rs-d').textContent=s.todayOrders||0;g('rs-r').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';
+  const nb=g('r-nb');nb.textContent=s.pendingOrders||0;nb.style.display=s.pendingOrders>0?'inline':'none';
+  if(g('rss-m'))g('rss-m').textContent=s.monthOrders||0;
+  if(g('rss-r'))g('rss-r').textContent=(s.monthRevenue||0).toLocaleString()+' FDJ';
+  if(g('rss-p'))g('rss-p').textContent=s.pendingOrders||0;
+  const vals=[34,51,63,47,72,68,s.todayOrders||0];const mx=Math.max(...vals,1);
+  if(g('r-chart'))g('r-chart').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'td':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
 }
-
 async function rLoadOrders(){
-  const orders=await api('GET','/restaurant/orders');if(!Array.isArray(orders))return;
-  const active=orders.filter(o=>!['delivered','cancelled'].includes(o.status));
-  if(!active.length){$('r-orders-list').innerHTML='<div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune commande active</div></div>';return;}
-  $('r-orders-list').innerHTML='<div style="padding:10px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--pu2)">COMMANDES EN COURS</div>'+active.map(o=>`
-    <div class="order-card ${o.status==='pending'?'new-ord':''}" id="ord-${o.id}" style="margin:8px 16px">
-      <div class="oc-head">
-        <div><span style="font-size:13px;font-weight:800">#${o.order_number} — ${o.client_name||'Client'}</span>${o.status==='pending'?'<span class="badge b-pu pulse" style="margin-left:8px;font-size:9px">NOUVELLE</span>':''}<div style="font-size:11px;color:var(--mid);margin-top:2px">${o.client_phone||''} · ${o.delivery_address||'Adresse non précisée'}</div></div>
-        ${osBadge(o.status)}
+  const ords=await api('GET','/restaurant/orders');if(!Array.isArray(ords))return;
+  const active=ords.filter(o=>!['delivered','cancelled'].includes(o.status));
+  if(!active.length){g('r-ol-list').innerHTML='<div class="empty"><div class="empty-ic">📭</div><div>Aucune commande active</div></div>';return;}
+  g('r-ol-list').innerHTML='<div style="padding:8px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--pu2)">COMMANDES EN COURS</div>'+active.map(o=>`
+    <div class="oc ${o.status==='pending'?'nw':''}">
+      <div class="oc-h">
+        <div><span style="font-size:13px;font-weight:800">#${o.order_number} — ${o.client_name||'Client'}</span>${o.status==='pending'?'<span class="bdg b-pu pulse" style="margin-left:8px;font-size:9px">NOUVELLE</span>':''}<div style="font-size:11px;color:var(--mid);margin-top:2px">${o.client_phone||''} · ${o.delivery_address||'—'}</div></div>
+        <span class="bdg ${o.status==='pending'?'b-or':o.status==='preparing'?'b-or':o.status==='ready'?'b-gr':'b-pu'}">${{pending:'⏳ En attente',accepted:'✓ Acceptée',preparing:'🍳 Préparation',ready:'✅ Prête',delivering:'🛵 Livraison'}[o.status]||o.status}</span>
       </div>
-      <div class="oc-body">
+      <div class="oc-b">
         <div class="oc-items">${(o.items||[]).map(i=>`${i.emoji||'•'} ${i.name} × ${i.quantity} — ${(i.price*i.quantity).toLocaleString()} FDJ`).join('<br>')}</div>
-        <div class="oc-footer">
-          <span class="oc-total">${(o.total||0).toLocaleString()} FDJ</span>
-          <div class="oc-acts">
-            ${o.status==='pending'?`<button class="btn-sm btn-sm-re" onclick="rUpdOrd('${o.id}','cancelled')">✗ Refuser</button><button class="btn-sm btn-sm-pu" onclick="rUpdOrd('${o.id}','accepted')">✓ Accepter</button>`:''}
-            ${o.status==='accepted'?`<button class="btn-sm btn-sm-pu" onclick="rUpdOrd('${o.id}','preparing')">🍳 En prépa.</button>`:''}
-            ${o.status==='preparing'?`<button class="btn-sm btn-sm-gr" onclick="rUpdOrd('${o.id}','ready')">✅ Prêt !</button>`:''}
-            ${o.status==='ready'?'<span style="font-size:11px;color:var(--mid)">🛵 Livreur en route</span>':''}
+        <div class="oc-f"><span class="oc-t">${(o.total||0).toLocaleString()} FDJ</span>
+          <div style="display:flex;gap:6px">
+            ${o.status==='pending'?`<button class="bsm bsm-re" onclick="rUpdOrd('${o.id}','cancelled')">✗ Refuser</button><button class="bsm bsm-pu" onclick="rUpdOrd('${o.id}','accepted')">✓ Accepter</button>`:''}
+            ${o.status==='accepted'?`<button class="bsm bsm-pu" onclick="rUpdOrd('${o.id}','preparing')">🍳 En prépa.</button>`:''}
+            ${o.status==='preparing'?`<button class="bsm bsm-gr" onclick="rUpdOrd('${o.id}','ready')">✅ Prêt !</button>`:''}
+            ${o.status==='ready'?'<span style="font-size:11px;color:var(--mid)">🛵 Livreur en route...</span>':''}
           </div>
         </div>
       </div>
     </div>`).join('');
 }
-
-async function rUpdOrd(id,status){const r=await api('PATCH',`/restaurant/orders/${id}/status`,{status});if(!r.error){rLoadOrders();rLoadStats();}}
-
+async function rUpdOrd(id,status){await api('PATCH',`/restaurant/orders/${id}/status`,{status});rLoadOrders();rLoadStats();}
 async function rLoadMenu(){
   R_MENU=await api('GET','/restaurant/menu');if(!Array.isArray(R_MENU))return;
-  const catSel=$('i-cat');catSel.innerHTML=R_MENU.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  $('r-menu-list').innerHTML=R_MENU.map(cat=>`
-    <div style="border-bottom:2px solid var(--border)">
-      <div class="card-head card-title" style="display:flex;justify-content:space-between">${cat.name}<button class="btn-sm btn-sm-pu" onclick="rOpenAddItemCat('${cat.id}')">+</button></div>
+  const catSel=g('r-ic');catSel.innerHTML=R_MENU.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  g('r-mlist').innerHTML=R_MENU.map(cat=>`
+    <div style="border-bottom:2px solid var(--bd)">
+      <div class="card-h"><span class="card-t">${cat.name}</span><button class="bsm bsm-pu" onclick="rOpenAddCat('${cat.id}')">+ Plat</button></div>
       ${cat.items.length?cat.items.map(item=>`
-        <div class="menu-row" id="item-${item.id}">
-          <span class="me-em">${item.emoji||'🍽️'}</span>
-          <div class="me-body"><div class="me-name">${item.name}</div><div class="me-desc">${item.description||''}</div><div class="me-price">${(item.price||0).toLocaleString()} FDJ</div></div>
-          <label class="tog"><input type="checkbox" ${item.is_available?'checked':''} onchange="rTogItem('${item.id}',this.checked)"><div class="tog-track"></div><div class="tog-thumb"></div></label>
-          <button class="btn-sm btn-sm-or" style="margin-left:6px" onclick="rOpenEditItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">✏️</button>
-          <button class="btn-sm btn-sm-re" style="margin-left:3px" onclick="rDelItem('${item.id}')">🗑</button>
+        <div class="mi">
+          <div class="mi-img">${item.image_url?`<img src="${item.image_url}" alt="${item.name}">`:''}${!item.image_url?(item.emoji||'🍽️'):''}</div>
+          <div class="mi-body"><div class="mi-name">${item.name}</div><div class="mi-desc">${item.description||''}</div><div class="mi-price">${(item.price||0).toLocaleString()} FDJ</div></div>
+          <label class="tog"><input type="checkbox" ${item.is_available?'checked':''} onchange="rTogI('${item.id}',this.checked)"><div class="tog-tr"></div><div class="tog-th"></div></label>
+          <button class="bsm bsm-or" style="margin-left:5px" onclick='rOpenEdit(${JSON.stringify(item).replace(/'/g,"\\'")})''>✏️</button>
+          <button class="bsm bsm-re" style="margin-left:3px" onclick="rDelI('${item.id}')">🗑</button>
         </div>`).join('')
-      :`<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun plat — <span style="color:var(--pu);cursor:pointer" onclick="rOpenAddItemCat('${cat.id}')">Ajouter</span></div>`}
+      :`<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun plat — <span style="color:var(--pu);cursor:pointer" onclick="rOpenAddCat('${cat.id}')">Ajouter</span></div>`}
     </div>`).join('');
 }
-
-async function rTogItem(id,av){await api('PATCH',`/restaurant/menu/items/${id}`,{is_available:av});}
-async function rDelItem(id){if(!confirm('Supprimer ce plat ?'))return;await api('DELETE',`/restaurant/menu/items/${id}`);rLoadMenu();}
-function rOpenAddItem(){$('item-modal-title').textContent='Ajouter un plat';$('edit-item-id').value='';['i-name','i-desc'].forEach(f=>$(f).value='');$('i-price').value='';$('i-emoji').value='🍽️';$('r-modal-item').style.display='flex';}
-function rOpenAddItemCat(catId){rOpenAddItem();$('i-cat').value=catId;}
-function rOpenEditItem(it){$('item-modal-title').textContent='Modifier';$('edit-item-id').value=it.id;$('i-name').value=it.name||'';$('i-price').value=it.price||'';$('i-emoji').value=it.emoji||'🍽️';$('i-desc').value=it.description||'';$('i-cat').value=it.category_id||'';$('r-modal-item').style.display='flex';}
-async function rSaveItem(){const eid=$('edit-item-id').value,body={name:$('i-name').value,price:parseInt($('i-price').value),emoji:$('i-emoji').value,description:$('i-desc').value,category_id:$('i-cat').value};if(!body.name||!body.price){alert('Nom et prix requis');return;}if(eid)await api('PATCH',`/restaurant/menu/items/${eid}`,body);else await api('POST','/restaurant/menu/items',body);$('r-modal-item').style.display='none';rLoadMenu();}
-function rOpenAddCat(){$('r-modal-cat').style.display='flex';}
-async function rSaveCat(){const name=$('cat-name').value.trim();if(!name)return;await api('POST','/restaurant/menu/categories',{name});$('r-modal-cat').style.display='none';$('cat-name').value='';rLoadMenu();}
-
-function rTab(t){const tabs={orders:'r-orders-tab',menu:'r-menu-tab',stats:'r-stats-tab'};Object.entries(tabs).forEach(([k,v])=>{$(v).style.display=k===t?'block':'none';$('rt-'+k)?.classList.toggle('active',k===t);});if(t==='menu')rLoadMenu();if(t==='stats')rLoadStats();}
-
-// ─── ADMIN ────────────────────────────────────────────────────────────────────
-async function aLoadAll(){aLoadStats();aLoadRestaurants();aLoadOrders();aLoadClients();aLoadLivreurs();}
-async function aLoadStats(){
-  const s=await api('GET','/admin/stats');if(s.error)return;
-  $('as-active').textContent=s.activeRests||0;$('as-today').textContent=s.todayOrders||0;$('as-pend').textContent=s.pendingRests||0;$('as-rev').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';$('a-pend-badge').textContent=s.pendingRests||0;
-  const vals=[34,51,63,47,72,68,s.todayOrders||87];const mx=Math.max(...vals);
-  $('a-chart').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'today':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
+async function rTogI(id,av){await api('PATCH',`/restaurant/menu/items/${id}`,{is_available:av});}
+async function rDelI(id){if(!confirm('Supprimer ce plat ?'))return;await api('DELETE',`/restaurant/menu/items/${id}`);rLoadMenu();}
+function rOpenAdd(){g('r-mt-title').textContent='Ajouter un plat';g('r-eid').value='';['r-in','r-id'].forEach(f=>g(f).value='');g('r-ip').value='';g('r-ie').value='🍽️';g('r-img-url').value='';g('r-img-preview').style.display='none';g('r-modal').style.display='flex';}
+function rOpenAddCat(catId){rOpenAdd();g('r-ic').value=catId;}
+function rOpenEdit(item){
+  g('r-mt-title').textContent='Modifier';g('r-eid').value=item.id;
+  g('r-in').value=item.name||'';g('r-ip').value=item.price||'';g('r-ie').value=item.emoji||'🍽️';
+  g('r-id').value=item.description||'';g('r-ic').value=item.category_id||'';
+  g('r-img-url').value=item.image_url||'';
+  if(item.image_url){g('r-img-preview').src=item.image_url;g('r-img-preview').style.display='block';}
+  else g('r-img-preview').style.display='none';
+  g('r-modal').style.display='flex';
 }
-async function aLoadRestaurants(){
-  A_RESTS=await api('GET','/admin/restaurants');if(!Array.isArray(A_RESTS))return;
-  aRenderRests();
-  const pend=A_RESTS.filter(r=>r.status==='pending');
-  $('a-pending-rests').innerHTML=pend.length?pend.map(r=>`<div class="list-row"><div class="row-ic">${r.logo_emoji||'🍽️'}</div><div><div class="row-title">${r.name}</div><div class="row-sub">${r.manager_name} · ${r.phone}</div></div><div style="display:flex;gap:5px;margin-left:auto"><button class="btn-sm btn-sm-gr" onclick="aUpdStatus('${r.id}','active')">✓</button><button class="btn-sm btn-sm-re" onclick="aUpdStatus('${r.id}','rejected')">✗</button></div></div>`).join(''):'<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun restaurant en attente ✅</div>';
+async function rUploadImg(input){
+  const file=input.files[0];if(!file)return;
+  g('r-img-loading').style.display='block';
+  try{const url=await uploadImg(file);g('r-img-url').value=url;g('r-img-preview').src=url;g('r-img-preview').style.display='block';}
+  catch(e){alert('Erreur upload: '+e.message);}
+  finally{g('r-img-loading').style.display='none';}
 }
-function aRenderRests(){
-  let data=A_RESTS;if(A_STATUS_FILTER!=='all')data=data.filter(r=>r.status===A_STATUS_FILTER);
-  $('a-rest-tbody').innerHTML=data.map(r=>`<tr><td style="font-size:11px;color:var(--mid)">${r.code}</td><td><strong>${r.logo_emoji} ${r.name}</strong><br><small style="color:var(--mid)">${r.quartier||''}</small></td><td>${r.manager_name}</td><td>${sBadge(r.status)}</td><td style="display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px">${r.status==='pending'?`<button class="btn-sm btn-sm-gr" onclick="aUpdStatus('${r.id}','active')">✓ Valider</button><button class="btn-sm btn-sm-re" onclick="aUpdStatus('${r.id}','rejected')">✗</button>`:''} ${r.status==='active'?`<button class="btn-sm btn-sm-or" onclick="aUpdStatus('${r.id}','suspended')">Suspendre</button>`:''} ${r.status==='suspended'?`<button class="btn-sm btn-sm-gr" onclick="aUpdStatus('${r.id}','active')">Réactiver</button>`:''}</td></tr>`).join('');
+async function rSaveItem(){
+  const eid=g('r-eid').value;
+  const body={name:g('r-in').value,price:parseInt(g('r-ip').value),emoji:g('r-ie').value,description:g('r-id').value,category_id:g('r-ic').value,image_url:g('r-img-url').value};
+  if(!body.name||!body.price){alert('Nom et prix requis');return;}
+  if(eid)await api('PATCH',`/restaurant/menu/items/${eid}`,body);
+  else await api('POST','/restaurant/menu/items',body);
+  g('r-modal').style.display='none';rLoadMenu();
 }
-function aFilterStatus(s,el){A_STATUS_FILTER=s;document.querySelectorAll('.a-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');aRenderRests();}
-async function aUpdStatus(id,status){if(!confirm({active:'Valider ?',suspended:'Suspendre ?',rejected:'Refuser définitivement ?'}[status]||'Confirmer ?'))return;const r=await api('PATCH',`/admin/restaurants/${id}/status`,{status});if(!r.error){await aLoadRestaurants();aLoadStats();}}
-async function aLoadOrders(){const orders=await api('GET','/admin/orders');if(!Array.isArray(orders))return;$('a-orders-tbody').innerHTML=orders.map(o=>`<tr><td style="font-size:11px"><code style="background:var(--pu-ll);padding:2px 5px;border-radius:4px">${o.order_number}</code></td><td>${o.client_name||'—'}<br><small style="color:var(--mid)">${o.client_phone||''}</small></td><td>${o.restaurant_name||'—'}</td><td style="font-weight:800">${(o.total||0).toLocaleString()} FDJ</td><td>${osBadge(o.status)}</td></tr>`).join('');$('a-recent-orders').innerHTML=orders.slice(0,5).map(o=>`<div class="list-row"><div class="row-ic">📦</div><div><div class="row-title">${o.restaurant_name||'—'} — ${o.order_number}</div><div class="row-sub">${o.client_name||'—'} · ${(o.created_at||'').slice(11,16)}</div></div><span style="margin-left:auto;font-size:13px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()} FDJ</span></div>`).join('')||'<div style="padding:16px;text-align:center;color:var(--mid)">Aucune commande</div>';}
-async function aLoadClients(){const c=await api('GET','/admin/clients');if(!Array.isArray(c))return;$('a-clients-tbody').innerHTML=c.map(cl=>`<tr><td><strong>${cl.first_name||''} ${cl.last_name||''}</strong></td><td>${cl.phone}</td><td>${cl.total_orders||0}</td><td style="font-weight:800">${(cl.total_spent||0).toLocaleString()} FDJ</td></tr>`).join('');}
-async function aLoadLivreurs(){const l=await api('GET','/admin/livreurs');if(!Array.isArray(l))return;const sm={available:'<span class="badge b-gr">Disponible</span>',delivering:'<span class="badge b-pu">Livraison</span>',offline:'<span class="badge b-mid">Hors ligne</span>'};$('a-livreurs-tbody').innerHTML=l.map(li=>`<tr><td><strong>${li.name}</strong></td><td>${li.phone}</td><td>${li.zone||'—'}</td><td>${li.total_deliveries||0}</td><td>${sm[li.status]||li.status}</td></tr>`).join('');}
-function aOpenNewRest(){$('a-rest-created').style.display='none';$('a-modal-rest').style.display='flex';}
-async function aCreateRest(){const body={name:$('ar-name').value,category:$('ar-cat').value,manager_name:$('ar-mgr').value,phone:$('ar-tel').value,address:$('ar-addr').value,quartier:$('ar-q').value,logo_emoji:$('ar-emoji').value};if(!body.name||!body.manager_name||!body.phone){alert('Champs * obligatoires');return;}const r=await api('POST','/admin/restaurants',body);if(r.error){alert(r.error);return;}const el=$('a-rest-created');el.style.display='block';el.innerHTML=`✅ Restaurant créé !<br><strong>Code:</strong> ${r.code}<br><strong>MDP temp:</strong> ${r.temp_password}`;aLoadRestaurants();aLoadStats();}
-function aOpenNewLiv(){$('a-modal-liv').style.display='flex';}
-async function aCreateLiv(){const r=await api('POST','/admin/livreurs',{name:$('al-name').value,phone:$('al-tel').value,zone:$('al-zone').value});if(r.error){alert(r.error);return;}alert('Livreur créé ! MDP: '+r.temp_password);$('a-modal-liv').style.display='none';aLoadLivreurs();}
-function aTab(t,btn){document.querySelectorAll('.admin-page').forEach(p=>p.classList.remove('active'));$('a-'+t).classList.add('active');document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const titles={overview:'Vue d\'ensemble',restaurants:'Restaurants',orders:'Commandes',clients:'Clients',livreurs:'Livreurs'};$('a-page-title').textContent=titles[t]||t;}
+function rOpenCat(){g('r-cmodal').style.display='flex';}
+async function rSaveCat(){const n=g('r-cn').value.trim();if(!n)return;await api('POST','/restaurant/menu/categories',{name:n});g('r-cmodal').style.display='none';g('r-cn').value='';rLoadMenu();}
+function rTab(t){
+  g('r-ot').style.display=t==='o'?'block':'none';
+  g('r-mt').style.display=t==='m'?'block':'none';
+  g('r-st').style.display=t==='s'?'block':'none';
+  ['o','m','s'].forEach(k=>{g('rt-'+k)?.classList.toggle('on',k===t);});
+  if(t==='m')rLoadMenu();if(t==='s')rLoadStats();
+}
 
-// ─── LIVREUR ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// LIVREUR
+// ══════════════════════════════════════════════════════════════════════
 let L_STATUS='available';
-async function lInit(){
-  const me=await api('GET','/livreur/me');if(me.error){logout();return;}
-  $('l-name').textContent=me.name;$('l-zone').textContent=(me.zone||'Djibouti-Ville')+' · BoltDj';
-  $('lh-total').textContent=me.total_deliveries||0;$('lh-rating').textContent=me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
-  L_STATUS=me.status||'available';lUpdateStatusBtn();
-  lLoadMissions();pollInterval=setInterval(lLoadMissions,20000);
+async function lReqOtp(){
+  const raw=g('l-ph').value.trim();
+  lPhone=raw.startsWith('+')?raw:'+253'+raw.replace(/\s/g,'');
+  hideErr('l-err');
+  const r=await fetch(API+'/livreur/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:lPhone})}).then(r=>r.json());
+  if(r.error){err('l-err',r.error);return;}
+  g('l-oh').textContent='Code envoyé au '+lPhone+(r.dev_otp?' (DEV: '+r.dev_otp+')':'');
+  sh('l-s1','none');sh('l-s2','block');
 }
-function lUpdateStatusBtn(){const on=L_STATUS!=='offline';$('l-status-dot').style.background=on?'var(--gr)':'var(--re)';$('l-status-lbl').textContent=on?'Disponible':'Hors ligne';$('l-eta').textContent=on?'En service':'Hors ligne';}
-async function lToggleStatus(){const r=await api('PATCH','/livreur/toggle-status');if(!r.error){L_STATUS=r.status;lUpdateStatusBtn();}}
+function lChkOtp(){const c=['lo1','lo2','lo3','lo4'].map(id=>g(id).value).join('');if(c.length===4)setTimeout(lVrfOtp,150);}
+async function lVrfOtp(){
+  const otp=['lo1','lo2','lo3','lo4'].map(id=>g(id).value).join('');
+  const r=await fetch(API+'/livreur/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:lPhone,otp})}).then(r=>r.json());
+  if(r.error){err('l-err',r.error);return;}
+  setToken('livreur',r.token);lInit(r.livreur);
+}
+async function lInit(info){
+  document.querySelectorAll('#p-livreur .pg').forEach(p=>p.classList.remove('active'));
+  g('l-main').classList.add('active');
+  const me=info||await api('GET','/livreur/me');if(me.error){logout();return;}
+  g('l-name').textContent=me.name;g('l-zone').textContent=(me.zone||'Djibouti-Ville')+' · BoltDj';
+  L_STATUS=me.status||'available';lUpdStatus();
+  g('lh-t').textContent=me.total_deliveries||0;
+  g('lh-r').textContent=me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
+  lLoadMissions();lPollInterval=setInterval(lLoadMissions,20000);
+}
+function lUpdStatus(){const on=L_STATUS!=='offline';g('l-sd').style.background=on?'var(--gr)':'var(--re)';g('l-sl').textContent=on?'Disponible':'Hors ligne';g('l-eta').textContent=on?'En service':'Hors ligne';}
+async function lTogStatus(){const r=await api('PATCH','/livreur/toggle-status');if(!r.error){L_STATUS=r.status;lUpdStatus();}}
 async function lLoadMissions(){
-  const missions=await api('GET','/livreur/missions');if(!Array.isArray(missions))return;
-  const active=missions.find(m=>m.status==='delivering');
-  const available=missions.filter(m=>m.status==='ready');
-  if(active){$('l-eta').textContent='~15 min';
-    $('l-active-mission').innerHTML=`<div style="padding:10px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--pu2)">EN COURS</div><div class="mission-card active-m"><div class="mc-h"><span class="mc-id">${active.order_number}</span><span class="badge b-pu">🛵 En route</span></div><div class="mc-b"><div class="addr-s"><div class="addr-dot-col"><div class="addr-dot" style="background:var(--pu)"></div><div class="addr-line"></div></div><div><div class="addr-lbl">Récupérer</div><div class="addr-val">${active.rest_name||'Restaurant'}</div><div style="font-size:11px;color:var(--mid)">${active.rest_address||''}</div></div></div><div class="addr-s"><div class="addr-dot-col"><div class="addr-dot" style="background:var(--gr)"></div></div><div><div class="addr-lbl">Livrer à</div><div class="addr-val">${active.client_name||'Client'}</div><div style="font-size:11px;color:var(--mid)">${active.delivery_address||''}<br><span style="color:var(--pu);font-weight:700">${active.client_phone||''}</span></div></div></div></div><div class="mc-f"><div style="flex:1"><div style="font-size:11px;color:var(--mid)">Montant</div><div style="font-size:16px;font-weight:800;color:var(--pu)">${(active.total||0).toLocaleString()} FDJ</div></div><button class="btn-gr" style="width:auto;padding:10px 18px;font-size:13px" onclick="lDeliver('${active.id}')">✓ Confirmer livraison</button></div></div>`;
-  } else $('l-active-mission').innerHTML='';
-  if(available.length){$('l-available-missions').innerHTML=`<div style="padding:10px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mid)">${available.length} MISSION${available.length>1?'S':''} DISPONIBLE${available.length>1?'S':''}</div>`+available.map(m=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)"><div class="row-ic">${m.logo_emoji||'📦'}</div><div style="flex:1"><div class="row-title">${m.order_number}</div><div class="row-sub">🍽️ ${m.rest_name||'—'} · 📍 ${m.delivery_address||'—'}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--pu)">${(m.total||0).toLocaleString()} FDJ</div><button class="btn-sm btn-sm-pu" style="margin-top:5px" onclick="lPickup('${m.id}')">Prendre</button></div></div>`).join('');}
-  else if(!active)$('l-available-missions').innerHTML='<div class="empty-state"><div class="empty-ic">⏳</div><div class="empty-title">En attente de missions</div><div class="empty-sub">Les commandes prêtes apparaîtront ici</div></div>';
+  const ms=await api('GET','/livreur/missions');if(!Array.isArray(ms))return;
+  const active=ms.find(m=>m.status==='delivering');
+  const avail=ms.filter(m=>m.status==='ready');
+  if(active){
+    g('l-eta').textContent='~15 min';
+    startGpsTracking(active.id);
+    g('l-active').innerHTML=`<div style="padding:8px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--pu2)">EN COURS</div>
+    <div class="mc am">
+      <div class="mc-h"><span style="font-size:13px;font-weight:800;color:var(--pu2)">${active.order_number}</span><span class="bdg b-pu">🛵 En route</span></div>
+      <div class="mc-b">
+        <div class="addr-s"><div class="addr-dc"><div class="addr-dot" style="background:var(--pu)"></div><div class="addr-ln"></div></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mid)">Récupérer</div><div style="font-size:13px;font-weight:700;margin-top:2px">${active.rest_name||'Restaurant'}</div><div style="font-size:11px;color:var(--mid)">${active.rest_address||''}</div></div></div>
+        <div class="addr-s"><div class="addr-dc"><div class="addr-dot" style="background:var(--gr)"></div></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mid)">Livrer à</div><div style="font-size:13px;font-weight:700;margin-top:2px">${active.client_name||'Client'}</div><div style="font-size:11px;color:var(--mid)">${active.delivery_address||''}</div><div style="font-size:12px;color:var(--pu);font-weight:700;margin-top:2px">${active.client_phone||''}</div></div></div>
+      </div>
+      <div class="mc-f"><div style="flex:1"><div style="font-size:11px;color:var(--mid)">Montant commande</div><div style="font-size:16px;font-weight:800;color:var(--pu)">${(active.total||0).toLocaleString()} FDJ</div></div>
+      <button class="btn-gr" style="width:auto;padding:10px 18px;font-size:13px;border-radius:12px" onclick="lDeliver('${active.id}')">✓ Confirmer livraison</button></div>
+    </div>`;
+  } else {
+    g('l-active').innerHTML='';stopGps();
+  }
+  if(avail.length){
+    g('l-avail').innerHTML=`<div style="padding:8px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mid)">${avail.length} MISSION${avail.length>1?'S':''} DISPONIBLE${avail.length>1?'S':''}</div>`
+    +avail.map(m=>`<div class="lrow"><div class="lic">${m.logo_emoji||'📦'}</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${m.order_number}</div><div style="font-size:11px;color:var(--mid)">🍽️ ${m.rest_name||'—'} · 📍 ${m.delivery_address||'—'}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--pu)">${(m.total||0).toLocaleString()} FDJ</div><button class="bsm bsm-pu" style="margin-top:5px" onclick="lPickup('${m.id}')">Prendre</button></div></div>`).join('');
+  } else if(!active) g('l-avail').innerHTML='<div class="empty"><div class="empty-ic">⏳</div><div style="font-size:15px;font-weight:800;margin-bottom:6px">En attente de missions</div><div>Les commandes prêtes apparaîtront ici</div></div>';
 }
 async function lPickup(id){const r=await api('PATCH',`/livreur/missions/${id}/pickup`);if(r.error){alert(r.error);return;}lLoadMissions();}
-async function lDeliver(id){if(!confirm('Confirmer la livraison ?'))return;const r=await api('PATCH',`/livreur/missions/${id}/deliver`);if(r.error){alert(r.error);return;}lLoadMissions();alert('✅ Livraison confirmée !');}
-async function lLoadHistory(){
-  const h=await api('GET','/livreur/history');if(!Array.isArray(h)||!h.length){$('l-history-list').innerHTML='<div class="empty-state"><div class="empty-ic">📭</div><div class="empty-title">Aucune livraison</div></div>';return;}
-  $('l-history-list').innerHTML=h.map(hi=>`<div style="padding:13px 16px;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:800">${hi.logo_emoji||'📦'} ${hi.rest_name||'—'}</div><span class="badge b-gr">✓ Livrée</span></div><div style="font-size:11px;color:var(--mid)">${hi.order_number} · ${(hi.created_at||'').slice(0,10)}</div><div style="font-size:14px;font-weight:800;color:var(--pu);margin-top:5px">+${hi.delivery_fee||300} FDJ</div></div>`).join('');
+async function lDeliver(id){if(!confirm('Confirmer la livraison ?'))return;const r=await api('PATCH',`/livreur/missions/${id}/deliver`);if(r.error){alert(r.error);return;}stopGps();lLoadMissions();alert('✅ Livraison confirmée !');}
+async function lLoadHist(){
+  const h=await api('GET','/livreur/history');if(!Array.isArray(h)||!h.length){g('l-hlist').innerHTML='<div class="empty"><div class="empty-ic">📭</div><div>Aucune livraison</div></div>';return;}
+  g('l-hlist').innerHTML=h.map(hi=>`<div style="padding:12px 16px;border-bottom:1px solid var(--bd)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:800">${hi.logo_emoji||'📦'} ${hi.rest_name||'—'}</div><span class="bdg b-gr">✓ Livrée</span></div><div style="font-size:11px;color:var(--mid)">${hi.order_number} · ${(hi.created_at||'').slice(0,10)}</div><div style="font-size:14px;font-weight:800;color:var(--pu);margin-top:4px">+${hi.delivery_fee||300} FDJ</div></div>`).join('');
 }
-function lTab(t){$('l-missions-tab').style.display=t==='missions'?'block':'none';$('l-history-tab').style.display=t==='history'?'block':'none';document.querySelectorAll('.portal#portal-livreur .btm-tab').forEach(b=>b.classList.remove('active'));$('lt-'+t)?.classList.add('active');if(t==='history')lLoadHistory();}
+function lTab(t){g('l-mt').style.display=t==='m'?'block':'none';g('l-ht').style.display=t==='h'?'block':'none';['m','h'].forEach(k=>g('lt-'+k)?.classList.toggle('on',k===t));if(t==='h')lLoadHist();}
+
+// ══════════════════════════════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════════════════════════════
+let A_RESTS=[],A_FLT='all';
+async function aLogin(){
+  hideErr('a-err');
+  const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:g('a-em').value,password:g('a-pw').value})}).then(r=>r.json());
+  if(r.error){err('a-err',r.error);return;}
+  setToken('admin',r.token);aLoad();
+}
+async function aLoad(){
+  document.querySelectorAll('#p-admin .pg').forEach(p=>p.classList.remove('active'));
+  g('a-main').classList.add('active');
+  aLoadStats();aLoadRests();aLoadOrds();aLoadClients();aLoadLivs();
+}
+async function aLoadStats(){
+  const s=await api('GET','/admin/stats');if(s.error)return;
+  g('as-a').textContent=s.activeRests||0;g('as-t').textContent=s.todayOrders||0;
+  g('as-p').textContent=s.pendingRests||0;g('as-r').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';
+  g('a-pb').textContent=s.pendingRests||0;
+  const vals=[34,51,63,47,72,68,s.todayOrders||0];const mx=Math.max(...vals,1);
+  g('a-chart').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'td':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
+}
+async function aLoadRests(){
+  A_RESTS=await api('GET','/admin/restaurants');if(!Array.isArray(A_RESTS))return;
+  aRndrRests();
+  const pend=A_RESTS.filter(r=>r.status==='pending');
+  g('a-pend').innerHTML=pend.length?pend.map(r=>`<div class="lrow"><div class="lic" style="background:${r.image_url?'transparent':'var(--pu-l)'};overflow:hidden;padding:0">${r.image_url?`<img src="${r.image_url}" style="width:100%;height:100%;object-fit:cover">`:r.logo_emoji||'🍽️'}</div><div><div style="font-size:12px;font-weight:700">${r.name}</div><div style="font-size:11px;color:var(--mid)">${r.manager_name} · ${r.phone}</div></div><div style="display:flex;gap:4px;margin-left:auto"><button class="bsm bsm-gr" onclick="aUpdR('${r.id}','active')">✓</button><button class="bsm bsm-re" onclick="aUpdR('${r.id}','rejected')">✗</button></div></div>`).join('')
+  :'<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun restaurant en attente ✅</div>';
+}
+function aRndrRests(){
+  let data=A_RESTS;if(A_FLT!=='all')data=data.filter(r=>r.status===A_FLT);
+  const sb={active:'<span class="bdg b-gr">Actif</span>',pending:'<span class="bdg b-or">En attente</span>',suspended:'<span class="bdg b-re">Suspendu</span>',rejected:'<span class="bdg b-md">Refusé</span>'};
+  g('a-rtbd').innerHTML=data.map(r=>`<tr>
+    <td style="font-size:11px;color:var(--mid)">${r.code}</td>
+    <td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:8px;overflow:hidden;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;flex-shrink:0">${r.image_url?`<img src="${r.image_url}" style="width:100%;height:100%;object-fit:cover">`:r.logo_emoji||'🍽️'}</div><div><strong style="font-weight:700">${r.name}</strong><div style="font-size:10px;color:var(--mid)">${r.quartier||''}</div></div></div></td>
+    <td style="font-size:12px">${r.manager_name}</td>
+    <td>${sb[r.status]||r.status}</td>
+    <td style="white-space:nowrap">
+      ${r.status==='pending'?`<button class="bsm bsm-gr" onclick="aUpdR('${r.id}','active')" style="margin-right:3px">✓</button><button class="bsm bsm-re" onclick="aUpdR('${r.id}','rejected')">✗</button>`:''}
+      ${r.status==='active'?`<button class="bsm bsm-or" onclick="aUpdR('${r.id}','suspended')">Suspendre</button>`:''}
+      ${r.status==='suspended'?`<button class="bsm bsm-gr" onclick="aUpdR('${r.id}','active')">Réactiver</button>`:''}
+    </td>
+  </tr>`).join('');
+}
+function aFlt(s,el){A_FLT=s;document.querySelectorAll('.a-chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');aRndrRests();}
+async function aUpdR(id,status){if(!confirm({active:'Valider ?',suspended:'Suspendre ?',rejected:'Refuser ?'}[status]||'Confirmer ?'))return;await api('PATCH',`/admin/restaurants/${id}/status`,{status});aLoadRests();aLoadStats();}
+async function aLoadOrds(){
+  const ords=await api('GET','/admin/orders');if(!Array.isArray(ords))return;
+  const sl={pending:'En attente',accepted:'Acceptée',preparing:'Préparation',ready:'Prête',delivering:'Livraison',delivered:'Livrée',cancelled:'Annulée'};
+  const sc={delivered:'var(--gr)',cancelled:'var(--re)',pending:'var(--mid)',preparing:'#9A6E00'};
+  g('a-otbd').innerHTML=ords.map(o=>`<tr><td><code style="background:var(--pu-ll);padding:2px 5px;border-radius:4px;font-size:11px">${o.order_number}</code></td><td style="font-size:12px">${o.client_name||'—'}<div style="font-size:10px;color:var(--mid)">${o.client_phone||''}</div></td><td style="font-size:12px">${o.restaurant_name||'—'}</td><td style="font-weight:800;font-size:12px">${(o.total||0).toLocaleString()} FDJ</td><td><span style="font-size:11px;font-weight:700;color:${sc[o.status]||'var(--pu)'};background:${sc[o.status]||'var(--pu)'}18;padding:3px 8px;border-radius:20px">${sl[o.status]||o.status}</span></td></tr>`).join('');
+  g('a-rec').innerHTML=ords.slice(0,5).map(o=>`<div class="lrow"><div class="lic">📦</div><div><div style="font-size:12px;font-weight:700">${o.restaurant_name||'—'} — ${o.order_number}</div><div style="font-size:11px;color:var(--mid)">${o.client_name||'—'}</div></div><span style="margin-left:auto;font-size:13px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()} FDJ</span></div>`).join('')||'<div style="padding:16px;text-align:center;color:var(--mid)">Aucune commande</div>';
+}
+async function aLoadClients(){const c=await api('GET','/admin/clients');if(!Array.isArray(c))return;g('a-ctbd').innerHTML=c.map(cl=>`<tr><td style="font-weight:700">${cl.first_name||''} ${cl.last_name||''}</td><td style="font-size:12px">${cl.phone}</td><td>${cl.total_orders||0}</td><td style="font-weight:700">${(cl.total_spent||0).toLocaleString()} FDJ</td></tr>`).join('');}
+async function aLoadLivs(){const l=await api('GET','/admin/livreurs');if(!Array.isArray(l))return;const sm={available:'<span class="bdg b-gr">Disponible</span>',delivering:'<span class="bdg b-pu">Livraison</span>',offline:'<span class="bdg b-md">Hors ligne</span>'};g('a-ltbd').innerHTML=l.map(li=>`<tr><td style="font-weight:700">${li.name}</td><td style="font-size:12px">${li.phone}</td><td>${li.zone||'—'}</td><td>${li.total_deliveries||0}</td><td>${sm[li.status]||li.status}</td></tr>`).join('');}
+
+function aOpenNewR(){g('a-rc').style.display='none';g('a-rm').style.display='flex';}
+async function aUploadRestImg(input){
+  const file=input.files[0];if(!file)return;
+  g('a-ri-loading').style.display='block';
+  try{const url=await uploadImg(file);g('a-ri-url').value=url;g('a-ri-preview').src=url;g('a-ri-preview').style.display='block';}
+  catch(e){alert('Erreur upload: '+e.message);}
+  finally{g('a-ri-loading').style.display='none';}
+}
+async function aCreateR(){
+  const body={name:g('an-n').value,category:g('an-c').value,manager_name:g('an-m').value,phone:g('an-t').value,address:g('an-a').value,quartier:g('an-q').value,logo_emoji:g('an-e').value,image_url:g('a-ri-url').value};
+  if(!body.name||!body.manager_name||!body.phone){alert('Champs * obligatoires');return;}
+  const r=await api('POST','/admin/restaurants',body);if(r.error){alert(r.error);return;}
+  const rc=g('a-rc');rc.style.display='block';rc.innerHTML=`✅ Restaurant créé !<br><strong>Code:</strong> ${r.code} | <strong>MDP:</strong> ${r.temp_password}`;
+  aLoadRests();aLoadStats();
+}
+function aOpenNewL(){g('a-lm').style.display='flex';}
+async function aCreateL(){const r=await api('POST','/admin/livreurs',{name:g('al-n').value,phone:g('al-t').value,zone:g('al-z').value});if(r.error){alert(r.error);return;}alert('Livreur créé ! MDP temp: '+r.temp_password);g('a-lm').style.display='none';aLoadLivs();}
+function aTab(t,btn){document.querySelectorAll('.apg').forEach(p=>p.classList.remove('on'));g('a-'+t)?.classList.add('on');document.querySelectorAll('.a-sb .sb-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');const titles={ov:'Vue d\'ensemble',r:'Restaurants',o:'Commandes',c:'Clients',l:'Livreurs'};g('a-pt').textContent=titles[t]||t;}
+
+// ── UPLOAD (called from upload zone) ─────────────────────────────────
+async function uploadImg(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      try{const r=await api('POST','/upload/image',{image:e.target.result});if(r.error)reject(new Error(r.error));else resolve(r.url);}
+      catch(err){reject(err);}
+    };
+    reader.readAsDataURL(file);
+  });
+}
 </script>
 </body>
 </html>
