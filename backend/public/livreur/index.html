@@ -2,6 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>BoltDj — Livreur</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -232,6 +237,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--white);colo
 </div>
 
 <script>
+
+// Add GPS navigation helper style
+document.head.insertAdjacentHTML('beforeend', '<style>.nav-btn{display:flex;align-items:center;gap:6px;background:#E8FBF6;color:#007A60;border:1px solid #A8EFD8;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}.nav-btn:hover{background:#D0F7EC}</style>');
+
 const API='/api';
 let TOKEN=localStorage.getItem('liv_token')||'';
 let LIV_INFO=null, currentPhone='', pollInterval;
@@ -373,6 +382,18 @@ async function pickupMission(id){
   if(r.error){alert(r.error);return;}
   loadMissions();
 }
+
+function openGPS(address){
+  const encoded=encodeURIComponent(address||'Djibouti Ville');
+  // Try Google Maps first, fallback to Waze
+  const ua=navigator.userAgent.toLowerCase();
+  if(/android/.test(ua)){
+    window.open('geo:0,0?q='+encoded,'_blank');
+  } else {
+    window.open('https://maps.google.com/maps?q='+encoded,'_blank');
+  }
+}
+
 async function confirmDelivery(id){
   if(!confirm('Confirmer la livraison ?'))return;
   const r=await api('PATCH',`/livreur/missions/${id}/deliver`);

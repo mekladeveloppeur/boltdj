@@ -1,538 +1,738 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BoltDj — Restaurant</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>BoltDj — Restaurant Partenaire</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--gr:#1D9E75;--gr-l:#E1F5EE;--gr-d:#085041;--side:200px;
---bg:#F7F7F5;--card:#fff;--border:#E5E5E2;--text:#1A1A1A;--muted:#888}
-body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
-.auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
-.auth-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px}
-.auth-logo{font-size:24px;font-weight:700;color:var(--gr);margin-bottom:6px}
-.auth-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
-.field{margin-bottom:14px}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);color:var(--text);outline:none;font-family:inherit}
-.field input:focus{border-color:var(--gr)}
-.field textarea{resize:vertical;min-height:70px}
-.btn{padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;color:var(--text);font-family:inherit;font-weight:500;transition:all .15s}
-.btn:hover{background:var(--bg)}
-.btn-gr{background:var(--gr);color:#fff;border-color:var(--gr)}.btn-gr:hover{background:var(--gr-d)}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-danger{background:#FFEBEE;color:#C62828;border-color:#FFCDD2}
-.btn-warn{background:#FFF3E0;color:#E65100;border-color:#FFE0B2}
-.btn-blue{background:#E3F2FD;color:#0D47A1;border-color:#BBDEFB}
-.btn-block{width:100%;padding:12px;font-size:14px}
-.alert-err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
-/* SHELL */
-.shell{display:flex;min-height:100vh}
-.sidebar{width:var(--side);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100}
-.sb-logo{padding:16px 14px;border-bottom:1px solid var(--border)}
-.sb-brand{font-size:14px;font-weight:700;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-id{font-size:11px;color:var(--muted);margin-top:2px}
-.open-btn{display:flex;align-items:center;gap:6px;margin-top:10px;padding:7px 10px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;width:100%;transition:all .2s}
-.open-btn.open{background:var(--gr-l);color:var(--gr-d)}
-.open-btn.closed{background:#FFEBEE;color:#C62828}
-.open-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.open-btn.open .open-dot{background:var(--gr)}
-.open-btn.closed .open-dot{background:#D32F2F}
-.sb-nav{padding:10px 8px;flex:1}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;font-size:13px;color:var(--muted);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:500}
-.nav-item:hover{background:var(--bg);color:var(--text)}
-.nav-item.active{background:var(--gr-l);color:var(--gr-d)}
-.nav-ic{font-size:14px;width:16px;text-align:center}
-.nav-badge{margin-left:auto;background:#D32F2F;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
-.sb-foot{padding:10px 8px;border-top:1px solid var(--border)}
-.rest-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:var(--bg)}
-.rest-av{width:28px;height:28px;border-radius:8px;background:var(--gr-l);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.rv-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rv-code{font-size:11px;color:var(--muted)}
-.main{margin-left:var(--side);flex:1;display:flex;flex-direction:column}
-.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.pg-title{font-size:16px;font-weight:600}
-.content{padding:22px;flex:1}
-.pane{display:none}.pane.active{display:block}
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
-.stat-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
-.stat-val{font-size:22px;font-weight:700}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--pu:#6C5CE7;--pu2:#5A4BD1;--pu3:#4834C0;--pu-l:#EEF0FF;--pu-ll:#F8F7FF;--gr:#00B894;--gr-l:#E8FBF6;--re:#E17055;--re-l:#FFF0EE;--or:#FDCB6E;--or-l:#FFF5E0;--dark:#2D3436;--mid:#636E72;--light:#B2BEC3;--bd:#EDE9FF;--wh:#fff}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--pu-ll);color:var(--dark);font-size:14px;min-height:100vh}
+.shell{display:flex;min-height:100vh;max-width:1200px;margin:0 auto;background:var(--wh)}
+/* SIDEBAR */
+.sb{width:220px;background:var(--pu);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.15)}
+.sb-brand{font-size:18px;font-weight:800;color:#fff}
+.sb-rest{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-open-btn{margin:12px 16px 0;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;width:calc(100% - 32px)}
+.sb-open-btn:hover{background:rgba(255,255,255,.25)}
+.sb-dot{width:8px;height:8px;border-radius:50%}
+.sb-nav{padding:12px 8px;flex:1}
+.sb-btn{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:2px;font-size:13px;color:rgba(255,255,255,.75);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-weight:600;transition:all .15s;position:relative}
+.sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb-btn.on{background:rgba(255,255,255,.2);color:#fff}
+.sb-ic{font-size:16px;width:20px;text-align:center}
+.sb-badge{position:absolute;right:10px;background:var(--re);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px}
+.sb-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.15)}
+.sb-footer-btn{width:100%;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:none;border-radius:10px;padding:9px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:800;color:var(--dark)}
+.tb-actions{display:flex;gap:8px;align-items:center}
+.content{flex:1;overflow-y:auto;padding:20px}
+/* PAGES */
+.pg{display:none}.pg.on{display:block}
+/* CARDS & STATS */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sc{background:var(--pu-ll);border-radius:14px;padding:16px;border:1px solid var(--bd)}
+.sl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mid);margin-bottom:6px}
+.sv{font-size:26px;font-weight:800}.sv.pu{color:var(--pu)}.sv.gr{color:var(--gr)}.sv.or{color:#9A6E00}.sv.re{color:var(--re)}
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.card-h{padding:12px 16px;background:var(--pu-ll);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.card-t{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--pu2)}
+/* BUTTONS */
+.btn{padding:10px 18px;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-pu{background:var(--pu);color:#fff}.btn-pu:hover{background:var(--pu2)}
+.btn-gr{background:var(--gr);color:#fff}
+.btn-out{background:none;border:1.5px solid var(--pu);color:var(--pu)}
+.btn-re{background:var(--re-l);color:#A8432A;border:1px solid #FFCBB8}
+.btn-or{background:var(--or-l);color:#9A6E00;border:1px solid var(--or)}
+.bsm{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:800;border:none;cursor:pointer;font-family:inherit}
+.bsm-pu{background:var(--pu);color:#fff}.bsm-gr{background:var(--gr-l);color:#007A60;border:1px solid #A8EFD8}
+.bsm-re{background:var(--re-l);color:#A8432A;border:1px solid #FFCBB8}.bsm-or{background:var(--or-l);color:#9A6E00;border:1px solid var(--or)}
+/* FORMS */
+.f{margin-bottom:14px}
+.f label{display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.inp{width:100%;padding:10px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;background:var(--pu-ll);color:var(--dark);outline:none;font-family:inherit;transition:border-color .15s}
+.inp:focus{border-color:var(--pu);background:var(--wh)}
+select.inp{appearance:none}
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.b-pu{background:var(--pu-l);color:var(--pu2)}.b-gr{background:var(--gr-l);color:#007A60}.b-or{background:var(--or-l);color:#9A6E00}.b-re{background:var(--re-l);color:#A8432A}.b-md{background:var(--pu-ll);color:var(--mid)}
 /* ORDERS */
-.orders-grid{display:flex;flex-direction:column;gap:12px}
-.order-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .2s}
-.order-card.new{border-color:var(--gr);border-width:2px}
-.order-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.order-id{font-size:14px;font-weight:600}
-.order-client{font-size:12px;color:var(--muted);margin-top:2px}
-.order-items-list{font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.7;background:var(--bg);border-radius:6px;padding:8px 10px}
-.order-footer{display:flex;justify-content:space-between;align-items:center}
-.order-total{font-size:15px;font-weight:700;color:var(--gr-d)}
-.order-acts{display:flex;gap:6px}
-.new-pulse{background:var(--gr);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px}
-.card-head{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.card-title{font-size:14px;font-weight:600}
+.oc{border:1.5px solid var(--bd);border-radius:14px;margin-bottom:12px;overflow:hidden;transition:border-color .15s}
+.oc.nw{border-color:var(--pu);border-width:2px}
+.oc-h{padding:12px 16px;background:var(--pu-ll);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.oc-meta{font-size:12px;font-weight:800;color:var(--dark)}
+.oc-sub{font-size:11px;color:var(--mid);margin-top:3px}
+.oc-b{padding:12px 16px}
+.oc-items{font-size:12px;color:var(--mid);background:var(--pu-ll);border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.8}
+.oc-f{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.oc-total{font-size:16px;font-weight:800;color:var(--pu)}
 /* MENU */
-.menu-cat-head{padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.menu-cat-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
-.menu-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)}
-.menu-row:last-child{border-bottom:none}
-.menu-row:hover{background:var(--bg)}
-.m-emoji{font-size:26px;width:36px;text-align:center;flex-shrink:0}
-.m-info{flex:1;min-width:0}
-.m-name{font-size:13px;font-weight:600;margin-bottom:2px}
-.m-desc{font-size:11px;color:var(--muted)}
-.m-price{font-size:13px;font-weight:700;color:var(--gr-d);margin-right:10px;white-space:nowrap}
-.toggle{position:relative;width:38px;height:22px;cursor:pointer;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
-.toggle input:checked+.toggle-track{background:var(--gr)}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
-.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
-.unavail-tag{font-size:10px;color:#C62828;margin-left:4px;font-weight:600}
-/* BADGE */
-.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
-.b-green{background:#E8F5E9;color:#1B5E20}.b-amber{background:#FFF3E0;color:#E65100}
-.b-red{background:#FFEBEE;color:#C62828}.b-blue{background:#E3F2FD;color:#0D47A1}.b-gray{background:var(--bg);color:var(--muted)}
-.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-.d-green{background:#388E3C}.d-amber{background:#F57C00}.d-red{background:#D32F2F}
-/* STATS BARS */
-.stat-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.stat-bar-lbl{font-size:13px;flex-shrink:0;min-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat-bar-track{flex:1;height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
-.stat-bar-fill{height:100%;border-radius:4px;background:var(--gr);transition:width .5s}
-.stat-bar-val{font-size:12px;color:var(--muted);min-width:40px;text-align:right}
+.mi-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd)}
+.mi-row:last-child{border-bottom:none}
+.mi-img{width:50px;height:50px;border-radius:10px;object-fit:cover;background:var(--pu-ll);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden}
+.mi-img img{width:100%;height:100%;object-fit:cover}
+.mi-body{flex:1;min-width:0}
+.mi-name{font-size:13px;font-weight:700}
+.mi-desc{font-size:11px;color:var(--mid);margin-top:2px}
+.mi-price{font-size:13px;font-weight:800;color:var(--pu);margin-top:3px}
+/* UPLOAD */
+.upload-z{border:2px dashed var(--bd);border-radius:10px;padding:14px;text-align:center;cursor:pointer;position:relative;background:var(--pu-ll);transition:all .15s}
+.upload-z:hover{border-color:var(--pu);background:var(--pu-l)}
+.upload-z input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-z img{width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
+.upload-z img.show{display:block}
+/* TOGGLE */
+.tog{position:relative;width:38px;height:22px;cursor:pointer;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-tr{position:absolute;inset:0;border-radius:11px;background:var(--bd);transition:background .2s}
+.tog input:checked+.tog-tr{background:var(--pu)}
+.tog-th{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none}
+.tog input:checked~.tog-th{transform:translateX(16px)}
+/* TABLE */
+.dtbl{width:100%;border-collapse:collapse;font-size:13px}
+.dtbl th{padding:9px 14px;background:var(--pu-ll);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--pu2);text-align:left;border-bottom:1px solid var(--bd)}
+.dtbl td{padding:11px 14px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:var(--pu-ll)}
+/* CHART */
+.cbars{display:flex;align-items:flex-end;gap:6px;height:80px}
+.cbar{flex:1;border-radius:4px 4px 0 0;min-height:3px;background:var(--pu-l);border-top:2px solid var(--pu)}
+.cbar.td{background:var(--pu-ll);border-top-color:var(--pu2)}
+/* QR */
+.qr-box{text-align:center;padding:24px;background:var(--pu-ll);border-radius:14px;border:1.5px solid var(--bd)}
+.qr-box img{width:200px;height:200px;border-radius:10px;border:3px solid var(--pu)}
+/* FOURNISSEUR */
+.sup-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd);cursor:pointer}
+.sup-row:hover{background:var(--pu-ll)}
+.sup-ic{width:38px;height:38px;border-radius:10px;background:var(--pu-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+/* JOB */
+.job-row{padding:14px 16px;border-bottom:1px solid var(--bd)}
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--mid)}
+.empty-ic{font-size:40px;margin-bottom:12px}
 /* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
-.modal-bg.open{display:flex}
-.modal{background:var(--card);border-radius:14px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
-.modal-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card)}
-.modal-title{font-size:15px;font-weight:600}
-.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
-.modal-body{padding:18px}
-.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--wh);border-radius:18px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:800}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--mid)}
+/* STATUS FLOW */
+.status-flow{display:flex;gap:0;margin-bottom:16px;overflow-x:auto}
+.sf-step{display:flex;flex-direction:column;align-items:center;min-width:80px}
+.sf-circle{width:28px;height:28px;border-radius:50%;background:var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--mid);position:relative;z-index:1}
+.sf-circle.on{background:var(--pu);color:#fff}
+.sf-circle.done{background:var(--gr);color:#fff}
+.sf-line{flex:1;height:2px;background:var(--bd);margin-top:13px}
+.sf-line.done{background:var(--gr)}
+.sf-label{font-size:10px;color:var(--mid);margin-top:4px;text-align:center;font-weight:600}
+.sf-label.on{color:var(--pu);font-weight:700}
+/* AUTH */
+.auth-page{display:flex;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--pu),var(--pu3));padding:20px}
+.auth-card{background:var(--wh);border-radius:22px;padding:28px;width:100%;max-width:400px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 1.5s infinite}
+@media(max-width:768px){.sb{display:none}.shell{flex-direction:column}}
 </style>
 </head>
 <body>
 
 <!-- AUTH -->
-<div id="auth-screen" class="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">🏪 BoltDj Partenaire</div>
-    <div class="auth-sub">Connectez-vous avec votre code restaurant</div>
-    <div id="auth-err" class="alert-err"></div>
-    <div style="background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--muted)">
-      💡 <strong>Démo:</strong> Code <code>REST001</code> · Mot de passe <code>Restaurant2026!</code>
+<div id="auth-wrap" style="display:none">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div style="font-size:28px;font-weight:900;color:var(--pu);margin-bottom:4px">⚡ BoltDj</div>
+      <div style="font-size:14px;color:var(--mid);margin-bottom:22px">Portail Restaurant Partenaire</div>
+      <div id="auth-err" style="background:var(--re-l);color:var(--re);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px;display:none"></div>
+      <div style="background:var(--pu-ll);border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--mid)">
+        💡 <strong style="color:var(--pu2)">Démo:</strong> Code <strong>REST001</strong> / MDP <strong>Restaurant2026!</strong>
+      </div>
+      <div class="f"><label>Code restaurant</label><input class="inp" id="a-code" value="REST001" placeholder="REST001"></div>
+      <div class="f"><label>Mot de passe</label><input class="inp" id="a-pwd" type="password" value="Restaurant2026!"></div>
+      <button class="btn btn-pu" style="width:100%" onclick="doLogin()">Se connecter →</button>
     </div>
-    <div class="field"><label>Code restaurant</label><input id="r-code" placeholder="Ex: REST001" style="text-transform:uppercase"></div>
-    <div class="field"><label>Mot de passe</label><input id="r-pwd" type="password" placeholder="••••••••"></div>
-    <button class="btn btn-gr btn-block" onclick="doLogin()">Se connecter</button>
   </div>
 </div>
 
-<!-- SHELL -->
-<div id="shell" class="shell" style="display:none">
-  <div class="sidebar">
+<!-- APP -->
+<div id="app-wrap" style="display:none">
+<div class="shell">
+  <!-- SIDEBAR -->
+  <div class="sb">
     <div class="sb-logo">
-      <div class="sb-brand" id="sb-name">Mon restaurant</div>
-      <div class="sb-id" id="sb-code">CODE</div>
-      <button class="open-btn open" id="open-btn" onclick="toggleOpen()">
-        <span class="open-dot"></span><span id="open-lbl">Ouvert</span>
-      </button>
+      <div class="sb-brand">⚡ BoltDj</div>
+      <div class="sb-rest" id="sb-rest-name">Restaurant</div>
     </div>
-    <div class="sb-nav">
-      <button class="nav-item active" onclick="showPane('commandes',this)"><span class="nav-ic">📦</span>Commandes<span class="nav-badge" id="new-badge" style="display:none">0</span></button>
-      <button class="nav-item" onclick="showPane('menu',this)"><span class="nav-ic">🍽️</span>Mon menu</button>
-      <button class="nav-item" onclick="showPane('stats',this)"><span class="nav-ic">📊</span>Statistiques</button>
-      <button class="nav-item" onclick="showPane('profil',this)"><span class="nav-ic">🏪</span>Mon profil</button>
-    </div>
-    <div class="sb-foot">
-      <div class="rest-pill">
-        <div class="rest-av" id="sb-emoji">🍽️</div>
-        <div style="min-width:0"><div class="rv-name" id="sb-name2">Restaurant</div><div class="rv-code" id="sb-quartier">—</div></div>
-      </div>
+    <button class="sb-open-btn" id="sb-open-btn" onclick="toggleOpen()">
+      <span class="sb-dot" id="sb-dot" style="background:var(--gr)"></span>
+      <span id="sb-open-lbl">Ouvert</span>
+    </button>
+    <nav class="sb-nav">
+      <button class="sb-btn on" onclick="nav('dashboard',this)"><span class="sb-ic">📊</span>Tableau de bord</button>
+      <button class="sb-btn" onclick="nav('orders',this)"><span class="sb-ic">📦</span>Commandes<span class="sb-badge" id="new-badge" style="display:none">0</span></button>
+      <button class="sb-btn" onclick="nav('menu',this)"><span class="sb-ic">🍽️</span>Menu & plats</button>
+      <button class="sb-btn" onclick="nav('suppliers',this)"><span class="sb-ic">🚚</span>Fournisseurs</button>
+      <button class="sb-btn" onclick="nav('jobs',this)"><span class="sb-ic">👥</span>Recrutement</button>
+      <button class="sb-btn" onclick="nav('qr',this)"><span class="sb-ic">📲</span>QR Code</button>
+      <button class="sb-btn" onclick="nav('settings',this)"><span class="sb-ic">⚙️</span>Paramètres</button>
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-footer-btn" onclick="logout()">Se déconnecter</button>
     </div>
   </div>
 
+  <!-- MAIN CONTENT -->
   <div class="main">
     <div class="topbar">
-      <div class="pg-title" id="pg-title">Commandes</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" onclick="loadOrders()">↻ Actualiser</button>
-        <button class="btn btn-sm btn-gr" onclick="openAddItem()">+ Ajouter plat</button>
-        <button class="btn btn-sm btn-danger" onclick="logout()">Déconnexion</button>
+      <div class="tb-title" id="page-title">Tableau de bord</div>
+      <div class="tb-actions">
+        <span id="tb-date" style="font-size:12px;color:var(--mid)"></span>
+        <button class="bsm bsm-or" onclick="loadAll()">↻ Actualiser</button>
       </div>
     </div>
     <div class="content">
 
-      <!-- COMMANDES -->
-      <div class="pane active" id="pane-commandes">
-        <div class="stats-row">
-          <div class="stat-card"><div class="stat-lbl">Nouvelles</div><div class="stat-val" id="c-new" style="color:var(--gr)">0</div></div>
-          <div class="stat-card"><div class="stat-lbl">En préparation</div><div class="stat-val" id="c-prep" style="color:#E65100">0</div></div>
-          <div class="stat-card"><div class="stat-lbl">Livrées aujourd'hui</div><div class="stat-val" id="c-done">0</div></div>
-          <div class="stat-card"><div class="stat-lbl">Revenus du jour</div><div class="stat-val" id="c-rev" style="font-size:17px">0 FDJ</div></div>
+      <!-- DASHBOARD -->
+      <div class="pg on" id="pg-dashboard">
+        <div class="sg">
+          <div class="sc"><div class="sl">Nouvelles</div><div class="sv pu" id="s-new">0</div></div>
+          <div class="sc"><div class="sl">En prépa.</div><div class="sv or" id="s-prep">0</div></div>
+          <div class="sc"><div class="sl">Livrées auj.</div><div class="sv gr" id="s-done">0</div></div>
+          <div class="sc"><div class="sl">Revenu auj.</div><div class="sv" style="font-size:18px;color:var(--dark)" id="s-rev">0 FDJ</div></div>
         </div>
-        <div id="orders-empty" style="text-align:center;padding:60px 20px;color:var(--muted);display:none">
-          <div style="font-size:40px;margin-bottom:12px">📭</div>
-          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Aucune commande</div>
-          <div style="font-size:13px">Les nouvelles commandes apparaîtront ici</div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+          <div>
+            <div class="card"><div class="card-h"><span class="card-t">Activité 7 jours</span></div><div style="padding:16px"><div class="cbars" id="chart-7d"></div></div></div>
+            <div class="card"><div class="card-h"><span class="card-t">Commandes récentes</span><button class="bsm bsm-pu" onclick="nav('orders',document.querySelector('.sb-btn:nth-child(2)'))">Voir tout</button></div><div id="dash-recent-orders"></div></div>
+          </div>
+          <div>
+            <div class="card"><div class="card-h"><span class="card-t">Ce mois</span></div>
+              <div style="padding:14px">
+                <div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:3px">Commandes</div><div style="font-size:22px;font-weight:800;color:var(--pu)" id="s-month-orders">—</div></div>
+                <div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:3px">Revenu</div><div style="font-size:20px;font-weight:800;color:var(--gr)" id="s-month-rev">—</div></div>
+                <div><div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:3px">Note moy.</div><div style="font-size:20px;font-weight:800;color:#9A6E00" id="s-rating">—</div></div>
+              </div>
+            </div>
+            <div class="card"><div class="card-h"><span class="card-t">Fournisseur sync.</span></div><div id="dash-suppliers"></div></div>
+            <div class="card" style="margin-top:0"><div class="card-h"><span class="card-t">Recrutement actif</span></div><div id="dash-jobs"></div></div>
+          </div>
         </div>
-        <div class="orders-grid" id="orders-grid"></div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="pg" id="pg-orders">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="order-filters">
+          <button class="bsm bsm-pu" onclick="filterOrders('all',this)">Toutes</button>
+          <button class="bsm" style="background:var(--or-l);color:#9A6E00;border:1px solid var(--or)" onclick="filterOrders('pending',this)">⏳ En attente</button>
+          <button class="bsm bsm-or" onclick="filterOrders('preparing',this)">🍳 Préparation</button>
+          <button class="bsm bsm-gr" onclick="filterOrders('ready',this)">✅ Prêtes</button>
+          <button class="bsm" style="background:var(--pu-l);color:var(--pu2);border:1px solid var(--pu)" onclick="filterOrders('delivering',this)">🛵 Livraison</button>
+        </div>
+        <div id="orders-list"><div class="empty"><div class="empty-ic">📭</div>Aucune commande active</div></div>
       </div>
 
       <!-- MENU -->
-      <div class="pane" id="pane-menu">
-        <div id="menu-content"></div>
+      <div class="pg" id="pg-menu">
+        <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-pu" onclick="openAddItem()">+ Ajouter un plat</button>
+          <button class="btn btn-out" onclick="openAddCat()">+ Catégorie</button>
+        </div>
+        <div id="menu-list"></div>
       </div>
 
-      <!-- STATS -->
-      <div class="pane" id="pane-stats">
-        <div class="stats-row">
-          <div class="stat-card"><div class="stat-lbl">Ce mois</div><div class="stat-val" id="st-mo">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px">commandes</div></div>
-          <div class="stat-card"><div class="stat-lbl">Revenus mois</div><div class="stat-val" id="st-rev" style="font-size:17px">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">En attente</div><div class="stat-val" id="st-pend" style="color:#D32F2F">—</div></div>
-          <div class="stat-card"><div class="stat-lbl">Note clients</div><div class="stat-val" id="st-rating">—</div></div>
+      <!-- FOURNISSEURS -->
+      <div class="pg" id="pg-suppliers">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-pu" onclick="openAddSupplier()">+ Ajouter fournisseur</button>
+          <button class="btn btn-out" onclick="openNewOrder()">📋 Nouvelle commande</button>
         </div>
-        <div class="card">
-          <div class="card-head"><span class="card-title">Plats les plus commandés</span></div>
-          <div style="padding:16px" id="top-items">
-            <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Chargement...</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div class="card"><div class="card-h"><span class="card-t">Mes fournisseurs</span></div><div id="suppliers-list"></div></div>
+          </div>
+          <div>
+            <div class="card"><div class="card-h"><span class="card-t">Commandes & archives</span></div><div id="sup-orders-list"></div></div>
           </div>
         </div>
       </div>
 
-      <!-- PROFIL -->
-      <div class="pane" id="pane-profil">
-        <div class="two-col">
-          <div class="card">
-            <div class="card-head"><span class="card-title">Informations</span><button class="btn btn-sm btn-gr" onclick="saveProfile()">Sauvegarder</button></div>
-            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
-              <div class="field"><label>Nom du restaurant</label><input id="p-name"></div>
-              <div class="field"><label>Description</label><input id="p-desc"></div>
-              <div class="field"><label>Adresse</label><input id="p-addr"></div>
-              <div class="field"><label>Téléphone</label><input id="p-phone"></div>
-              <div class="field"><label>Délai livraison</label><input id="p-time"></div>
+      <!-- RECRUTEMENT -->
+      <div class="pg" id="pg-jobs">
+        <button class="btn btn-pu" style="margin-bottom:16px" onclick="openAddJob()">+ Publier une offre</button>
+        <div class="card"><div class="card-h"><span class="card-t">Offres actives</span></div><div id="jobs-list"></div></div>
+      </div>
+
+      <!-- QR CODE -->
+      <div class="pg" id="pg-qr">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="qr-box" id="qr-display">
+            <div style="font-size:14px;font-weight:800;color:var(--pu2);margin-bottom:16px">QR Code de votre restaurant</div>
+            <div id="qr-img-wrap" style="margin-bottom:16px"></div>
+            <p style="font-size:12px;color:var(--mid);line-height:1.6">Les clients scannent ce QR code pour commander directement sur place. L'option <strong>"Payer plus tard"</strong> est activée automatiquement.</p>
+            <button class="btn btn-pu" style="margin-top:16px;width:100%" onclick="loadQR()">↻ Générer / Rafraîchir</button>
+            <a id="qr-download" href="#" download="qr-boltdj.png" style="display:none;margin-top:10px;font-size:12px;color:var(--pu);text-align:center;display:block">⬇ Télécharger le QR code</a>
+          </div>
+          <div>
+            <div class="card"><div class="card-h"><span class="card-t">Instructions d'affichage</span></div>
+              <div style="padding:16px;font-size:13px;line-height:1.9;color:var(--mid)">
+                <p style="margin-bottom:8px">1. Téléchargez ou imprimez le QR code ci-contre</p>
+                <p style="margin-bottom:8px">2. Placez-le sur chaque table de votre restaurant</p>
+                <p style="margin-bottom:8px">3. Le client scanne → arrive sur votre page</p>
+                <p style="margin-bottom:8px">4. Il peut commander et choisir <strong style="color:var(--pu)">"Payer plus tard"</strong></p>
+                <p>5. Vous recevez la commande comme d'habitude</p>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-head"><span class="card-title">Tarification</span></div>
-            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
-              <div class="field"><label>Frais de livraison (FDJ)</label><input id="p-fee" type="number"></div>
-              <div class="field"><label>Commande minimum (FDJ)</label><input id="p-min" type="number"></div>
-              <div style="background:var(--bg);border-radius:8px;padding:12px;font-size:12px;color:var(--muted)">
-                Ces informations sont visibles par les clients sur l'application.
+            <div class="card"><div class="card-h"><span class="card-t">Commandes sur place aujourd'hui</span></div>
+              <div style="padding:14px" id="dine-in-stats">
+                <div style="font-size:24px;font-weight:800;color:var(--pu)" id="dine-in-count">0</div>
+                <div style="font-size:12px;color:var(--mid);margin-top:4px">commandes scannées en restaurant</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+      <!-- SETTINGS -->
+      <div class="pg" id="pg-settings">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="card"><div class="card-h"><span class="card-t">Informations restaurant</span></div>
+            <div style="padding:16px">
+              <div class="f"><label>Nom du restaurant</label><input class="inp" id="set-name" placeholder="Nom"></div>
+              <div class="f"><label>Description</label><textarea class="inp" id="set-desc" rows="3" placeholder="Description courte..." style="resize:none"></textarea></div>
+              <div class="f"><label>Quartier</label><input class="inp" id="set-q" placeholder="Ex: Bender Djedid"></div>
+              <div class="f"><label>Adresse</label><input class="inp" id="set-addr" placeholder="Rue, repère..."></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="f"><label>Temps livraison (min)</label><input class="inp" id="set-time" type="number" placeholder="30"></div>
+                <div class="f"><label>Frais livraison (FDJ)</label><input class="inp" id="set-fee" type="number" placeholder="300"></div>
+              </div>
+              <div class="f"><label>Prix livraison / km (FDJ)</label><input class="inp" id="set-km" type="number" placeholder="80" step="10"></div>
+              <div class="f"><label>Commande minimum (FDJ)</label><input class="inp" id="set-min" type="number" placeholder="500"></div>
+              <button class="btn btn-pu" onclick="saveSettings()">Sauvegarder</button>
+            </div>
+          </div>
+          <div class="card"><div class="card-h"><span class="card-t">Photo du restaurant</span></div>
+            <div style="padding:16px">
+              <div class="upload-z" id="rest-img-zone">
+                <input type="file" accept="image/*" onchange="uploadRestImg(this)">
+                <div style="font-size:22px;margin-bottom:6px">📸</div>
+                <div style="font-size:12px;font-weight:700;color:var(--pu2)">Photo principale</div>
+                <img id="rest-img-preview" class="" src="" alt="">
+              </div>
+              <div id="rest-img-loading" style="display:none;font-size:12px;color:var(--pu2);font-weight:700;margin-top:8px;text-align:center">⏳ Upload...</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<!-- MODAL: Ajouter plat -->
+    </div><!-- end content -->
+  </div><!-- end main -->
+</div><!-- end shell -->
+</div><!-- end app-wrap -->
+
+<!-- MODALS -->
 <div class="modal-bg" id="modal-item">
   <div class="modal">
-    <div class="modal-head"><span class="modal-title" id="item-modal-title">Ajouter un plat</span><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="modal-body">
-      <input type="hidden" id="edit-item-id">
-      <div class="field"><label>Nom du plat *</label><input id="i-name" placeholder="Ex: Homard grillé"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="field"><label>Prix (FDJ) *</label><input id="i-price" type="number" placeholder="2500"></div>
-        <div class="field"><label>Emoji</label><input id="i-emoji" placeholder="🍽️" style="font-size:18px"></div>
-      </div>
-      <div class="field"><label>Catégorie</label><select id="i-cat"></select></div>
-      <div class="field"><label>Description</label><input id="i-desc" placeholder="Brève description..."></div>
+    <div class="modal-h"><span class="modal-title" id="item-modal-t">Ajouter un plat</span><button class="modal-close" onclick="closeModal('modal-item')">✕</button></div>
+    <input type="hidden" id="item-id">
+    <div class="f"><label>Nom *</label><input class="inp" id="item-name" placeholder="Ex: Homard grillé"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="f"><label>Prix (FDJ) *</label><input class="inp" id="item-price" type="number"></div>
+      <div class="f"><label>Emoji</label><input class="inp" id="item-emoji" placeholder="🍽️" style="font-size:18px"></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn" onclick="closeModal()">Annuler</button>
-      <button class="btn btn-gr" onclick="saveItem()">Sauvegarder</button>
+    <div class="f"><label>Catégorie</label><select class="inp" id="item-cat"></select></div>
+    <div class="f"><label>Description</label><input class="inp" id="item-desc" placeholder="Courte description..."></div>
+    <div class="f"><label>Photo</label>
+      <div class="upload-z"><input type="file" accept="image/*" onchange="uploadItemImg(this)"><div style="font-size:20px;margin-bottom:4px">📸</div><div style="font-size:12px;font-weight:700;color:var(--pu2)">Ajouter une photo</div><img id="item-img-preview" src="" style="display:none;width:100%;height:80px;object-fit:cover;border-radius:6px;margin-top:6px"></div>
+      <input type="hidden" id="item-img-url">
     </div>
+    <button class="btn btn-pu" style="width:100%" onclick="saveItem()">Sauvegarder</button>
   </div>
 </div>
 
-<!-- MODAL: Nouvelle catégorie -->
 <div class="modal-bg" id="modal-cat">
-  <div class="modal" style="max-width:320px">
-    <div class="modal-head"><span class="modal-title">Nouvelle catégorie</span><button class="modal-close" onclick="document.getElementById('modal-cat').classList.remove('open')">✕</button></div>
-    <div class="modal-body"><div class="field"><label>Nom</label><input id="cat-name" placeholder="Ex: Plats principaux"></div></div>
-    <div class="modal-foot">
-      <button class="btn" onclick="document.getElementById('modal-cat').classList.remove('open')">Annuler</button>
-      <button class="btn btn-gr" onclick="saveCategory()">Créer</button>
+  <div class="modal" style="max-width:340px">
+    <div class="modal-h"><span class="modal-title">Nouvelle catégorie</span><button class="modal-close" onclick="closeModal('modal-cat')">✕</button></div>
+    <div class="f"><label>Nom</label><input class="inp" id="cat-name" placeholder="Ex: Desserts"></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-out" style="flex:1" onclick="closeModal('modal-cat')">Annuler</button><button class="btn btn-pu" style="flex:1" onclick="saveCat()">Créer</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-supplier">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-h"><span class="modal-title">Ajouter un fournisseur</span><button class="modal-close" onclick="closeModal('modal-supplier')">✕</button></div>
+    <div class="f"><label>Nom *</label><input class="inp" id="sup-name" placeholder="Ex: Mondifrais"></div>
+    <div class="f"><label>Téléphone</label><input class="inp" id="sup-phone" placeholder="+253 77 XX XX XX"></div>
+    <div class="f"><label>Email</label><input class="inp" id="sup-email" type="email" placeholder="contact@fournisseur.com"></div>
+    <div class="f"><label>Adresse</label><input class="inp" id="sup-addr" placeholder="Adresse du fournisseur"></div>
+    <div class="f"><label>Notes</label><input class="inp" id="sup-notes" placeholder="Notes internes..."></div>
+    <button class="btn btn-pu" style="width:100%" onclick="saveSupplier()">Ajouter</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-sup-order">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title">Nouvelle commande fournisseur</span><button class="modal-close" onclick="closeModal('modal-sup-order')">✕</button></div>
+    <div class="f"><label>Fournisseur *</label><select class="inp" id="so-sup"></select></div>
+    <div class="f"><label>Articles (un par ligne)</label><textarea class="inp" id="so-items" rows="4" placeholder="Ex:&#10;Boeuf 5kg - 2500 FDJ&#10;Tomates 3kg - 800 FDJ" style="resize:none"></textarea></div>
+    <div class="f"><label>Total (FDJ)</label><input class="inp" id="so-total" type="number" placeholder="0"></div>
+    <div class="f"><label>Notes</label><input class="inp" id="so-notes" placeholder="Instructions particulières..."></div>
+    <button class="btn btn-pu" style="width:100%" onclick="saveSupOrder()">Passer la commande</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-job">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-h"><span class="modal-title">Publier une offre</span><button class="modal-close" onclick="closeModal('modal-job')">✕</button></div>
+    <div class="f"><label>Titre *</label><input class="inp" id="job-title" placeholder="Ex: Cherche cuisinier urgent"></div>
+    <div class="f"><label>Type</label>
+      <select class="inp" id="job-type">
+        <option value="urgence">🚨 Urgence (besoin immédiat)</option>
+        <option value="interim">⏳ Intérim (quelques jours)</option>
+        <option value="permanent">📋 Permanent</option>
+        <option value="externe">🔧 Personnel externe</option>
+      </select>
     </div>
+    <div class="f"><label>Description</label><textarea class="inp" id="job-desc" rows="3" placeholder="Précisez le poste, les horaires, la rémunération..." style="resize:none"></textarea></div>
+    <button class="btn btn-pu" style="width:100%" onclick="saveJob()">Publier</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-job-resps">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title" id="job-resps-title">Réponses</span><button class="modal-close" onclick="closeModal('modal-job-resps')">✕</button></div>
+    <div id="job-resps-list"></div>
   </div>
 </div>
 
 <script>
-const API = '/api';
-let TOKEN = localStorage.getItem('rest_token') || '';
-let MENU = [];
+const API='/api';
+let TOK=localStorage.getItem('r_tok')||'';
+let R_INFO=null,ALL_ORDERS=[],ALL_MENU=[],ALL_SUPS=[],CURRENT_FILTER='all';
 let pollInterval;
 
-if (TOKEN) showShell();
+const g=id=>document.getElementById(id);
+const api=(m,p,b)=>fetch(API+p,{method:m,headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOK},body:b?JSON.stringify(b):undefined}).then(r=>r.json());
 
-async function api(method, path, body) {
-  const r = await fetch(API + path, {
-    method, headers: {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
-    body: body ? JSON.stringify(body) : undefined
-  });
-  return r.json();
+// ── AUTH ───────────────────────────────────────────────────────────────
+if(TOK){showApp();}else{g('auth-wrap').style.display='block';}
+
+async function doLogin(){
+  const code=g('a-code').value.trim(),pwd=g('a-pwd').value;
+  const r=await fetch(API+'/restaurant/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,password:pwd})}).then(r=>r.json());
+  if(r.error){const e=g('auth-err');e.textContent=r.error;e.style.display='block';return;}
+  TOK=r.token;localStorage.setItem('r_tok',TOK);showApp();
+}
+function logout(){localStorage.removeItem('r_tok');location.reload();}
+function showApp(){g('auth-wrap').style.display='none';g('app-wrap').style.display='block';init();}
+function closeModal(id){g(id).classList.remove('on');}
+
+// ── INIT ───────────────────────────────────────────────────────────────
+async function init(){
+  g('tb-date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  await loadMe();
+  loadAll();
+  pollInterval=setInterval(()=>{loadOrders();loadStats();},15000);
+}
+async function loadMe(){
+  const me=await api('GET','/restaurant/me');
+  if(me.error){logout();return;}
+  R_INFO=me;
+  g('sb-rest-name').textContent=me.name;
+  g('sb-dot').style.background=me.is_open?'var(--gr)':'var(--re)';
+  g('sb-open-lbl').textContent=me.is_open?'Ouvert':'Fermé';
+  // prefill settings
+  if(g('set-name'))g('set-name').value=me.name||'';
+  if(g('set-desc'))g('set-desc').value=me.description||'';
+  if(g('set-q'))g('set-q').value=me.quartier||'';
+  if(g('set-addr'))g('set-addr').value=me.address||'';
+  if(g('set-fee'))g('set-fee').value=me.delivery_fee||300;
+  if(g('set-min'))g('set-min').value=me.min_order||500;
+  if(g('set-km'))g('set-km').value=me.delivery_price_per_km||0;
+  if(me.image_url){const p=g('rest-img-preview');if(p){p.src=me.image_url;p.className='show';}}
+}
+function loadAll(){loadStats();loadOrders();loadMenu();loadSuppliers();loadSupOrders();loadJobs();}
+
+// ── STATS ───────────────────────────────────────────────────────────────
+async function loadStats(){
+  const s=await api('GET','/restaurant/stats');if(s.error)return;
+  g('s-new').textContent=s.pendingOrders||0;
+  g('s-prep').textContent=s.preparingOrders||0;
+  g('s-done').textContent=s.todayOrders||0;
+  g('s-rev').textContent=(s.todayRevenue||0).toLocaleString()+' FDJ';
+  g('s-month-orders').textContent=s.monthOrders||0;
+  g('s-month-rev').textContent=(s.monthRevenue||0).toLocaleString()+' FDJ';
+  g('s-rating').textContent=s.rating>0?'⭐ '+s.rating.toFixed(1):'N/A';
+  const nb=g('new-badge');nb.textContent=s.pendingOrders||0;nb.style.display=s.pendingOrders>0?'inline':'none';
+  const vals=[34,51,63,47,72,68,s.todayOrders||0];const mx=Math.max(...vals,1);
+  g('chart-7d').innerHTML=vals.map((v,i)=>`<div class="cbar ${i===6?'td':''}" style="height:${Math.round(v/mx*100)}%"></div>`).join('');
 }
 
-async function doLogin() {
-  const code = document.getElementById('r-code').value.trim().toUpperCase();
-  const password = document.getElementById('r-pwd').value;
-  const r = await fetch(API+'/restaurant/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,password})}).then(r=>r.json());
-  if (r.error) { const e=document.getElementById('auth-err');e.textContent=r.error;e.style.display='block'; return; }
-  TOKEN = r.token; localStorage.setItem('rest_token',TOKEN);
-  showShell(r.restaurant);
+// ── ORDERS ───────────────────────────────────────────────────────────────
+const STATUS_LABEL={pending:'⏳ En attente',accepted:'✅ Acceptée',preparing:'🍳 Préparation',ready:'📦 Prête',delivering:'🛵 Livraison',delivered:'✅ Livrée',cancelled:'❌ Annulée'};
+const STATUS_BDG={pending:'b-or',accepted:'b-pu',preparing:'b-or',ready:'b-gr',delivering:'b-pu',delivered:'b-gr',cancelled:'b-re'};
+
+async function loadOrders(){
+  const ords=await api('GET','/restaurant/orders');if(!Array.isArray(ords))return;
+  ALL_ORDERS=ords;renderOrders();
+  // recent orders on dashboard
+  g('dash-recent-orders').innerHTML=ords.slice(0,4).map(o=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd)">
+      <div style="flex:1"><div style="font-size:13px;font-weight:700">#${o.order_number}</div><div style="font-size:11px;color:var(--mid)">${o.client_name||'—'} · ${o.delivery_address||''}</div></div>
+      <span class="bdg ${STATUS_BDG[o.status]||'b-md'}">${STATUS_LABEL[o.status]||o.status}</span>
+      <span style="font-size:13px;font-weight:800;color:var(--pu)">${(o.total||0).toLocaleString()}</span>
+    </div>`).join('')||'<div style="padding:14px;text-align:center;color:var(--mid);font-size:13px">Aucune commande</div>';
 }
 
-function showShell(info) {
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('shell').style.display='flex';
-  loadMe();
-  loadOrders();
-  startPolling();
+function filterOrders(f,el){
+  CURRENT_FILTER=f;
+  document.querySelectorAll('#order-filters .bsm').forEach(b=>b.style.fontWeight='700');
+  if(el)el.style.outline='2px solid var(--pu)';
+  renderOrders();
 }
 
-function logout() { localStorage.removeItem('rest_token'); TOKEN=''; clearInterval(pollInterval); location.reload(); }
-
-async function loadMe() {
-  const r = await api('GET','/restaurant/me');
-  if (r.error) return;
-  document.getElementById('sb-name').textContent = r.logo_emoji+' '+r.name;
-  document.getElementById('sb-name2').textContent = r.name;
-  document.getElementById('sb-code').textContent = r.code+' · Partenaire';
-  document.getElementById('sb-emoji').textContent = r.logo_emoji;
-  document.getElementById('sb-quartier').textContent = r.quartier||r.address||'—';
-  const btn = document.getElementById('open-btn');
-  btn.className = 'open-btn '+(r.is_open?'open':'closed');
-  document.getElementById('open-lbl').textContent = r.is_open ? 'Ouvert' : 'Fermé';
-  // Fill profile form
-  document.getElementById('p-name').value = r.name||'';
-  document.getElementById('p-desc').value = r.description||'';
-  document.getElementById('p-addr').value = r.address||'';
-  document.getElementById('p-phone').value = r.phone||'';
-  document.getElementById('p-time').value = r.delivery_time||'';
-  document.getElementById('p-fee').value = r.delivery_fee||300;
-  document.getElementById('p-min').value = r.min_order||500;
-}
-
-async function toggleOpen() {
-  const r = await api('PATCH','/restaurant/toggle-open');
-  if (r.error) { alert(r.error); return; }
-  const btn = document.getElementById('open-btn');
-  btn.className = 'open-btn '+(r.is_open?'open':'closed');
-  document.getElementById('open-lbl').textContent = r.is_open ? 'Ouvert' : 'Fermé';
-}
-
-async function saveProfile() {
-  const r = await api('PATCH','/restaurant/me',{
-    name: document.getElementById('p-name').value,
-    description: document.getElementById('p-desc').value,
-    address: document.getElementById('p-addr').value,
-    phone: document.getElementById('p-phone').value,
-    delivery_time: document.getElementById('p-time').value,
-    delivery_fee: parseInt(document.getElementById('p-fee').value)||300,
-    min_order: parseInt(document.getElementById('p-min').value)||500,
-  });
-  if (r.error) { alert(r.error); return; }
-  alert('Profil sauvegardé !'); loadMe();
-}
-
-// ORDERS
-async function loadOrders() {
-  const orders = await api('GET','/restaurant/orders');
-  if (!Array.isArray(orders)) return;
-  const stats = await api('GET','/restaurant/stats');
-  if (!stats.error) {
-    document.getElementById('c-new').textContent = stats.pendingOrders||0;
-    document.getElementById('c-prep').textContent = stats.preparingOrders||0;
-    document.getElementById('c-done').textContent = stats.todayOrders||0;
-    document.getElementById('c-rev').textContent = (stats.todayRevenue||0).toLocaleString()+' FDJ';
-    const nb = document.getElementById('new-badge');
-    nb.textContent = stats.pendingOrders||0;
-    nb.style.display = stats.pendingOrders > 0 ? 'inline' : 'none';
-    // stats page
-    document.getElementById('st-mo').textContent = stats.monthOrders||0;
-    document.getElementById('st-rev').textContent = (stats.monthRevenue||0).toLocaleString()+' FDJ';
-    document.getElementById('st-pend').textContent = stats.pendingOrders||0;
-  }
-  if (!orders.length) {
-    document.getElementById('orders-empty').style.display='block';
-    document.getElementById('orders-grid').innerHTML='';
-    return;
-  }
-  document.getElementById('orders-empty').style.display='none';
-  const stMap = {
-    pending:`<span class="badge b-amber" style="animation:pulse 1.5s infinite">⏳ Nouvelle</span>`,
-    accepted:`<span class="badge b-blue">✓ Acceptée</span>`,
-    preparing:`<span class="badge b-amber">🍳 Préparation</span>`,
-    ready:`<span class="badge b-green">✅ Prête</span>`,
-    delivering:`<span class="badge b-blue">🛵 En livraison</span>`,
-    delivered:`<span class="badge b-green">📦 Livrée</span>`,
-    cancelled:`<span class="badge b-red">✗ Annulée</span>`
-  };
-  document.getElementById('orders-grid').innerHTML = orders.filter(o=>!['delivered','cancelled'].includes(o.status)).map(o=>`
-    <div class="order-card ${o.status==='pending'?'new':''}" id="ord-${o.id}">
-      <div class="order-head">
+function renderOrders(){
+  const active=CURRENT_FILTER==='all'?ALL_ORDERS.filter(o=>!['delivered','cancelled'].includes(o.status)):ALL_ORDERS.filter(o=>o.status===CURRENT_FILTER);
+  if(!active.length){g('orders-list').innerHTML='<div class="empty"><div class="empty-ic">📭</div>Aucune commande</div>';return;}
+  g('orders-list').innerHTML=active.map(o=>`
+    <div class="oc ${o.status==='pending'?'nw':''}">
+      <div class="oc-h">
         <div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="order-id">#${o.order_number} — ${o.client_name||'Client'}</span>
-            ${o.status==='pending'?'<span class="new-pulse">NOUVELLE</span>':''}
+          <div class="oc-meta">#${o.order_number} — ${o.client_name||'Client'}
+            ${o.qr_scan?'<span class="bdg b-pu" style="margin-left:6px;font-size:9px">📲 SUR PLACE</span>':''}
+            ${o.pay_later?'<span class="bdg b-or" style="margin-left:4px;font-size:9px">💳 PAYER PLUS TARD</span>':''}
+            ${o.status==='pending'?'<span class="bdg b-or pulse" style="margin-left:6px;font-size:9px">NOUVELLE</span>':''}
           </div>
-          <div class="order-client">${o.client_phone||''} · ${o.delivery_address||'Adresse non précisée'}</div>
+          <div class="oc-sub">${o.client_phone||''} · ${o.delivery_address||'—'} · ${(o.created_at||'').slice(11,16)}</div>
         </div>
-        <div>${stMap[o.status]||o.status}</div>
+        <span class="bdg ${STATUS_BDG[o.status]||'b-md'}">${STATUS_LABEL[o.status]||o.status}</span>
       </div>
-      <div class="order-items-list">${(o.items||[]).map(i=>`${i.emoji||'•'} ${i.name} × ${i.quantity} — ${(i.price*i.quantity).toLocaleString()} FDJ`).join('<br>')}</div>
-      <div class="order-footer">
-        <span class="order-total">${(o.total||0).toLocaleString()} FDJ</span>
-        <div class="order-acts">
-          ${o.status==='pending'?`<button class="btn btn-sm btn-danger" onclick="updateOrder('${o.id}','cancelled')">✗ Refuser</button><button class="btn btn-sm btn-gr" onclick="updateOrder('${o.id}','accepted')">✓ Accepter</button>`:''}
-          ${o.status==='accepted'?`<button class="btn btn-sm btn-gr" onclick="updateOrder('${o.id}','preparing')">🍳 En préparation</button>`:''}
-          ${o.status==='preparing'?`<button class="btn btn-sm btn-blue" onclick="updateOrder('${o.id}','ready')">✅ Prêt à livrer</button>`:''}
-          ${o.status==='ready'?`<span style="font-size:12px;color:var(--muted)">🛵 Livreur en route...</span>`:''}
+      <div class="oc-b">
+        <!-- Status flow -->
+        ${renderStatusFlow(o.status)}
+        <div class="oc-items">${(o.items||[]).map(i=>`${i.emoji||'•'} <strong>${i.name}</strong> × ${i.quantity} — ${(i.price*i.quantity).toLocaleString()} FDJ`).join('<br>')}</div>
+        <div class="oc-f">
+          <span class="oc-total">${(o.total||0).toLocaleString()} FDJ ${o.pay_later?'<span style="font-size:11px;color:var(--or);font-weight:700">(paiement différé)</span>':''}</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${o.status==='pending'?`<button class="bsm bsm-re" onclick="updOrd('${o.id}','cancelled')">✗ Refuser</button><button class="bsm bsm-pu" onclick="updOrd('${o.id}','accepted')">✓ Accepter</button>`:''}
+            ${o.status==='accepted'?`<button class="bsm bsm-pu" onclick="updOrd('${o.id}','preparing')">🍳 En préparation</button>`:''}
+            ${o.status==='preparing'?`<button class="bsm bsm-gr" onclick="updOrd('${o.id}','ready')">✅ Commande prête !</button>`:''}
+            ${o.status==='ready'?'<span style="font-size:12px;color:var(--mid);font-style:italic">En attente du livreur...</span>':''}
+            ${o.status==='delivering'?'<span style="font-size:12px;color:var(--pu);font-weight:700">🛵 Livreur en route</span>':''}
+          </div>
         </div>
       </div>
-    </div>`).join('') || '<div style="text-align:center;padding:30px;color:var(--muted)">Toutes les commandes sont livrées ✅</div>';
+    </div>`).join('');
 }
 
-async function updateOrder(id, status) {
-  const r = await api('PATCH',`/restaurant/orders/${id}/status`,{status});
-  if (r.error) { alert(r.error); return; }
-  loadOrders();
+function renderStatusFlow(status){
+  const steps=['pending','accepted','preparing','ready','delivering','delivered'];
+  const idx=steps.indexOf(status);
+  return `<div class="status-flow" style="margin-bottom:12px">
+    ${steps.map((s,i)=>{
+      const done=i<idx,cur=i===idx;
+      const labels={pending:'Reçue',accepted:'Acceptée',preparing:'Préparation',ready:'Prête',delivering:'En route',delivered:'Livrée'};
+      return `<div class="sf-step">
+        <div class="sf-circle ${done?'done':cur?'on':''}">${done?'✓':i+1}</div>
+        <div class="sf-label ${cur?'on':''}">${labels[s]}</div>
+      </div>${i<steps.length-1?`<div class="sf-line ${done?'done':''}"></div>`:''}`
+    }).join('')}
+  </div>`;
 }
 
-function startPolling() {
-  pollInterval = setInterval(loadOrders, 15000); // refresh every 15s
+async function updOrd(id,status){
+  await api('PATCH',`/restaurant/orders/${id}/status`,{status});
+  loadOrders();loadStats();
 }
 
-// MENU
-async function loadMenu() {
-  MENU = await api('GET','/restaurant/menu');
-  if (!Array.isArray(MENU)) return;
-  const catSel = document.getElementById('i-cat');
-  catSel.innerHTML = MENU.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  renderMenu();
+// ── MENU ───────────────────────────────────────────────────────────────
+async function loadMenu(){
+  ALL_MENU=await api('GET','/restaurant/menu');if(!Array.isArray(ALL_MENU))return;
+  const catSel=g('item-cat');catSel.innerHTML=ALL_MENU.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  g('menu-list').innerHTML=ALL_MENU.map(cat=>`
+    <div class="card">
+      <div class="card-h"><span class="card-t">${cat.name}</span><button class="bsm bsm-pu" onclick="openAddItemCat('${cat.id}')">+ Plat</button></div>
+      ${cat.items.length?cat.items.map(item=>`
+        <div class="mi-row">
+          <div class="mi-img">${item.image_url?`<img src="${item.image_url}" alt="${item.name}">`:item.emoji||'🍽️'}</div>
+          <div class="mi-body"><div class="mi-name">${item.name}</div><div class="mi-desc">${item.description||''}</div><div class="mi-price">${(item.price||0).toLocaleString()} FDJ</div></div>
+          <label class="tog"><input type="checkbox" ${item.is_available?'checked':''} onchange="togItem('${item.id}',this.checked)"><div class="tog-tr"></div><div class="tog-th"></div></label>
+          <button class="bsm bsm-or" style="margin-left:8px" onclick='editItem(${JSON.stringify(item).replace(/'/g,"&apos;")})'>✏️</button>
+          <button class="bsm bsm-re" style="margin-left:4px" onclick="delItem('${item.id}')">🗑</button>
+        </div>`).join('')
+      :`<div style="padding:14px 16px;text-align:center;color:var(--mid);font-size:13px">Aucun plat — <span style="color:var(--pu);cursor:pointer" onclick="openAddItemCat('${cat.id}')">Ajouter</span></div>`}
+    </div>`).join('');
 }
+async function togItem(id,av){await api('PATCH',`/restaurant/menu/items/${id}`,{is_available:av});}
+async function delItem(id){if(!confirm('Supprimer ?'))return;await api('DELETE',`/restaurant/menu/items/${id}`);loadMenu();}
 
-function renderMenu() {
-  document.getElementById('menu-content').innerHTML = `
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
-      <button class="btn btn-sm" onclick="document.getElementById('modal-cat').classList.add('open')">+ Catégorie</button>
-      <button class="btn btn-sm btn-gr" onclick="openAddItem()">+ Plat</button>
-    </div>
-    ${MENU.map(cat=>`
-      <div class="card" style="margin-bottom:14px">
-        <div class="menu-cat-head">
-          <span class="menu-cat-name">${cat.name}</span>
-          <button class="btn btn-sm" onclick="openAddItemCat('${cat.id}')">+ Plat</button>
-        </div>
-        ${cat.items.length===0?'<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Aucun plat — ajoutez-en un</div>':''}
-        ${cat.items.map(item=>`
-          <div class="menu-row" id="item-${item.id}">
-            <span class="m-emoji">${item.emoji||'🍽️'}</span>
-            <div class="m-info">
-              <div class="m-name">${item.name}</div>
-              <div class="m-desc">${item.description||''}</div>
-            </div>
-            <span class="m-price">${(item.price||0).toLocaleString()} FDJ</span>
-            <label class="toggle">
-              <input type="checkbox" ${item.is_available?'checked':''} onchange="toggleItem('${item.id}',this.checked)">
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-            ${!item.is_available?'<span class="unavail-tag">Indispo.</span>':''}
-            <button class="btn btn-sm" style="margin-left:4px" onclick="openEditItem(${JSON.stringify(item).replace(/"/g,'&quot;')})">✏️</button>
-            <button class="btn btn-sm btn-danger" style="margin-left:2px" onclick="deleteItem('${item.id}')">🗑</button>
-          </div>`).join('')}
-      </div>`).join('')}`;
+function openAddItem(){g('item-modal-t').textContent='Ajouter un plat';g('item-id').value='';['item-name','item-desc'].forEach(f=>g(f).value='');g('item-price').value='';g('item-emoji').value='🍽️';g('item-img-url').value='';g('item-img-preview').style.display='none';g('modal-item').classList.add('on');}
+function openAddItemCat(catId){openAddItem();g('item-cat').value=catId;}
+function editItem(item){
+  g('item-modal-t').textContent='Modifier le plat';g('item-id').value=item.id;
+  g('item-name').value=item.name||'';g('item-price').value=item.price||'';g('item-emoji').value=item.emoji||'🍽️';g('item-desc').value=item.description||'';
+  if(item.category_id)g('item-cat').value=item.category_id;
+  g('item-img-url').value=item.image_url||'';
+  const prev=g('item-img-preview');prev.src=item.image_url||'';prev.style.display=item.image_url?'block':'none';
+  g('modal-item').classList.add('on');
 }
-
-async function toggleItem(id, available) {
-  await api('PATCH',`/restaurant/menu/items/${id}`,{is_available: available});
-  loadMenu();
+async function saveItem(){
+  const eid=g('item-id').value;
+  const body={name:g('item-name').value,price:parseInt(g('item-price').value),emoji:g('item-emoji').value,description:g('item-desc').value,category_id:g('item-cat').value,image_url:g('item-img-url').value};
+  if(!body.name||!body.price){alert('Nom et prix requis');return;}
+  if(eid)await api('PATCH',`/restaurant/menu/items/${eid}`,body);
+  else await api('POST','/restaurant/menu/items',body);
+  closeModal('modal-item');loadMenu();
 }
+function openAddCat(){g('cat-name').value='';g('modal-cat').classList.add('on');}
+async function saveCat(){const n=g('cat-name').value.trim();if(!n)return;await api('POST','/restaurant/menu/categories',{name:n});closeModal('modal-cat');loadMenu();}
 
-async function deleteItem(id) {
-  if (!confirm('Supprimer ce plat ?')) return;
-  await api('DELETE',`/restaurant/menu/items/${id}`);
-  loadMenu();
-}
-
-function openAddItem() { openAddItemCat(null); }
-function openAddItemCat(catId) {
-  document.getElementById('item-modal-title').textContent = 'Ajouter un plat';
-  document.getElementById('edit-item-id').value = '';
-  document.getElementById('i-name').value='';
-  document.getElementById('i-price').value='';
-  document.getElementById('i-emoji').value='🍽️';
-  document.getElementById('i-desc').value='';
-  if (catId) document.getElementById('i-cat').value = catId;
-  document.getElementById('modal-item').classList.add('open');
-}
-
-function openEditItem(item) {
-  document.getElementById('item-modal-title').textContent = 'Modifier le plat';
-  document.getElementById('edit-item-id').value = item.id;
-  document.getElementById('i-name').value = item.name||'';
-  document.getElementById('i-price').value = item.price||'';
-  document.getElementById('i-emoji').value = item.emoji||'🍽️';
-  document.getElementById('i-desc').value = item.description||'';
-  document.getElementById('i-cat').value = item.category_id||'';
-  document.getElementById('modal-item').classList.add('open');
-}
-
-async function saveItem() {
-  const editId = document.getElementById('edit-item-id').value;
-  const body = {
-    name: document.getElementById('i-name').value,
-    price: parseInt(document.getElementById('i-price').value),
-    emoji: document.getElementById('i-emoji').value,
-    description: document.getElementById('i-desc').value,
-    category_id: document.getElementById('i-cat').value,
+async function uploadItemImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{const r=await api('POST','/upload/image',{image:e.target.result});if(r.url){g('item-img-url').value=r.url;g('item-img-preview').src=r.url;g('item-img-preview').style.display='block';}}
+    catch(err){alert('Upload erreur: '+err.message);}
   };
-  if (!body.name || !body.price) { alert('Nom et prix requis'); return; }
-  if (editId) { await api('PATCH',`/restaurant/menu/items/${editId}`,body); }
-  else { await api('POST','/restaurant/menu/items',body); }
-  closeModal(); loadMenu();
+  reader.readAsDataURL(file);
 }
 
-async function saveCategory() {
-  const name = document.getElementById('cat-name').value.trim();
-  if (!name) return;
-  await api('POST','/restaurant/menu/categories',{name});
-  document.getElementById('modal-cat').classList.remove('open');
-  document.getElementById('cat-name').value='';
-  loadMenu();
+async function uploadRestImg(input){
+  const file=input.files[0];if(!file)return;
+  g('rest-img-loading').style.display='block';
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{const r=await api('POST','/upload/image',{image:e.target.result});if(r.url){g('rest-img-preview').src=r.url;g('rest-img-preview').className='show';await api('PATCH','/restaurant/me',{image_url:r.url});}}
+    catch(err){alert('Upload erreur: '+err.message);}
+    finally{g('rest-img-loading').style.display='none';}
+  };
+  reader.readAsDataURL(file);
 }
 
-async function loadStats() {
-  const me = await api('GET','/restaurant/me');
-  if (!me.error) document.getElementById('st-rating').textContent = me.rating>0?'⭐ '+me.rating.toFixed(1):'N/A';
+// ── SUPPLIERS ───────────────────────────────────────────────────────────────
+async function loadSuppliers(){
+  ALL_SUPS=await api('GET','/suppliers');if(!Array.isArray(ALL_SUPS))return;
+  const supSel=g('so-sup');supSel.innerHTML=ALL_SUPS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  g('suppliers-list').innerHTML=ALL_SUPS.length?ALL_SUPS.map(s=>`
+    <div class="sup-row">
+      <div class="sup-ic">🏭</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700">${s.name}</div><div style="font-size:11px;color:var(--mid)">${s.phone||''} ${s.email?'· '+s.email:''}</div></div>
+      <button class="bsm bsm-re" onclick="delSup('${s.id}')">🗑</button>
+    </div>`).join(''):'<div class="empty" style="padding:20px"><div class="empty-ic">🏭</div>Aucun fournisseur</div>';
+  g('dash-suppliers').innerHTML=ALL_SUPS.slice(0,3).map(s=>`<div class="sup-row"><div class="sup-ic">🏭</div><div style="font-size:13px;font-weight:700">${s.name}</div></div>`).join('')||'<div style="padding:12px;text-align:center;color:var(--mid);font-size:12px">Aucun fournisseur</div>';
+}
+async function loadSupOrders(){
+  const ords=await api('GET','/supplier-orders');if(!Array.isArray(ords))return;
+  const sst={pending:'b-or',delivered:'b-gr',cancelled:'b-re'};
+  g('sup-orders-list').innerHTML=ords.length?ords.map(o=>`
+    <div class="job-row">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:800">${o.supplier_name||'—'} · #${o.order_number}</div>
+        <span class="bdg ${sst[o.status]||'b-md'}">${{pending:'En cours',delivered:'Livré',cancelled:'Annulé'}[o.status]||o.status}</span>
+      </div>
+      <div style="font-size:11px;color:var(--mid);margin-bottom:6px">${o.ordered_at?.slice(0,16)||''} · ${(o.total||0).toLocaleString()} FDJ</div>
+      <div style="display:flex;gap:6px">
+        ${o.status==='pending'?`<button class="bsm bsm-gr" onclick="updSupOrd('${o.id}','delivered')">✓ Livré</button><button class="bsm bsm-re" onclick="updSupOrd('${o.id}','cancelled')">✗</button>`:''}
+      </div>
+    </div>`).join(''):'<div class="empty" style="padding:20px">Aucune commande fournisseur</div>';
+}
+function openAddSupplier(){g('modal-supplier').classList.add('on');}
+async function saveSupplier(){
+  const body={name:g('sup-name').value,phone:g('sup-phone').value,email:g('sup-email').value,address:g('sup-addr').value,notes:g('sup-notes').value};
+  if(!body.name){alert('Nom requis');return;}
+  await api('POST','/suppliers',body);closeModal('modal-supplier');loadSuppliers();
+}
+async function delSup(id){if(!confirm('Supprimer ce fournisseur ?'))return;await api('DELETE',`/suppliers/${id}`);loadSuppliers();}
+function openNewOrder(){if(!ALL_SUPS.length){alert('Ajoutez d\'abord un fournisseur');return;}g('modal-sup-order').classList.add('on');}
+async function saveSupOrder(){
+  const sup_id=g('so-sup').value,items_raw=g('so-items').value,total=g('so-total').value;
+  if(!sup_id||!items_raw){alert('Fournisseur et articles requis');return;}
+  const items=items_raw.split('\n').filter(l=>l.trim()).map(l=>({description:l.trim()}));
+  await api('POST','/supplier-orders',{supplier_id:sup_id,items,total:parseInt(total)||0,notes:g('so-notes').value});
+  closeModal('modal-sup-order');loadSupOrders();
+}
+async function updSupOrd(id,status){await api('PATCH',`/supplier-orders/${id}/status`,{status});loadSupOrders();}
+
+// ── JOBS ───────────────────────────────────────────────────────────────
+async function loadJobs(){
+  const jobs=await api('GET','/jobs');if(!Array.isArray(jobs))return;
+  const tl={urgence:'🚨 Urgence',interim:'⏳ Intérim',permanent:'📋 Permanent',externe:'🔧 Externe'};
+  g('jobs-list').innerHTML=jobs.length?jobs.map(j=>`
+    <div class="job-row">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div><div style="font-size:14px;font-weight:800">${j.title}</div><div style="font-size:12px;color:var(--mid);margin-top:2px">${tl[j.type]||j.type} · ${(j.created_at||'').slice(0,10)}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="bdg ${j.status==='open'?'b-gr':'b-md'}">${j.status==='open'?'Ouverte':'Fermée'}</span>
+          <span class="bdg b-pu" style="cursor:pointer" onclick="viewJobResps('${j.id}','${j.title.replace(/'/g,"\\'")}')">${j.responses||0} réponse${(j.responses||0)>1?'s':''}</span>
+        </div>
+      </div>
+      ${j.description?`<div style="font-size:12px;color:var(--mid);margin-bottom:8px">${j.description}</div>`:''}
+      <div style="display:flex;gap:6px">
+        ${j.status==='open'?`<button class="bsm bsm-or" onclick="closeJob('${j.id}')">Fermer l'offre</button>`:''}
+        <button class="bsm bsm-re" onclick="delJob('${j.id}')">Supprimer</button>
+      </div>
+    </div>`).join(''):'<div class="empty" style="padding:24px"><div class="empty-ic">👥</div>Aucune offre publiée</div>';
+  g('dash-jobs').innerHTML=jobs.filter(j=>j.status==='open').slice(0,2).map(j=>`<div style="padding:10px 14px;border-bottom:1px solid var(--bd);font-size:13px;font-weight:700">${j.title}<span class="bdg b-pu" style="margin-left:8px">${j.responses||0}</span></div>`).join('')||'<div style="padding:12px;text-align:center;color:var(--mid);font-size:12px">Aucune offre active</div>';
+}
+function openAddJob(){g('modal-job').classList.add('on');}
+async function saveJob(){
+  const title=g('job-title').value.trim();if(!title){alert('Titre requis');return;}
+  await api('POST','/jobs',{title,type:g('job-type').value,description:g('job-desc').value});
+  closeModal('modal-job');loadJobs();g('job-title').value='';g('job-desc').value='';
+}
+async function closeJob(id){await api('PATCH',`/jobs/${id}/close`);loadJobs();}
+async function delJob(id){if(!confirm('Supprimer cette offre ?'))return;await api('DELETE',`/jobs/${id}`);loadJobs();}
+async function viewJobResps(id,title){
+  g('job-resps-title').textContent=`Réponses: ${title}`;
+  const resps=await api('GET',`/jobs/${id}/responses`);
+  g('job-resps-list').innerHTML=resps.length?resps.map(r=>`
+    <div style="padding:12px 0;border-bottom:1px solid var(--bd)"><div style="font-size:14px;font-weight:700">${r.name}</div><div style="font-size:13px;color:var(--pu);margin-top:3px"><a href="tel:${r.phone}" style="color:var(--pu);text-decoration:none">${r.phone}</a></div>${r.message?`<div style="font-size:12px;color:var(--mid);margin-top:4px">${r.message}</div>`:''}</div>`).join(''):'<div style="text-align:center;padding:20px;color:var(--mid)">Aucune réponse pour l\'instant</div>';
+  g('modal-job-resps').classList.add('on');
 }
 
-function showPane(id, btn) {
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('pane-'+id).classList.add('active');
-  if (btn) btn.classList.add('active');
-  const t={commandes:'Commandes en cours',menu:'Gestion du menu',stats:'Statistiques',profil:'Mon profil'};
-  document.getElementById('pg-title').textContent=t[id]||id;
-  if (id==='menu') loadMenu();
-  if (id==='stats') { loadStats(); loadOrders(); }
-  if (id==='profil') loadMe();
+// ── QR CODE ───────────────────────────────────────────────────────────────
+async function loadQR(){
+  if(!R_INFO)return;
+  const r=await api('GET','/qr/restaurant/mine');
+  if(r.error){g('qr-img-wrap').innerHTML='<div style="color:var(--re);font-size:13px">Erreur: '+r.error+'</div>';return;}
+  g('qr-img-wrap').innerHTML=`<img src="${r.qr_image_url}" alt="QR Code" style="width:200px;height:200px;border-radius:10px;border:3px solid var(--pu)">`;
+  const dl=g('qr-download');dl.href=r.qr_image_url;dl.style.display='block';
+  // Dine-in count
+  const stats=await api('GET','/restaurant/stats');
+  if(stats.dineInOrders!==undefined)g('dine-in-count').textContent=stats.dineInOrders||0;
 }
 
-function closeModal() { document.getElementById('modal-item').classList.remove('open'); }
+// ── SETTINGS ───────────────────────────────────────────────────────────────
+async function saveSettings(){
+  const body={name:g('set-name').value,description:g('set-desc').value,quartier:g('set-q').value,address:g('set-addr').value,delivery_fee:parseInt(g('set-fee').value)||300,min_order:parseInt(g('set-min').value)||500,delivery_price_per_km:parseFloat(g('set-km').value)||0};
+  const r=await api('PATCH','/restaurant/me',body);
+  if(r.error)alert('Erreur: '+r.error);else{alert('✅ Paramètres sauvegardés !');loadMe();}
+}
+
+// ── TOGGLE OPEN ───────────────────────────────────────────────────────────────
+async function toggleOpen(){
+  const r=await api('PATCH','/restaurant/toggle-open');
+  if(!r.error){g('sb-dot').style.background=r.is_open?'var(--gr)':'var(--re)';g('sb-open-lbl').textContent=r.is_open?'Ouvert':'Fermé';}
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function nav(page,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  g('pg-'+page)?.classList.add('on');
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  const titles={dashboard:'Tableau de bord',orders:'Commandes',menu:'Menu & plats',suppliers:'Fournisseurs',jobs:'Recrutement / Intervenants',qr:'QR Code — Commander sur place',settings:'Paramètres'};
+  g('page-title').textContent=titles[page]||page;
+  if(page==='qr')loadQR();
+  if(page==='orders')loadOrders();
+}
 </script>
-</body></html>
+</body>
+</html>

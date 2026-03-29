@@ -31,6 +31,8 @@ require('./routes/public')(router);
 require('./routes/universal')(router);
 require('./routes/upload')(router);
 require('./routes/gps')(router);
+require('./routes/suppliers')(router);
+require('./routes/qr')(router);
 
 function matchRoute(method, pathname) {
   const table = routes[method] || {};
@@ -117,6 +119,15 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ── PWA FILES ──
+  if (pathname === '/manifest.json') {
+    const mf = path.join(PUBLIC_DIR, 'manifest.json');
+    if (serveStatic(res, mf)) return;
+  }
+  if (pathname === '/sw.js') {
+    const sw = path.join(PUBLIC_DIR, 'sw.js');
+    if (serveStatic(res, sw)) return;
+  }
   // ── ROOT PAGE ──
   if (pathname === '' || pathname === '/') {
     const htmlExists = (p) => fs.existsSync(path.join(PUBLIC_DIR, p, 'index.html'));
