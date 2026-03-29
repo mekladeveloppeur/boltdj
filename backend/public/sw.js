@@ -1,36 +1,19 @@
-const CACHE = 'boltdj-v2';
-const STATIC = ['/', '/client', '/restaurant', '/livreur', '/admin', '/manifest.json'];
+const CACHE='boltdj-v3';
+const PRECACHE=['/client','/manifest.json'];
 
-self.addEventListener('install', e => {
+self.addEventListener('install',e=>{
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE).then(c => 
-      Promise.allSettled(STATIC.map(url => c.add(url).catch(() => {})))
-    )
-  );
+  e.waitUntil(caches.open(CACHE).then(c=>Promise.allSettled(PRECACHE.map(u=>c.add(u).catch(()=>{})))));
 });
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => 
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
 });
-
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  if (e.request.url.includes('/api/')) return; // Never cache API
-  
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET'||e.request.url.includes('/api/'))return;
   e.respondWith(
-    fetch(e.request)
-      .then(resp => {
-        if (resp.ok) {
-          const clone = resp.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return resp;
-      })
-      .catch(() => caches.match(e.request).then(r => r || caches.match('/client')))
+    fetch(e.request).then(r=>{
+      if(r.ok){const cl=r.clone();caches.open(CACHE).then(c=>c.put(e.request,cl));}
+      return r;
+    }).catch(()=>caches.match(e.request).then(r=>r||caches.match('/client')))
   );
 });
