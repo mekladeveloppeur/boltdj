@@ -10,8 +10,14 @@ router.post('/admin/login', (req, res) => {
   const admin = db.prepare('SELECT * FROM admins WHERE email=?').get(email);
   if (!admin || !verifyPassword(password, admin.password_hash))
     return res.status(401).json({ error: 'Identifiants incorrects' });
-  const token = signToken({ id: admin.id, role: 'admin', name: admin.name });
+  const token = signToken({ id: admin.id, role: 'admin', name: admin.name }, 2592000);
   res.json({ token, admin: { id: admin.id, email: admin.email, name: admin.name } });
+});
+
+router.get('/admin/me', auth(['admin']), (req, res) => {
+  const admin = db.prepare('SELECT id, name, email FROM admins WHERE id=?').get(req.user.id);
+  if (!admin) return res.status(404).json({ error: 'Admin introuvable' });
+  res.json(admin);
 });
 
 router.get('/admin/stats', auth(['admin']), (req, res) => {

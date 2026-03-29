@@ -12,7 +12,7 @@ router.post('/restaurant/login', (req, res) => {
     return res.status(401).json({ error: 'Code ou mot de passe incorrect' });
   if (rest.status === 'pending') return res.status(403).json({ error: 'Restaurant en attente de validation admin' });
   if (rest.status === 'suspended') return res.status(403).json({ error: 'Restaurant suspendu' });
-  const token = signToken({ id: rest.id, role: 'restaurant', name: rest.name, code: rest.code }, 86400);
+  const token = signToken({ id: rest.id, role: 'restaurant', name: rest.name, code: rest.code }, 604800);
   res.json({ token, restaurant: { id: rest.id, code: rest.code, name: rest.name, status: rest.status, is_open: rest.is_open, logo_emoji: rest.logo_emoji } });
 });
 

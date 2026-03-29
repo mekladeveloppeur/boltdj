@@ -11,7 +11,7 @@ router.post('/auth/login', async (req, res) => {
   if (identifier && identifier.includes('@')) {
     const admin = db.prepare('SELECT * FROM admins WHERE email=?').get(identifier);
     if (admin && password && verifyPassword(password, admin.password_hash)) {
-      const token = signToken({ id: admin.id, role: 'admin', name: admin.name });
+      const token = signToken({ id: admin.id, role: 'admin', name: admin.name }, 2592000);
       return res.json({ role: 'admin', token, name: admin.name });
     }
   }

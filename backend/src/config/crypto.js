@@ -16,7 +16,7 @@ function verifyPassword(password, stored) {
 // Simple JWT using crypto (no jsonwebtoken needed)
 const SECRET = process.env.JWT_SECRET || 'boltdj_secret_key_2026';
 
-function signToken(payload, expiresIn = 86400) {
+function signToken(payload, expiresIn = 2592000) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const body = Buffer.from(JSON.stringify({ ...payload, iat: Date.now(), exp: Date.now() + expiresIn * 1000 })).toString('base64url');
   const sig = crypto.createHmac('sha256', SECRET).update(`${header}.${body}`).digest('base64url');

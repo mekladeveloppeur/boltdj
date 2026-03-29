@@ -73,11 +73,10 @@ router.patch('/supplier-orders/:id/status', auth(['restaurant']), (req, res) => 
 
 // GET /api/jobs — offres du restaurant
 router.get('/jobs', auth(['restaurant', 'admin']), (req, res) => {
-  const rest_id = req.user.role === 'admin' ? req.query.restaurant_id : req.user.id;
-  const where = rest_id ? 'WHERE restaurant_id=?' : '';
+  const rest_id = req.user.role === 'admin' ? (req.query.restaurant_id || null) : req.user.id;
   const jobs = rest_id
-    ? db.prepare(`SELECT * FROM job_posts ${where} ORDER BY created_at DESC`).all(rest_id)
-    : db.prepare(`SELECT j.*, r.name as restaurant_name FROM job_posts j LEFT JOIN restaurants r ON j.restaurant_id=r.id ORDER BY j.created_at DESC`).all();
+    ? db.prepare('SELECT j.*, r.name as restaurant_name FROM job_posts j LEFT JOIN restaurants r ON j.restaurant_id=r.id WHERE j.restaurant_id=? ORDER BY j.created_at DESC').all(rest_id)
+    : db.prepare('SELECT j.*, r.name as restaurant_name FROM job_posts j LEFT JOIN restaurants r ON j.restaurant_id=r.id ORDER BY j.created_at DESC').all();
   res.json(jobs);
 });
 
