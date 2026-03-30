@@ -13,7 +13,11 @@ if (fs.existsSync(envPath)) {
 }
 
 // Auto-seed database on first launch
-require('./config/auto-seed')();
+try {
+  require('./config/auto-seed')()
+} catch (e) {
+  console.log('Auto-seed disabled:', e.message)
+}
 
 // ── Router ────────────────────────────────────────────────────────────────────
 const routes = { GET:{}, POST:{}, PATCH:{}, DELETE:{} };
