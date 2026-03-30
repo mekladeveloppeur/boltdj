@@ -2,6 +2,9 @@
   "name": "boltdj-monorepo",
   "version": "1.0.0",
   "private": true,
+  "dependencies": {
+    "sqlite3": "^5.1.6"
+  },
   "scripts": {
     "install:all": "npm install && cd backend && npm install",
     "dev": "cd backend && npm run dev",
