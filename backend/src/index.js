@@ -13,31 +13,26 @@ if (fs.existsSync(envPath)) {
 }
 
 // Auto-seed database on first launch
-try {
-  require('./config/auto-seed')()
-} catch (e) {
-  console.log('Auto-seed disabled:', e.message)
-}
+require('./config/auto-seed')();
 
-function safeRoute(file) {
-  try {
-    require(file)(router);
-    console.log('✅ Loaded:', file);
-  } catch (e) {
-    console.log('❌ Skipped:', file, '-', e.message);
-  }
-}
+// ── Router ────────────────────────────────────────────────────────────────────
+const routes = { GET:{}, POST:{}, PATCH:{}, DELETE:{} };
+function router(method, pattern, ...handlers) { routes[method][pattern] = handlers; }
+router.get  = (p,...h) => router('GET',p,...h);
+router.post = (p,...h) => router('POST',p,...h);
+router.patch= (p,...h) => router('PATCH',p,...h);
+router.delete=(p,...h) => router('DELETE',p,...h);
 
-safeRoute('./routes/admin');
-safeRoute('./routes/restaurant');
-safeRoute('./routes/client');
-safeRoute('./routes/livreur');
-safeRoute('./routes/public');
-safeRoute('./routes/universal');
-safeRoute('./routes/upload');
-safeRoute('./routes/gps');
-safeRoute('./routes/suppliers');
-safeRoute('./routes/qr');
+require('./routes/admin')(router);
+require('./routes/restaurant')(router);
+require('./routes/client')(router);
+require('./routes/livreur')(router);
+require('./routes/public')(router);
+require('./routes/universal')(router);
+require('./routes/upload')(router);
+require('./routes/gps')(router);
+require('./routes/suppliers')(router);
+require('./routes/qr')(router);
 
 function matchRoute(method, pathname) {
   const table = routes[method] || {};
