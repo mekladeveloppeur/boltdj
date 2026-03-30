@@ -5,6 +5,7 @@
   "scripts": {
     "install:all": "npm install && cd backend && npm install",
     "dev": "cd backend && npm run dev",
-    "setup:db": "cd backend && node src/config/seed.js"
+    "setup:db": "cd backend && node src/config/seed.js",
+    "start": "cd backend && node src/index.js"
   }
 }
